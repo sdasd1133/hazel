@@ -2,14 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ProductCard from "@/components/ui/product-card";
-import { getFeaturedProducts } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/lib/authStore";
 import { ArrowRight } from "lucide-react";
 
 export default function Home() {
-  const featuredProducts = getFeaturedProducts();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
 
@@ -42,95 +39,6 @@ export default function Home() {
                 로그인하고 쇼핑하기 <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* 카테고리 소개 */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">트렌드 카테고리</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">최신 트렌드의 다양한 카테고리 제품을 만나보세요</p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Link href={isAuthenticated ? "/products?category=티셔츠" : "/login"} className="group">
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden card-hover">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
-                <div className="absolute inset-0 bg-[url('/category-tshirt.jpg')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
-                  <h3 className="text-white font-semibold text-xl mb-1">티셔츠</h3>
-                  <div className="flex items-center text-white/70">
-                    <span className="text-sm">자세히 보기</span>
-                    <ArrowRight size={14} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link href={isAuthenticated ? "/products?category=맨투맨/후드" : "/login"} className="group">
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden card-hover">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
-                <div className="absolute inset-0 bg-[url('/category-hoodie.jpg')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
-                  <h3 className="text-white font-semibold text-xl mb-1">맨투맨/후드</h3>
-                  <div className="flex items-center text-white/70">
-                    <span className="text-sm">자세히 보기</span>
-                    <ArrowRight size={14} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link href={isAuthenticated ? "/products?category=니트/스웨터" : "/login"} className="group">
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden card-hover">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
-                <div className="absolute inset-0 bg-[url('/category-knit.jpg')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
-                  <h3 className="text-white font-semibold text-xl mb-1">니트/스웨터</h3>
-                  <div className="flex items-center text-white/70">
-                    <span className="text-sm">자세히 보기</span>
-                    <ArrowRight size={14} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-            <Link href={isAuthenticated ? "/products?category=팬츠" : "/login"} className="group">
-              <div className="relative aspect-[4/5] rounded-2xl overflow-hidden card-hover">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent z-10"></div>
-                <div className="absolute inset-0 bg-[url('/category-pants.jpg')] bg-cover bg-center group-hover:scale-110 transition-transform duration-700"></div>
-                <div className="absolute inset-0 flex flex-col justify-end p-6 z-20">
-                  <h3 className="text-white font-semibold text-xl mb-1">팬츠</h3>
-                  <div className="flex items-center text-white/70">
-                    <span className="text-sm">자세히 보기</span>
-                    <ArrowRight size={14} className="ml-1 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 추천 상품 */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">베스트 아이템</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">많은 고객님들이 선택한 베스트 상품</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Link href={isAuthenticated ? "/products" : "/login"}>
-              <Button variant="outline" size="lg" rounded className="group">
-                {isAuthenticated ? "전체 상품 보기" : "로그인하고 상품 보기"}
-                <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>

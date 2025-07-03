@@ -11,11 +11,6 @@ export const parentCategories: ParentCategory[] = [
     id: "accessories",
     name: "악세사리",
     description: "패션 악세사리 제품"
-  },
-  {
-    id: "best",
-    name: "베스트 추천",
-    description: "가장 인기있는 제품"
   }
 ];
 
@@ -204,10 +199,6 @@ export const getParentCategories = () => {
 
 // 상위 카테고리에 해당하는 모든 상품 가져오기
 export const getProductsByParentCategory = (parentId: string) => {
-  if (parentId === "best") {
-    return getFeaturedProducts();
-  }
-  
   const categoriesInParent = getCategoriesByParent(parentId).map(cat => cat.name);
   return products.filter(product => categoriesInParent.includes(product.category));
 };
