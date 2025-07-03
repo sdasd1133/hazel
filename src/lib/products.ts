@@ -9,8 +9,8 @@ export const parentCategories: ParentCategory[] = [
   },
   {
     id: "accessories",
-    name: "악세사리",
-    description: "패션 악세사리 제품"
+    name: "아이템",
+    description: "다양한 패션 아이템"
   }
 ];
 
@@ -19,6 +19,7 @@ export const categoryToParentMapping: Record<string, string> = {
   "남성의류": "clothing",
   "여성의류": "clothing",
   "스포츠의류": "clothing",
+  "악세사리": "accessories",
   "모자": "accessories",
   "가방": "accessories",
   "신발": "accessories",
@@ -157,6 +158,19 @@ export const products: Product[] = [
     images: ["/images/products/belt-1-1.jpg", "/images/products/belt-1-2.jpg"],
     sizes: ["S", "M", "L"],
     colors: ["블랙", "다크브라운", "탄"],
+    inStock: true,
+  },
+  // 아이템 - 악세사리
+  {
+    id: "12",
+    name: "실버 목걸이 세트",
+    price: 42000,
+    category: "악세사리",
+    description: "세련된 디자인의 실버 목걸이 세트입니다. 다양한 스타일링에 활용하기 좋은 베이직한 디자인입니다.",
+    images: ["/images/products/accessory-1-1.jpg", "/images/products/accessory-1-2.jpg"],
+    sizes: ["Free"],
+    colors: ["실버"],
+    isFeatured: true,
     inStock: true,
   },
 ];
