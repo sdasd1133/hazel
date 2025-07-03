@@ -41,7 +41,7 @@ const Footer = () => {
         </div>
         
         {/* 메인 푸터 콘텐츠 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* 회사 소개 */}
           <div>
             <h3 className="text-xl font-bold text-gradient mb-6">HAZEL</h3>
@@ -62,60 +62,6 @@ const Footer = () => {
                 <Youtube size={16} />
               </Link>
             </div>
-          </div>
-
-          {/* 퀵 링크 */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">쇼핑</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/products?parent=clothing" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 의류
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?parent=accessories" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 악세사리
-                </Link>
-              </li>
-              <li>
-                <Link href="/products?parent=best" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 베스트 추천
-                </Link>
-              </li>
-              <li>
-                <Link href="/products" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 전체 상품
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* 고객 서비스 */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">고객 서비스</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/about" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 회사소개
-                </Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 개인정보처리방침
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 이용약관
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-white/70 hover:text-primary transition-colors flex items-center">
-                  <ArrowRight size={14} className="mr-2" /> 자주 묻는 질문
-                </Link>
-              </li>
-            </ul>
           </div>
 
           {/* 연락처 */}
