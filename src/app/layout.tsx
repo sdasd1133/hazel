@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HAZEL - 트렌디한 의류 쇼핑몰",
+  title: "GL GOOD LUCK FASION - 트렌디한 의류 쇼핑몰",
   description: "최신 트렌드의 의류와 패션 아이템을 만나보세요",
 };
 
