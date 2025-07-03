@@ -3,6 +3,8 @@ module.exports = {
   ignorePatterns: [".next/**"],
   rules: {
     "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/ban-ts-comment": "warn",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/ban-types": "warn",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 };
