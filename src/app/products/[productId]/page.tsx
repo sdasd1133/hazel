@@ -3,10 +3,12 @@ import { getProductById } from "@/lib/products";
 import { Metadata } from "next";
 import ProductClientPage from "./client-page";
 
-interface ProductPageProps {
+// Next.js 15에서 타입 정의 수정
+type ProductPageProps = {
   params: {
     productId: string;
   };
+  searchParams: Record<string, string | string[] | undefined>;
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {

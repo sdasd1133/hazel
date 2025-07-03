@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "export", // 정적 HTML 내보내기 활성화
+  // Netlify Next.js 플러그인은 정적 내보내기 대신 SSR을 지원합니다
   images: {
-    unoptimized: true, // 네트리파이에서 이미지 최적화를 위해
+    domains: ['ctbdaguwxibcvlxohdqv.supabase.co'], // Supabase 도메인 추가
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   trailingSlash: true, // 슬래시로 끝나는 URL 처리
 };

@@ -1,28 +1,27 @@
-# 기본 빌드 명령어
+# 빌드 설정
 [build]
   command = "npm run build"
   publish = ".next"
 
-# SPA 모드를 위한 리다이렉트
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  
-# 기본 Next.js 리다이렉트 처리
+# Netlify Next.js 플러그인 사용
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Next.js 정적 파일을 위한 리다이렉트
 [[redirects]]
   from = "/_next/static/*"
   to = "/static/:splat"
   status = 200
 
-# API 리다이렉트
+# API 경로를 위한 리다이렉트
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/nextjs-api/:splat"
   status = 200
 
-# 모든 페이지가 index.html을 통해 처리되도록 설정
+# SPA 폴백 - 클라이언트 사이드 라우팅을 위함
 [[redirects]]
   from = "/*"
-  to = "/404"
-  status = 404
+  to = "/.netlify/functions/nextjs-server"
+  status = 200
+  force = false
