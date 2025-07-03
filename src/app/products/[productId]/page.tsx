@@ -3,15 +3,9 @@ import { getProductById } from "@/lib/products";
 import { Metadata } from "next";
 import ProductClientPage from "./client-page";
 
-// Next.js 15에서 타입 정의 수정
-type ProductPageProps = {
-  params: {
-    productId: string;
-  };
-  searchParams: Record<string, string | string[] | undefined>;
-}
+// Next.js 15에서는 인라인 타입 정의 사용
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { productId: string } }): Promise<Metadata> {
   const product = getProductById(params.productId);
   
   if (!product) {
@@ -26,6 +20,6 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   };
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage({ params }: { params: { productId: string } }) {
   return <ProductClientPage productId={params.productId} />;
 }
