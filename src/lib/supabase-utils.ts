@@ -1,15 +1,8 @@
 import { supabase } from './supabase';
 import {
   Product,
-  SupabaseProduct,
-  SupabaseProductImage,
-  SupabaseProductSize,
-  SupabaseProductColor,
   Category,
-  SupabaseCategory,
   ParentCategory,
-  SupabaseParentCategory,
-  SupabaseUser,
   User
 } from '@/types/supabase';
 

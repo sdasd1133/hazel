@@ -47,7 +47,7 @@ const insertCategories = async () => {
 const insertProducts = async () => {
   for (const product of products) {
     // 제품 기본 정보 삽입
-    const { data: productData, error: productError } = await supabase
+    const { error: productError } = await supabase
       .from('products')
       .upsert({
         id: product.id,

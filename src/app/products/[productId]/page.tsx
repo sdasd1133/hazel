@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+// notFound는 ProductClientPage에서 사용됨
 import { getProductById } from "@/lib/products";
 import { Metadata } from "next";
 import ProductClientPage from "./client-page";

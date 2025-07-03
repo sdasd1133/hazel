@@ -15,7 +15,7 @@ const Header = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  // 호버 효과는 CSS group-hover로 처리됨
   const headerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -66,8 +66,6 @@ const Header = () => {
               <div 
                 key={category.id} 
                 className="relative group"
-                onMouseEnter={() => setHoveredCategory(category.id)}
-                onMouseLeave={() => setHoveredCategory(null)}
               >
                 <Link
                   href={isAuthenticated ? `/products?parent=${category.id}` : `/login?redirectTo=${encodeURIComponent(`/products?parent=${category.id}`)}`}

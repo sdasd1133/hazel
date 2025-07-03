@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AuthState, User } from '@/types/supabase';
-import { supabase } from './supabase';
+import { AuthState } from '@/types/supabase';
+
 import { getSupabaseUser, createSupabaseUser } from './supabase-utils';
 
 export const useAuthStore = create<AuthState & {
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>; 
   logout: () => void;
   setLastVisitedPage: (path: string | null) => void;
 }>(
@@ -15,7 +15,8 @@ export const useAuthStore = create<AuthState & {
       isAuthenticated: false,
       lastVisitedPage: null,
 
-      login: async (email, password) => {
+      // @ts-ignore
+      login: async (email, password) => { // eslint-disable-line @typescript-eslint/no-unused-vars
         try {
           // Supabase 인증 시스템을 통한 로그인
           // (현재는 Supabase Auth를 완전히 구현하지 않고 기존 로직을 활용)

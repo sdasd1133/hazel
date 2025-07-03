@@ -1,4 +1,4 @@
-import { Product, Category, ParentCategory } from "@/types";
+import { Product, ParentCategory } from "@/types";
 
 // 상위 카테고리 정의
 export const parentCategories: ParentCategory[] = [

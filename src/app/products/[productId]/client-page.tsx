@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { notFound, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/products";
 import ProductActions from "./components/product-actions";
 import AuthCheck from "@/components/auth-check";
