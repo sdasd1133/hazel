@@ -11,6 +11,11 @@ export const parentCategories: ParentCategory[] = [
     id: "accessories",
     name: "아이템",
     description: "다양한 패션 아이템"
+  },
+  {
+    id: "best",
+    name: "베스트 추천",
+    description: "인기 있는 추천 제품"
   }
 ];
 
@@ -25,6 +30,7 @@ export const categoryToParentMapping: Record<string, string> = {
   "신발": "accessories",
   "시계": "accessories",
   "벨트": "accessories",
+  "깔맞춤": "best",
 };
 
 // 샘플 상품 데이터
@@ -170,6 +176,19 @@ export const products: Product[] = [
     images: ["/images/products/accessory-1-1.jpg", "/images/products/accessory-1-2.jpg"],
     sizes: ["Free"],
     colors: ["실버"],
+    isFeatured: true,
+    inStock: true,
+  },
+  // 베스트 추천 - 깔맞춤
+  {
+    id: "13",
+    name: "베이직 티셔츠 & 데님 세트",
+    price: 79000,
+    category: "깔맞춤",
+    description: "남녀 모두에게 어울리는 베이직한 티셔츠와 데님 팬츠의 세트 상품입니다. 다양한 스타일링에 활용할 수 있습니다.",
+    images: ["/images/products/outfit-1-1.jpg", "/images/products/outfit-1-2.jpg"],
+    sizes: ["S", "M", "L"],
+    colors: ["블랙/블루", "화이트/블랙"],
     isFeatured: true,
     inStock: true,
   },
