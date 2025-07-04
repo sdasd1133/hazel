@@ -40,7 +40,7 @@ const Header = () => {
     <header ref={headerRef} className="sticky top-0 z-50 bg-gradient-to-r from-white/90 to-white/80 dark:from-black/90 dark:to-black/80 backdrop-blur-lg shadow-sm">
       {/* 상단 로고와 네비게이션 */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-20">
           {/* 모바일 메뉴 아이콘 */}
           <div className="lg:hidden">
             <Button 
@@ -57,13 +57,13 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <div className="h-24 w-auto relative flex items-center justify-center">
+              <div className="h-16 w-auto relative flex items-center justify-center">
                 <span className="sr-only">GL GOOD LUCK FASION</span>
                 <Image 
-                  src="/gl-logo.svg" 
+                  src="/logo.png" 
                   alt="GL GOOD LUCK FASION" 
-                  width={240}
-                  height={80}
+                  width={150}
+                  height={150}
                   style={{ width: 'auto', height: '100%' }}
                   priority
                 />

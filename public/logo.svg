@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
+  <style>
+    text {
+      font-family: 'Arial', sans-serif;
+    }
+    .good-luck {
+      font-size: 30px;
+      font-weight: bold;
+      letter-spacing: 5px;
+    }
+    .fashion {
+      font-size: 26px;
+      letter-spacing: 10px;
+    }
+  </style>
+  <g>
+    <!-- GL 큰 로고 - 첨부해주신 이미지와 더 유사하게 수정 -->
+    <g transform="translate(0, 10)">
+      <!-- G 부분 - 곡선 조정 -->
+      <path d="M70,140 C110,60 190,95 230,140" stroke="black" stroke-width="38" fill="none" stroke-linecap="round"/>
+      
+      <!-- G 아래쪽 곡선 -->
+      <path d="M70,340 C100,220 210,220 230,310 C230,370 190,400 140,400 C80,400 80,350 100,350 C130,350 140,370 140,370" stroke="black" stroke-width="38" fill="none" stroke-linecap="round"/>
+      
+      <!-- L 부분 (수직 직선) -->
+      <rect x="290" y="110" width="45" height="290" fill="black"/>
+      
+      <!-- L 부분 (수평 상단) - 짧게 -->
+      <rect x="290" y="110" width="60" height="45" fill="black"/>
+      
+      <!-- L 부분 (수평 하단) - 길게 -->
+      <rect x="290" y="355" width="150" height="45" fill="black"/>
+    </g>
+    
+    <!-- GOOD LUCK text -->
+    <text x="250" y="250" text-anchor="middle" class="good-luck">GOOD LUCK</text>
+    
+    <!-- FASION text -->
+    <text x="250" y="395" text-anchor="middle" class="fashion">FASION</text>
+  </g>
+</svg>

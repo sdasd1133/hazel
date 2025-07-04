@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <g fill="#000000">
+    <!-- G 부분 - 상단 반원 -->
+    <path d="M100,180 C140,110 210,140 250,180" stroke="black" stroke-width="40" fill="none" />
+    
+    <!-- G 부분 - 하단 원형 -->
+    <path d="M70,320 C100,220 200,230 250,320 C260,390 210,420 150,420 C90,420 100,380 120,380" stroke="black" stroke-width="40" fill="none" />
+    
+    <!-- L 부분 - 수직선 -->
+    <rect x="310" y="140" width="50" height="280" fill="black" />
+    
+    <!-- L 부분 - 상단 짧은 가로선 -->
+    <rect x="310" y="140" width="70" height="50" fill="black" />
+    
+    <!-- L 부분 - 하단 긴 가로선 -->
+    <rect x="310" y="370" width="140" height="50" fill="black" />
+    
+    <!-- GOOD LUCK 텍스트 -->
+    <text x="300" y="250" font-family="Arial, sans-serif" font-size="26" font-weight="900" text-anchor="middle" letter-spacing="8">GOOD LUCK</text>
+    
+    <!-- FASION 텍스트 -->
+    <text x="300" y="395" font-family="Arial, sans-serif" font-size="22" font-weight="400" text-anchor="middle" letter-spacing="15">FASION</text>
+  </g>
+</svg>
