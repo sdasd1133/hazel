@@ -58,10 +58,10 @@ const Header = () => {
           <div className="flex-shrink-0">
             <Link href="/" className="hover:opacity-90 transition-opacity">
               <div className="h-16 w-auto relative flex items-center justify-center">
-                <span className="sr-only">GL GOOD LUCK FASION</span>
+                <span className="sr-only">GL GOOD LUCK FASHION</span>
                 <Image 
                   src="/logo.png" 
-                  alt="GL GOOD LUCK FASION" 
+                  alt="GL GOOD LUCK FASHION" 
                   width={150}
                   height={150}
                   style={{ width: 'auto', height: '100%' }}

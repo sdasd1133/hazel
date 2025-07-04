@@ -9,14 +9,14 @@ const Footer = () => {
           <Link href="/" className="mb-4 sm:mb-0">
             <Image
               src="/logo.png"
-              alt="HAZEL Logo"
+              alt="GL GOOD LUCK FASHION"
               width={150}
               height={150}
               className="h-12 w-auto"
             />
           </Link>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} HAZEL. All rights reserved.
+            &copy; {new Date().getFullYear()} GL GOOD LUCK FASHION. All rights reserved.
           </p>
         </div>
       </div>
