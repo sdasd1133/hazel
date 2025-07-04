@@ -39,7 +39,7 @@ const Header = () => {
     <header ref={headerRef} className="sticky top-0 z-50 bg-gradient-to-r from-white/90 to-white/80 dark:from-black/90 dark:to-black/80 backdrop-blur-lg shadow-sm">
       {/* 상단 로고와 네비게이션 */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-24">
           {/* 모바일 메뉴 아이콘 */}
           <div className="lg:hidden">
             <Button 
@@ -56,7 +56,7 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <div className="h-10 w-auto relative">
+              <div className="h-20 w-auto relative">
                 <span className="sr-only">GL GOOD LUCK FASION</span>
                 <svg className="h-full w-auto" viewBox="0 0 450 450" xmlns="http://www.w3.org/2000/svg">
                   <g>

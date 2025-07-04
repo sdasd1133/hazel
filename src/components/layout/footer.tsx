@@ -16,7 +16,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* 회사 소개 */}
           <div>
-            <div className="mb-4 h-10 w-auto">
+            <div className="mb-4 h-16 w-auto">
               <svg className="h-full w-auto" viewBox="0 0 450 450" xmlns="http://www.w3.org/2000/svg">
                 <g>
                   <path d="M246.5,135.5 L354,135.5 L354,217 L313,217 L313,172 L246.5,172 Z" />
