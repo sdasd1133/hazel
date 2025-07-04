@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
@@ -59,13 +58,11 @@ const Header = () => {
             <Link href="/" className="hover:opacity-90 transition-opacity">
               <div className="h-16 w-auto relative flex items-center justify-center">
                 <span className="sr-only">GL GOOD LUCK FASHION</span>
-                <Image 
+                <img 
                   src="/logo.png" 
                   alt="GL GOOD LUCK FASHION" 
-                  width={150}
-                  height={150}
-                  style={{ width: 'auto', height: '100%' }}
-                  priority
+                  className="h-full w-auto"
+                  style={{ objectFit: 'contain' }}
                 />
               </div>
             </Link>
