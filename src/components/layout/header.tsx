@@ -36,7 +36,7 @@ const Header = () => {
   };
 
   return (
-    <header ref={headerRef} className="sticky top-0 z-50 bg-gradient-to-r from-white/90 to-white/80 dark:from-black/90 dark:to-black/80 backdrop-blur-lg shadow-sm">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow-sm">
       {/* 상단 로고와 네비게이션 */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
