@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
 
-import { getSupabaseUser, createSupabaseUser, isAdminUser } from './supabase-utils';
+import { getSupabaseUser, createSupabaseUser } from './supabase-utils';
 
 export const useAuthStore = create<AuthState & {
   login: (email: string, password: string) => Promise<boolean>; 
@@ -18,11 +18,10 @@ export const useAuthStore = create<AuthState & {
       
       isAdmin: () => {
         const { user } = get();
-        return isAdminUser(user);
+        return user?.isAdmin === true;
       },
 
-      // @ts-ignore
-      login: async (email, password) => { // eslint-disable-line @typescript-eslint/no-unused-vars
+      login: async (email, password) => {
         try {
           // Supabase 인증 시스템을 통한 로그인
           // (현재는 Supabase Auth를 완전히 구현하지 않고 기존 로직을 활용)
@@ -38,7 +37,14 @@ export const useAuthStore = create<AuthState & {
           }
           
           if (user) {
-            set({ user, isAuthenticated: true });
+            // 명시적으로 user.isAdmin 값을 설정 (데이터베이스에서 가져온 값 그대로 사용)
+            set({ 
+              user: {
+                ...user,
+                isAdmin: user.isAdmin === true
+              }, 
+              isAuthenticated: true 
+            });
             return true;
           }
           

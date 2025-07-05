@@ -46,7 +46,11 @@ export const createSupabaseUser = async (email: string, name: string): Promise<U
 
 // 사용자가 관리자인지 확인
 export const isAdminUser = (user: User | null): boolean => {
-  return !!user?.isAdmin;
+  // admin@hazel.com 이메일을 가진 사용자를 관리자로 처리 (테스트용)
+  if (user?.email === 'admin@hazel.com') {
+    return true;
+  }
+  return user?.isAdmin === true;
 };
 
 // Supabase에서 모든 상위 카테고리 가져오기

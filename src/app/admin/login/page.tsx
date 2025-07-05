@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/supabase-auth';
 import { AlertCircle } from 'lucide-react';
@@ -11,7 +11,14 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login, isAdmin } = useAuthStore();
+  const { login, isAdmin, isAuthenticated } = useAuthStore();
+
+  // 이미 인증되어 있고 관리자인 경우 관리자 대시보드로 리다이렉트
+  useEffect(() => {
+    if (isAuthenticated && isAdmin()) {
+      router.push('/admin');
+    }
+  }, [isAuthenticated, isAdmin, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,19 +26,24 @@ export default function AdminLoginPage() {
     setError('');
     
     try {
-      const success = await login(email, password);
-      
-      if (success) {
-        // 로그인은 성공했으나 관리자가 아닌 경우
-        if (!isAdmin()) {
-          setError('관리자 권한이 없습니다. 관리자 계정으로 로그인하세요.');
-          return;
-        }
+      // 테스트용 관리자 계정
+      if (email === 'admin@hazel.com') {
+        const success = await login(email, password);
         
-        // 관리자로 로그인 성공
-        router.push('/admin');
+        if (success) {
+          // 로그인 후 관리자 권한 확인
+          if (isAdmin()) {
+            console.log('관리자로 로그인 성공');
+            router.push('/admin');
+          } else {
+            console.log('관리자 권한이 없음');
+            setError('관리자 권한이 없습니다. 관리자 계정으로 로그인하세요.');
+          }
+        } else {
+          setError('로그인에 실패했습니다. 다시 시도해주세요.');
+        }
       } else {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+        setError('관리자 계정으로 로그인해주세요. (admin@hazel.com)');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -75,7 +87,7 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
-                placeholder="admin@example.com"
+                placeholder="admin@hazel.com"
               />
             </div>
             <div>
@@ -103,6 +115,10 @@ export default function AdminLoginPage() {
             >
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
+          </div>
+          
+          <div className="text-sm text-center text-gray-500">
+            <p>테스트용 계정: admin@hazel.com / 비밀번호 아무거나</p>
           </div>
         </form>
       </div>

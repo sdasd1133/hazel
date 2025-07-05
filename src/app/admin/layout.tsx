@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { LayoutDashboard, Package, Users, ShoppingCart, Settings, LogOut } from 'lucide-react';
@@ -13,12 +13,35 @@ export default function AdminLayout({
 }) {
   const { isAuthenticated, isAdmin, logout } = useAuthStore();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    // 인증되지 않았거나 관리자가 아니면 로그인 페이지로 이동
-    if (!isAuthenticated || !isAdmin()) {
-      router.push('/admin/login');
-    }
+    // 인증 상태와 관리자 권한 확인
+    const checkAuth = async () => {
+      setLoading(true);
+      
+      // 인증 상태 확인
+      if (!isAuthenticated) {
+        console.log('사용자 인증되지 않음, 로그인 페이지로 이동');
+        router.push('/admin/login');
+        return;
+      }
+      
+      // 관리자 권한 확인
+      const adminCheck = isAdmin();
+      if (!adminCheck) {
+        console.log('관리자 권한 없음, 로그인 페이지로 이동');
+        router.push('/admin/login');
+        return;
+      }
+      
+      // 인증 및 권한 확인 완료
+      setAuthorized(true);
+      setLoading(false);
+    };
+    
+    checkAuth();
   }, [isAuthenticated, isAdmin, router]);
 
   const handleLogout = () => {
@@ -26,13 +49,18 @@ export default function AdminLayout({
     router.push('/admin/login');
   };
 
-  // 인증 중이거나 권한 체크 중일 때 보여줄 로딩 화면
-  if (!isAuthenticated || !isAdmin()) {
+  // 인증 및 권한 체크 중일 때 보여줄 로딩 화면
+  if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="animate-pulse text-lg font-medium">로딩 중...</div>
       </div>
     );
+  }
+
+  // 권한이 없는 경우 빈 컴포넌트 반환 (리다이렉트 처리됨)
+  if (!authorized) {
+    return null;
   }
 
   return (
