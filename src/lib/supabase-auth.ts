@@ -2,18 +2,24 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
 
-import { getSupabaseUser, createSupabaseUser } from './supabase-utils';
+import { getSupabaseUser, createSupabaseUser, isAdminUser } from './supabase-utils';
 
 export const useAuthStore = create<AuthState & {
   login: (email: string, password: string) => Promise<boolean>; 
   logout: () => void;
   setLastVisitedPage: (path: string | null) => void;
+  isAdmin: () => boolean;
 }>(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       lastVisitedPage: null,
+      
+      isAdmin: () => {
+        const { user } = get();
+        return isAdminUser(user);
+      },
 
       // @ts-ignore
       login: async (email, password) => { // eslint-disable-line @typescript-eslint/no-unused-vars

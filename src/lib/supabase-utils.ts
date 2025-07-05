@@ -44,6 +44,11 @@ export const createSupabaseUser = async (email: string, name: string): Promise<U
   };
 };
 
+// 사용자가 관리자인지 확인
+export const isAdminUser = (user: User | null): boolean => {
+  return !!user?.isAdmin;
+};
+
 // Supabase에서 모든 상위 카테고리 가져오기
 export const getSupabaseParentCategories = async (): Promise<ParentCategory[]> => {
   const { data, error } = await supabase
