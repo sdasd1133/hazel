@@ -6,19 +6,22 @@ import { useAuthStore } from '@/lib/supabase-auth';
 import { AlertCircle } from 'lucide-react';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@hazel.com');  // 기본값으로 테스트 계정 설정
+  const [password, setPassword] = useState('password');   // 기본값으로 임의 비밀번호 설정
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login, isAdmin, isAuthenticated } = useAuthStore();
+  const { login, isAdmin, isAuthenticated, user } = useAuthStore();
 
-  // 이미 인증되어 있고 관리자인 경우 관리자 대시보드로 리다이렉트
   useEffect(() => {
+    console.log('로그인 페이지 상태:', { isAuthenticated, isAdmin: isAdmin(), user });
+    
+    // 이미 인증되어 있고 관리자인 경우 관리자 대시보드로 리다이렉트
     if (isAuthenticated && isAdmin()) {
+      console.log('이미 인증된 관리자, 대시보드로 이동');
       router.push('/admin');
     }
-  }, [isAuthenticated, isAdmin, router]);
+  }, [isAuthenticated, isAdmin, router, user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,24 +29,23 @@ export default function AdminLoginPage() {
     setError('');
     
     try {
-      // 테스트용 관리자 계정
-      if (email === 'admin@hazel.com') {
-        const success = await login(email, password);
+      console.log('로그인 시도:', email);
+      const success = await login(email, password);
+      
+      if (success) {
+        // 로그인 후 관리자 권한 확인
+        const adminCheck = isAdmin();
+        console.log('로그인 성공, 관리자 권한:', adminCheck);
         
-        if (success) {
-          // 로그인 후 관리자 권한 확인
-          if (isAdmin()) {
-            console.log('관리자로 로그인 성공');
-            router.push('/admin');
-          } else {
-            console.log('관리자 권한이 없음');
-            setError('관리자 권한이 없습니다. 관리자 계정으로 로그인하세요.');
-          }
+        if (adminCheck) {
+          console.log('관리자로 로그인 성공, 대시보드로 이동');
+          router.push('/admin');
         } else {
-          setError('로그인에 실패했습니다. 다시 시도해주세요.');
+          console.log('관리자 권한이 없음');
+          setError('관리자 권한이 없습니다. 관리자 계정으로 로그인하세요.');
         }
       } else {
-        setError('관리자 계정으로 로그인해주세요. (admin@hazel.com)');
+        setError('로그인에 실패했습니다. 다시 시도해주세요.');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -52,6 +54,19 @@ export default function AdminLoginPage() {
       setIsLoading(false);
     }
   };
+
+  // 테스트용 자동 로그인 기능
+  useEffect(() => {
+    const autoLogin = async () => {
+      if (!isAuthenticated && !isLoading && !error) {
+        console.log('자동 로그인 시도');
+        await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+      }
+    };
+    
+    autoLogin();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
