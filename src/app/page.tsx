@@ -43,38 +43,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 프로모션 배너 */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="relative rounded-3xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-95"></div>
-            <div className="absolute inset-0 bg-[url('/pattern-dots.svg')] opacity-10"></div>
-            <div className="relative z-10 p-10 md:p-16 text-center md:text-left md:flex items-center justify-between">
-              <div className="md:max-w-xl mb-8 md:mb-0">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">신규 회원 10% 할인</h2>
-                <p className="text-white/80 text-lg mb-6 max-w-md">
-                  지금 회원가입하고 첫 구매 시 10% 할인 혜택을 받아보세요. 최신 트렌드의 의류를 특별한 가격에 만나보세요.
-                </p>
-                {!isAuthenticated && (
-                  <Button onClick={() => router.push('/login')} variant="default" size="lg" rounded 
-                    className="bg-white text-primary hover:bg-white/90 hover:scale-105 transform transition-all">
-                    지금 시작하기
-                  </Button>
-                )}
-              </div>
-              <div className="hidden md:block relative w-64 h-64">
-                <div className="absolute inset-0 bg-white/20 backdrop-blur-md rounded-full animate-pulse"></div>
-                <div className="absolute inset-4 bg-white rounded-full flex items-center justify-center">
-                  <div className="text-primary font-bold">
-                    <div className="text-5xl">10%</div>
-                    <div className="text-xl">OFF</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* 프로모션 배너 섹션이 이전에 있었지만 요청에 따라 제거되었습니다 */}
     </>
   );
 }
