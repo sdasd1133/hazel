@@ -97,12 +97,20 @@ const Header = () => {
                       </Link>
                     ))}
                     {category.id === 'best' && (
-                      <Link
-                        href={isAuthenticated ? `/products?parent=best` : `/login?redirectTo=${encodeURIComponent('/products?parent=best')}`}
-                        className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
-                      >
-                        모든 베스트 상품
-                      </Link>
+                      <>
+                        <Link
+                          href={isAuthenticated ? `/products?category=중고명품` : `/login?redirectTo=${encodeURIComponent('/products?category=중고명품')}`}
+                          className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
+                        >
+                          중고명품
+                        </Link>
+                        <Link
+                          href={isAuthenticated ? `/products?parent=best` : `/login?redirectTo=${encodeURIComponent('/products?parent=best')}`}
+                          className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
+                        >
+                          모든 추천 상품
+                        </Link>
+                      </>
                     )}
                   </div>
                 </div>

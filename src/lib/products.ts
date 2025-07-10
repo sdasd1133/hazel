@@ -14,7 +14,7 @@ export const parentCategories: ParentCategory[] = [
   },
   {
     id: "best",
-    name: "베스트 추천",
+    name: "추천",
     description: "인기 있는 추천 제품"
   }
 ];
@@ -31,6 +31,7 @@ export const categoryToParentMapping: Record<string, string> = {
   "시계": "accessories",
   "벨트": "accessories",
   "깔맞춤": "best",
+  "중고명품": "best",
 };
 
 // 샘플 상품 데이터
