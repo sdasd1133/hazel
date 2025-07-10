@@ -20,12 +20,12 @@ export default function Home() {
         
         {/* 컨텐츠 */}
         <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center relative z-30 text-center">
-          <span className="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-sm mb-6 text-white">2025 신상품 출시</span>
+          <span className="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-sm mb-6 text-white">오셨습니까 형님!누님!</span>
           <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
-            2025 여름 컬렉션
+            오셨습니까 형님!누님!
           </h1>
           <p className="text-lg md:text-xl mb-10 max-w-xl text-white/90 mx-auto">
-            트렌디하고 스타일리시한 의류로 여러분의 여름을 더욱 특별하게 만들어보세요.
+            오셨습니까 형님!누님!
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isAuthenticated ? (
