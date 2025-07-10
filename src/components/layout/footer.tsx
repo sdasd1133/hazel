@@ -28,8 +28,11 @@ const Footer = () => {
             <p className="text-sm text-gray-700 dark:text-gray-200">
               &copy; {new Date().getFullYear()} GL GOOD LUCK FASHION. All rights reserved.
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              사업자등록번호: 123-45-67890 | 대표: 홍길동 | 서울특별시 강남구 패션로 123
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+              사업자등록번호: 123-45-67890 | 대표: 홍길동
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+              주소: 부산광역시 동랙구 금강공원로33번길 5 3층
             </p>
           </div>
         </div>
