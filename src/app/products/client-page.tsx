@@ -87,29 +87,39 @@ export default function ProductsPage() {
         
         {/* 상위 카테고리 필터 */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-3 border-b pb-4 mb-6">
+          <div className="flex flex-wrap gap-3 border-b pb-6 mb-6">
             <button
               onClick={() => navigateTo({ parent: undefined, category: undefined })}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+              className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${
                 !parent && !category
-                  ? "bg-black text-white"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
+                  : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"
               }`}
             >
-              전체
+              <span className="flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+                전체
+              </span>
             </button>
             
             {parentCategories.map((parentCategory) => (
               <button
                 key={parentCategory.id}
                 onClick={() => navigateTo({ parent: parentCategory.id, category: undefined })}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${
                   parent === parentCategory.id
-                    ? "bg-black text-white"
-                    : "bg-gray-100 hover:bg-gray-200"
+                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
+                    : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"
                 }`}
               >
-                {parentCategory.name}
+                <span className="flex items-center">
+                  <span className={`w-2 h-2 rounded-full mr-2 ${
+                    parent === parentCategory.id ? "bg-white" : "bg-gray-400"
+                  }`}></span>
+                  {parentCategory.name}
+                </span>
               </button>
             ))}
           </div>
@@ -118,19 +128,51 @@ export default function ProductsPage() {
         <div className="flex flex-col md:flex-row gap-6">
           {/* 카테고리 필터 사이드바 */}
           <div className="w-full md:w-1/5 mb-6">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <h2 className="text-lg font-semibold mb-4">카테고리</h2>
-              <div className="space-y-2">
-                {filteredCategories.map((category) => (
-                  <div key={category.id}>
-                    <button
-                      onClick={() => navigateTo({ category: category.id })}
-                      className="text-gray-700 hover:text-primary hover:underline"
-                    >
-                      {category.name}
-                    </button>
-                  </div>
-                ))}
+            <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+                <h2 className="text-lg font-bold text-white flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                  카테고리
+                </h2>
+              </div>
+              
+              <div className="p-4">
+                <div className="space-y-1">
+                  {filteredCategories.map((categoryItem) => (
+                    <div key={categoryItem.id}>
+                      <button
+                        onClick={() => navigateTo({ category: categoryItem.id })}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group ${
+                          category === categoryItem.id
+                            ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
+                            : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
+                        }`}
+                      >
+                        <span className="flex items-center">
+                          <span className={`w-2 h-2 rounded-full mr-3 ${
+                            category === categoryItem.id 
+                              ? "bg-indigo-500" 
+                              : "bg-gray-300 group-hover:bg-indigo-400"
+                          }`}></span>
+                          {categoryItem.name}
+                        </span>
+                        <svg 
+                          className={`w-4 h-4 transition-transform duration-200 ${
+                            category === categoryItem.id 
+                              ? "text-indigo-500 rotate-90" 
+                              : "text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1"
+                          }`} 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
