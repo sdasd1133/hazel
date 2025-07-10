@@ -5,7 +5,6 @@ import { getUrlFromCategory } from "@/lib/category-utils";
 import ProductCard from "@/components/ui/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -149,9 +148,12 @@ export default function ProductsPage() {
                 <div className="space-y-1">
                   {filteredCategories.map((categoryItem) => (
                     <div key={categoryItem.id}>
-                      <Link
-                        href={getUrlFromCategory(categoryItem.name)}
-                        prefetch={false}
+                      <button
+                        onClick={() => {
+                          const url = getUrlFromCategory(categoryItem.name);
+                          console.log('카테고리 클릭:', categoryItem.name, '→', url);
+                          window.location.href = url;
+                        }}
                         className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group ${
                           category === categoryItem.id
                             ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
@@ -177,7 +179,7 @@ export default function ProductsPage() {
                         >
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
-                      </Link>
+                      </button>
                     </div>
                   ))}
                 </div>
