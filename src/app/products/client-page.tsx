@@ -153,7 +153,7 @@ export default function ProductsPage() {
                     <div key={categoryItem.id}>
                       <Link
                         href={getUrlFromCategory(categoryItem.name)}
-                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group block ${
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group ${
                           category === categoryItem.id
                             ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
                             : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600"

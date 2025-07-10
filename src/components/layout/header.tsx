@@ -6,6 +6,7 @@ import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown } from "lucide-rea
 import { useCartStore } from "@/lib/cartStore";
 import { useAuthStore } from "@/lib/supabase-auth";
 import { getParentCategories, getCategoriesByParent } from "@/lib/products";
+import { getUrlFromCategory } from "@/lib/category-utils";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 
@@ -90,7 +91,7 @@ const Header = () => {
                     {getCategoriesByParent(category.id).map(subCategory => (
                       <Link
                         key={subCategory.id}
-                        href={isAuthenticated ? `/products?category=${subCategory.name}` : `/login?redirectTo=${encodeURIComponent(`/products?category=${subCategory.name}`)}`}
+                        href={isAuthenticated ? getUrlFromCategory(subCategory.name) : `/login?redirectTo=${encodeURIComponent(getUrlFromCategory(subCategory.name))}`}
                         className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                       >
                         {subCategory.name}
@@ -99,16 +100,16 @@ const Header = () => {
                     {category.id === 'best' && (
                       <>
                         <Link
-                          href={isAuthenticated ? `/products?category=중고명품` : `/login?redirectTo=${encodeURIComponent('/products?category=중고명품')}`}
+                          href={isAuthenticated ? `/category/used-luxury` : `/login?redirectTo=${encodeURIComponent('/category/used-luxury')}`}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
                           중고명품
                         </Link>
                         <Link
-                          href={isAuthenticated ? `/products?parent=best` : `/login?redirectTo=${encodeURIComponent('/products?parent=best')}`}
+                          href={isAuthenticated ? `/category/coordinated-sets` : `/login?redirectTo=${encodeURIComponent('/category/coordinated-sets')}`}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
-                          모든 추천 상품
+                          깔맞춤
                         </Link>
                       </>
                     )}
@@ -203,7 +204,7 @@ const Header = () => {
                   {getCategoriesByParent(category.id).map(subCategory => (
                     <Link
                       key={subCategory.id}
-                      href={isAuthenticated ? `/products?category=${subCategory.name}` : `/login?redirectTo=${encodeURIComponent(`/products?category=${subCategory.name}`)}`}
+                      href={isAuthenticated ? getUrlFromCategory(subCategory.name) : `/login?redirectTo=${encodeURIComponent(getUrlFromCategory(subCategory.name))}`}
                       className="block py-2 px-3 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
