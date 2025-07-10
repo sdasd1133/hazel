@@ -2,23 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types";
 import { Eye, ShoppingBag } from "lucide-react";
-import { useState, useCallback } from "react";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const [imageState, setImageState] = useState<'loading' | 'loaded' | 'error'>('loading');
-
-  const handleImageError = useCallback(() => {
-    setImageState('error');
-  }, []);
-
-  const handleImageLoad = useCallback(() => {
-    setImageState('loaded');
-  }, []);
-
   // 이미지가 있는지 확인
   const hasValidImage = product.images && product.images[0] && product.images[0].trim() !== '';
 
@@ -28,40 +17,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* 상품 이미지 */}
         <div className="w-full h-full absolute">
           {hasValidImage ? (
-            <>
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={`object-cover transition-opacity duration-300 ${
-                  imageState === 'loaded' ? 'opacity-100' : 'opacity-0'
-                }`}
-                onError={handleImageError}
-                onLoad={handleImageLoad}
-                unoptimized={true}
-              />
-              
-              {/* 로딩 또는 에러 상태일 때만 표시 */}
-              {imageState !== 'loaded' && (
-                <div className="w-full h-full flex items-center justify-center bg-slate-100 absolute inset-0">
-                  {imageState === 'loading' ? (
-                    <div className="text-center">
-                      <div className="w-8 h-8 mx-auto mb-2 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-xs text-slate-500">로딩중...</p>
-                    </div>
-                  ) : (
-                    <div className="text-center p-4">
-                      <div className="w-16 h-16 mx-auto mb-3 bg-slate-300 rounded-xl flex items-center justify-center">
-                        <ShoppingBag className="w-8 h-8 text-slate-500" />
-                      </div>
-                      <h3 className="text-sm font-medium text-slate-700 mb-1">{product.name}</h3>
-                      <p className="text-xs text-slate-500">이미지 준비중</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+              unoptimized={true}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-slate-100">
               <div className="text-center p-4">
@@ -70,11 +35,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 </div>
                 <h3 className="text-sm font-medium text-slate-700 mb-1">{product.name}</h3>
                 <p className="text-xs text-slate-500">이미지 없음</p>
-              </div>
-            </div>
-          )}
-        </div>
-                <p className="text-xs text-slate-500">이미지 준비중</p>
               </div>
             </div>
           )}
