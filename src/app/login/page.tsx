@@ -165,10 +165,14 @@ function LoginForm() {
                 </Button>
               </div>
 
-              <div className="mt-4 text-center">
-                <p className="text-muted-foreground text-sm">
-                  * 테스트용 계정: user@example.com / password123
-                </p>
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-sm font-semibold text-blue-800 mb-2">테스트 계정 안내</h3>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <p><strong>관리자:</strong> admin@hazel.com (비밀번호: 임의입력)</p>
+                  <p><strong>일반사용자:</strong> user@example.com (비밀번호: 임의입력)</p>
+                  <p><strong>일반사용자:</strong> test@hazel.com (비밀번호: 임의입력)</p>
+                  <p className="text-blue-600 mt-2">※ 현재는 테스트 모드로 비밀번호 검증을 하지 않습니다.</p>
+                </div>
               </div>
             </form>
           )}

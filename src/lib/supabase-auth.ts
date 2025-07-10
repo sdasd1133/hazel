@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
 
-import { getSupabaseUser, createSupabaseUser } from './supabase-utils';
-
-export const useAuthStore = create<AuthState & {
+type AuthStoreState = AuthState & {
   login: (email: string, password: string) => Promise<boolean>; 
   logout: () => void;
   setLastVisitedPage: (path: string | null) => void;
   isAdmin: () => boolean;
-}>(
+};
+
+export const useAuthStore = create<AuthStoreState>()(
   persist(
     (set, get) => ({
       user: null,
@@ -25,25 +25,50 @@ export const useAuthStore = create<AuthState & {
         return user?.isAdmin === true;
       },
 
-      login: async (email, password) => {
+      login: async (email: string, password: string) => {
         try {
           console.log('로그인 시도:', email);
+          console.log('비밀번호 검증 스킵 (테스트 모드):', password ? '입력됨' : '미입력');
           
-          // 테스트용: admin@hazel.com은 항상 관리자로 로그인
-          if (email === 'admin@hazel.com') {
-            console.log('관리자 계정으로 로그인 처리');
+          // 테스트용 계정들 (현재는 비밀번호 검증하지 않음 - 실제 운영에서는 보안 강화 필요)
+          const testAccounts = {
+            'admin@hazel.com': {
+              id: 'admin-id',
+              email: 'admin@hazel.com',
+              name: '관리자',
+              isAdmin: true
+            },
+            'user@example.com': {
+              id: 'user-id-1',
+              email: 'user@example.com',
+              name: '테스트 사용자',
+              isAdmin: false
+            },
+            'test@hazel.com': {
+              id: 'user-id-2',
+              email: 'test@hazel.com',
+              name: '일반 사용자',
+              isAdmin: false
+            }
+          };
+          
+          // 테스트 계정인지 확인 (현재는 비밀번호 무시)
+          if (testAccounts[email as keyof typeof testAccounts]) {
+            console.log('테스트 계정으로 로그인 처리:', email);
+            const user = testAccounts[email as keyof typeof testAccounts];
             set({ 
-              user: {
-                id: 'admin-id',
-                email: 'admin@hazel.com',
-                name: '관리자',
-                isAdmin: true
-              }, 
+              user,
               isAuthenticated: true 
             });
             return true;
           }
           
+          // 테스트가 아닌 계정의 경우
+          console.log('등록되지 않은 계정입니다:', email);
+          return false;
+          
+          // 실제 Supabase 계정 처리 (현재는 비활성화)
+          /*
           // 임시: 이메일로 사용자 찾기
           let user = await getSupabaseUser(email);
           
@@ -64,8 +89,7 @@ export const useAuthStore = create<AuthState & {
             });
             return true;
           }
-          
-          return false;
+          */
         } catch (error) {
           console.error('Login error:', error);
           return false;
