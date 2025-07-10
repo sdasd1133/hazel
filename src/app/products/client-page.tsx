@@ -1,10 +1,12 @@
 "use client";
 
 import { products, getCategories, getParentCategories, getCategoriesByParent, getProductsByParentCategory } from "@/lib/products";
+import { getUrlFromCategory } from "@/lib/category-utils";
 import ProductCard from "@/components/ui/product-card";
 import AuthCheck from "@/components/auth-check";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -149,9 +151,9 @@ export default function ProductsPage() {
                 <div className="space-y-1">
                   {filteredCategories.map((categoryItem) => (
                     <div key={categoryItem.id}>
-                      <button
-                        onClick={() => navigateTo({ category: categoryItem.id })}
-                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group ${
+                      <Link
+                        href={getUrlFromCategory(categoryItem.name)}
+                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group block ${
                           category === categoryItem.id
                             ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
                             : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
@@ -176,7 +178,7 @@ export default function ProductsPage() {
                         >
                           <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                         </svg>
-                      </button>
+                      </Link>
                     </div>
                   ))}
                 </div>
