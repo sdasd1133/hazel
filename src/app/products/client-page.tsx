@@ -21,41 +21,34 @@ export default function ProductsPage() {
   
   // 상품 및 카테고리 필터링 로직을 useEffect로 이동
   useEffect(() => {
-    const filterProducts = async () => {
-      setIsLoading(true);
-      try {
-        // 약간의 지연을 추가하여 자연스러운 로딩 효과
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        let newFilteredProducts = [...products];
-        let newFilteredCategories = [...categories];
-        
-        // 상위 카테고리 선택 시
-        if (parent) {
-          newFilteredProducts = getProductsByParentCategory(parent);
-          newFilteredCategories = getCategoriesByParent(parent);
-        } 
-        // 하위 카테고리 선택 시
-        else if (category) {
-          newFilteredProducts = products.filter(product => 
-            product.category.toLowerCase().replace(/\s+/g, '-') === category
-          );
-        }
-        
-        setFilteredProducts(newFilteredProducts);
-        setFilteredCategories(newFilteredCategories);
-      } catch (error) {
-        console.error("상품 필터링 오류:", error);
-        // 오류 발생 시 기본값으로 복원
-        setFilteredProducts([...products]);
-        setFilteredCategories([...categories]);
-      } finally {
-        setIsLoading(false);
+    const filterProducts = () => {
+      // 즉시 필터링하여 깜빡임 줄이기
+      let newFilteredProducts = [...products];
+      let newFilteredCategories = [...categories];
+      
+      // 상위 카테고리 선택 시
+      if (parent) {
+        newFilteredProducts = getProductsByParentCategory(parent);
+        newFilteredCategories = getCategoriesByParent(parent);
+      } 
+      // 하위 카테고리 선택 시
+      else if (category) {
+        newFilteredProducts = products.filter(product => 
+          product.category.toLowerCase().replace(/\s+/g, '-') === category
+        );
+      }
+      
+      setFilteredProducts(newFilteredProducts);
+      setFilteredCategories(newFilteredCategories);
+      
+      // 필터링 완료 후 로딩 상태 해제
+      if (isLoading) {
+        setTimeout(() => setIsLoading(false), 100);
       }
     };
     
     filterProducts();
-  }, [category, parent, categories, parentCategories]);
+  }, [category, parent, categories, parentCategories, isLoading]);
   
   // 현재 선택된 상위 카테고리 확인
   const selectedParentCategory = parent
