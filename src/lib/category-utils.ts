@@ -21,5 +21,7 @@ export const getCategoryFromUrl = (url: string): string | null => {
 
 // 카테고리명에서 URL 생성
 export const getUrlFromCategory = (categoryName: string): string => {
-  return categoryUrlMapping[categoryName] || `/products?category=${categoryName.toLowerCase().replace(/\s+/g, '-')}`;
+  const url = categoryUrlMapping[categoryName] || `/products?category=${categoryName.toLowerCase().replace(/\s+/g, '-')}`;
+  console.log(`카테고리 "${categoryName}" → URL: "${url}"`);
+  return url;
 };

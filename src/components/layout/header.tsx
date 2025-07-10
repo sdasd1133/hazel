@@ -92,6 +92,7 @@ const Header = () => {
                       <Link
                         key={subCategory.id}
                         href={getUrlFromCategory(subCategory.name)}
+                        prefetch={false}
                         className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                       >
                         {subCategory.name}
@@ -101,12 +102,14 @@ const Header = () => {
                       <>
                         <Link
                           href={`/category/used-luxury`}
+                          prefetch={false}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
                           중고명품
                         </Link>
                         <Link
                           href={`/category/coordinated-sets`}
+                          prefetch={false}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
                           깔맞춤
@@ -205,6 +208,7 @@ const Header = () => {
                     <Link
                       key={subCategory.id}
                       href={getUrlFromCategory(subCategory.name)}
+                      prefetch={false}
                       className="block py-2 px-3 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
