@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, User, Lock, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/lib/authStore';
+import { useAuthStore } from '@/lib/supabase-auth';
 
 // 로그인 페이지 - searchParams를 사용하는 컴포넌트를 Suspense로 감싸야 합니다
 export default function LoginPage() {

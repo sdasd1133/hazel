@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/lib/authStore";
+import { useAuthStore } from "@/lib/supabase-auth";
 import { ArrowRight } from "lucide-react";
 
 export default function Home() {

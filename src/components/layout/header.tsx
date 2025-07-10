@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
-import { useAuthStore } from "@/lib/authStore";
+import { useAuthStore } from "@/lib/supabase-auth";
 import { getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
