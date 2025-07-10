@@ -136,7 +136,7 @@ const Header = () => {
             {/* 회원정보 */}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <span className="hidden md:inline text-sm font-medium bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <span className="hidden md:inline text-sm font-medium text-black">
                   {user?.name}님
                 </span>
                 <Button 
