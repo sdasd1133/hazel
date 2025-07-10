@@ -77,7 +77,7 @@ const Header = () => {
                 className="relative group"
               >
                 <Link
-                  href={isAuthenticated ? `/products?parent=${category.id}` : `/login?redirectTo=${encodeURIComponent(`/products?parent=${category.id}`)}`}
+                  href={`/products?parent=${category.id}`}
                   className="flex items-center px-3 py-2 rounded-md text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
                 >
                   <span>{category.name}</span>
@@ -91,7 +91,7 @@ const Header = () => {
                     {getCategoriesByParent(category.id).map(subCategory => (
                       <Link
                         key={subCategory.id}
-                        href={isAuthenticated ? getUrlFromCategory(subCategory.name) : `/login?redirectTo=${encodeURIComponent(getUrlFromCategory(subCategory.name))}`}
+                        href={getUrlFromCategory(subCategory.name)}
                         className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                       >
                         {subCategory.name}
@@ -100,13 +100,13 @@ const Header = () => {
                     {category.id === 'best' && (
                       <>
                         <Link
-                          href={isAuthenticated ? `/category/used-luxury` : `/login?redirectTo=${encodeURIComponent('/category/used-luxury')}`}
+                          href={`/category/used-luxury`}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
                           중고명품
                         </Link>
                         <Link
-                          href={isAuthenticated ? `/category/coordinated-sets` : `/login?redirectTo=${encodeURIComponent('/category/coordinated-sets')}`}
+                          href={`/category/coordinated-sets`}
                           className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
                         >
                           깔맞춤
@@ -192,7 +192,7 @@ const Header = () => {
             {parentCategories.map((category) => (
               <div key={category.id} className="space-y-1">
                 <Link
-                  href={isAuthenticated ? `/products?parent=${category.id}` : `/login?redirectTo=${encodeURIComponent(`/products?parent=${category.id}`)}`}
+                  href={`/products?parent=${category.id}`}
                   className="block py-2.5 px-3 text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-md font-medium transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -204,7 +204,7 @@ const Header = () => {
                   {getCategoriesByParent(category.id).map(subCategory => (
                     <Link
                       key={subCategory.id}
-                      href={isAuthenticated ? getUrlFromCategory(subCategory.name) : `/login?redirectTo=${encodeURIComponent(getUrlFromCategory(subCategory.name))}`}
+                      href={getUrlFromCategory(subCategory.name)}
                       className="block py-2 px-3 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >

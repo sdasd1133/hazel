@@ -3,7 +3,6 @@
 import { products, getCategories, getParentCategories, getCategoriesByParent, getProductsByParentCategory } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import ProductCard from "@/components/ui/product-card";
-import AuthCheck from "@/components/auth-check";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -88,11 +87,10 @@ export default function ProductsPage() {
   };
 
   return (
-    <AuthCheck>
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">
-          {selectedParentCategory?.name || "전체 상품"}
-        </h1>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="text-2xl md:text-3xl font-bold mb-2">
+        {selectedParentCategory?.name || "전체 상품"}
+      </h1>
         
         {/* 상위 카테고리 필터 */}
         <div className="mb-8">
@@ -215,6 +213,5 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
-    </AuthCheck>
   );
 }
