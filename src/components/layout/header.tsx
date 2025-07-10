@@ -98,24 +98,6 @@ const Header = () => {
                         {subCategory.name}
                       </Link>
                     ))}
-                    {category.id === 'best' && (
-                      <>
-                        <Link
-                          href={`/category/used-luxury`}
-                          prefetch={false}
-                          className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
-                        >
-                          중고명품
-                        </Link>
-                        <Link
-                          href={`/category/coordinated-sets`}
-                          prefetch={false}
-                          className="block px-3 py-2 text-sm text-foreground/70 hover:text-primary hover:bg-primary/5 rounded transition-colors"
-                        >
-                          깔맞춤
-                        </Link>
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
