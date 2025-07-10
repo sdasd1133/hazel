@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['ctbdaguwxibcvlxohdqv.supabase.co', 'picsum.photos'], // Supabase와 picsum 도메인 추가
+    domains: ['ctbdaguwxibcvlxohdqv.supabase.co', 'picsum.photos', 'images.unsplash.com'], // 이미지 도메인들 추가
     remotePatterns: [
       {
         protocol: 'https',

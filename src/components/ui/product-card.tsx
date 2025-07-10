@@ -13,22 +13,27 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const [imageLoading, setImageLoading] = useState(true);
 
   const handleImageError = () => {
+    console.log('이미지 로드 실패:', product.images[0]);
     setImageError(true);
     setImageLoading(false);
   };
 
   const handleImageLoad = () => {
+    console.log('이미지 로드 성공:', product.images[0]);
     setImageLoading(false);
     setImageError(false);
   };
+
+  // 임시로 이미지 로딩 문제 해결을 위한 fallback
+  const showFallback = !product.images[0] || imageError;
 
   return (
     <Link href={`/products/${product.id}`} className="group block">
       <div className="card-hover aspect-square rounded-xl bg-muted relative overflow-hidden">
         {/* 상품 이미지 */}
         <div className="w-full h-full absolute transform transition-all duration-500 group-hover:scale-105">
-          {product.images[0] && !imageError ? (
-            <>
+          {!showFallback ? (
+            <div className="relative w-full h-full">
               <Image
                 src={product.images[0]}
                 alt={product.name}
@@ -37,20 +42,23 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 className="object-cover"
                 onError={handleImageError}
                 onLoad={handleImageLoad}
+                priority={false}
+                unoptimized={true}
               />
               {imageLoading && (
-                <div className="w-full h-full flex items-center justify-center bg-muted absolute inset-0">
+                <div className="w-full h-full flex items-center justify-center bg-muted absolute inset-0 z-10">
                   <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
               )}
-            </>
+            </div>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-              <div className="text-center">
-                <div className="w-16 h-16 mx-auto mb-2 bg-gray-300 rounded-lg flex items-center justify-center">
-                  <ShoppingBag className="w-8 h-8 text-gray-500" />
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+              <div className="text-center p-4">
+                <div className="w-16 h-16 mx-auto mb-3 bg-slate-300 rounded-xl flex items-center justify-center">
+                  <ShoppingBag className="w-8 h-8 text-slate-500" />
                 </div>
-                <span className="text-sm text-gray-500">{product.name}</span>
+                <h3 className="text-sm font-medium text-slate-700 mb-1">{product.name}</h3>
+                <p className="text-xs text-slate-500">이미지 준비중</p>
               </div>
             </div>
           )}
