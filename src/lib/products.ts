@@ -193,6 +193,43 @@ export const products: Product[] = [
     isFeatured: true,
     inStock: true,
   },
+  // 베스트 추천 - 중고명품
+  {
+    id: "14",
+    name: "프리미엄 브랜드 핸드백",
+    price: 850000,
+    category: "중고명품",
+    description: "명품 브랜드의 프리미엄 핸드백입니다. 상태가 매우 좋으며 정품 인증서가 포함되어 있습니다.",
+    images: ["https://picsum.photos/400/400?random=27", "https://picsum.photos/400/400?random=28"],
+    sizes: ["FREE"],
+    colors: ["블랙", "브라운"],
+    isFeatured: true,
+    inStock: true,
+  },
+  {
+    id: "15",
+    name: "럭셔리 시계",
+    price: 1200000,
+    category: "중고명품",
+    description: "스위스 명품 시계 브랜드의 럭셔리 시계입니다. 완벽한 컨디션으로 보증서와 박스가 포함되어 있습니다.",
+    images: ["https://picsum.photos/400/400?random=29", "https://picsum.photos/400/400?random=30"],
+    sizes: ["FREE"],
+    colors: ["실버", "골드"],
+    isFeatured: true,
+    inStock: true,
+  },
+  {
+    id: "16",
+    name: "명품 드레스",
+    price: 450000,
+    category: "중고명품",
+    description: "유명 디자이너의 명품 드레스입니다. 한 번만 착용한 거의 새 상품으로, 특별한 날에 완벽한 스타일을 연출할 수 있습니다.",
+    images: ["https://picsum.photos/400/400?random=31", "https://picsum.photos/400/400?random=32"],
+    sizes: ["S", "M"],
+    colors: ["블랙", "네이비"],
+    isFeatured: true,
+    inStock: true,
+  },
 ];
 
 // 카테고리별 상품 필터링 함수
