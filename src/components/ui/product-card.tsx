@@ -2,28 +2,56 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types";
 import { Eye, ShoppingBag } from "lucide-react";
+import { useState } from "react";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+    setImageError(false);
+  };
+
   return (
     <Link href={`/products/${product.id}`} className="group block">
       <div className="card-hover aspect-square rounded-xl bg-muted relative overflow-hidden">
         {/* 상품 이미지 */}
         <div className="w-full h-full absolute transform transition-all duration-500 group-hover:scale-105">
-          {product.images[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover"
-            />
+          {product.images[0] && !imageError ? (
+            <>
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover"
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+              />
+              {imageLoading && (
+                <div className="w-full h-full flex items-center justify-center bg-muted absolute inset-0">
+                  <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-muted">
-              <span className="text-muted-foreground">이미지 없음</span>
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-2 bg-gray-300 rounded-lg flex items-center justify-center">
+                  <ShoppingBag className="w-8 h-8 text-gray-500" />
+                </div>
+                <span className="text-sm text-gray-500">{product.name}</span>
+              </div>
             </div>
           )}
         </div>
