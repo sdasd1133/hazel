@@ -15,7 +15,6 @@ export default function ProductsPage() {
   const parentCategories = getParentCategories();
   const categories = getCategories();
   
-  const [loading, setLoading] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState([...products]);
   const [filteredCategories, setFilteredCategories] = useState([...categories]);
   
@@ -41,8 +40,6 @@ export default function ProductsPage() {
       setFilteredCategories(newFilteredCategories);
     } catch (error) {
       console.error("상품 필터링 오류:", error);
-    } finally {
-      setLoading(false);
     }
   }, [category, parent, categories, parentCategories]);
   
@@ -52,7 +49,7 @@ export default function ProductsPage() {
     : undefined;
 
   // 안전한 라우팅 이동 함수
-  const navigateTo = (params) => {
+  const navigateTo = (params: Record<string, string | undefined>) => {
     try {
       const newParams = new URLSearchParams();
       
@@ -80,21 +77,6 @@ export default function ProductsPage() {
       console.error("라우팅 오류:", error);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <AuthCheck>
