@@ -20,13 +20,9 @@ export default function Home() {
         
         {/* 컨텐츠 */}
         <div className="container mx-auto px-4 h-full flex flex-col justify-center items-center relative z-30 text-center">
-          <span className="inline-block bg-white/10 backdrop-blur-sm px-4 py-1 rounded-full text-sm mb-6 text-white">오셨습니까 형님!누님!</span>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+          <h1 className="text-4xl md:text-6xl font-bold mb-10 text-white">
             오셨습니까 형님!누님!
           </h1>
-          <p className="text-lg md:text-xl mb-10 max-w-xl text-white/90 mx-auto">
-            오셨습니까 형님!누님!
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isAuthenticated ? (
               <Link href="/products?category=티셔츠">
@@ -42,8 +38,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* 프로모션 배너 섹션이 이전에 있었지만 요청에 따라 제거되었습니다 */}
     </>
   );
 }
