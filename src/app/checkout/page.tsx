@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     deliveryRequest: ''
   });
 
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [agreementChecks, setAgreementChecks] = useState({
     purchase: false,
     privacy: false,
@@ -88,8 +88,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 결제 처리 로직
-    alert('결제가 완료되었습니다!');
+    // 현금결제 주문 처리 로직
+    alert('주문이 접수되었습니다! 매장 방문 시 현금으로 결제해주세요.\n\n주문번호: ORD' + Date.now() + '\n매장 주소: 서울시 강남구 테헤란로 123 HAZEL 매장\n운영시간: 10:00 - 22:00');
   };
 
   return (
@@ -98,7 +98,7 @@ export default function CheckoutPage() {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">주문/결제</h1>
-            <p className="text-gray-600 mt-2">주문 정보를 확인하고 결제를 진행해주세요.</p>
+            <p className="text-gray-600 mt-2">주문 정보를 확인하고 매장 방문 현금결제를 위한 주문접수를 진행해주세요.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -227,53 +227,70 @@ export default function CheckoutPage() {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold mb-4">결제 방법</h2>
                 <div className="space-y-3">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="card"
-                      checked={paymentMethod === 'card'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span>신용카드</span>
-                  </label>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cash"
+                        checked={paymentMethod === 'cash'}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="mr-3"
+                        disabled
+                      />
+                      <span className="font-medium text-blue-800">💵 현금결제 (유일한 결제 방법)</span>
+                    </div>
+                    <p className="text-sm text-blue-600 mt-2 ml-6">
+                      매장 방문 시 현금으로 결제해주세요. 온라인 주문 후 매장에서 상품 수령 및 결제가 가능합니다.
+                    </p>
+                  </div>
                   
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="bank"
-                      checked={paymentMethod === 'bank'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span>계좌이체</span>
-                  </label>
-                  
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="virtual"
-                      checked={paymentMethod === 'virtual'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span>가상계좌</span>
-                  </label>
-                  
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="kakao"
-                      checked={paymentMethod === 'kakao'}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="mr-3"
-                    />
-                    <span>카카오페이</span>
-                  </label>
+                  {/* 비활성화된 다른 결제 방법들 */}
+                  <div className="opacity-50">
+                    <label className="flex items-center cursor-not-allowed">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="card"
+                        disabled
+                        className="mr-3"
+                      />
+                      <span className="line-through">신용카드 (현재 사용 불가)</span>
+                    </label>
+                    
+                    <label className="flex items-center cursor-not-allowed mt-2">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="bank"
+                        disabled
+                        className="mr-3"
+                      />
+                      <span className="line-through">계좌이체 (현재 사용 불가)</span>
+                    </label>
+                    
+                    <label className="flex items-center cursor-not-allowed mt-2">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="virtual"
+                        disabled
+                        className="mr-3"
+                      />
+                      <span className="line-through">가상계좌 (현재 사용 불가)</span>
+                    </label>
+                    
+                    <label className="flex items-center cursor-not-allowed mt-2">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="kakao"
+                        disabled
+                        className="mr-3"
+                      />
+                      <span className="line-through">카카오페이 (현재 사용 불가)</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -356,25 +373,27 @@ export default function CheckoutPage() {
                     disabled={!allAgreed}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
                       allAgreed
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        ? 'bg-black text-white hover:bg-gray-800'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    {total.toLocaleString()}원 결제하기
+                    💵 {total.toLocaleString()}원 주문하기 (매장 현금결제)
                   </button>
                   
                   <div className="text-xs text-gray-500 text-center">
-                    <p>결제 시 개인정보 및 결제정보는 암호화 처리되어 안전하게 보호됩니다.</p>
+                    <p>주문 접수 후 매장 방문하여 현금으로 결제 및 상품 수령이 가능합니다.</p>
+                    <p className="mt-1">매장 주소: 서울시 강남구 테헤란로 123 HAZEL 매장</p>
                   </div>
                 </div>
 
-                {/* 혜택 정보 */}
+                {/* 현금결제 안내 */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-medium mb-3">혜택 정보</h3>
+                  <h3 className="font-medium mb-3">💵 현금결제 안내</h3>
                   <div className="space-y-2 text-sm text-gray-600">
-                    <p>🎁 첫 구매 시 5,000원 적립금 지급</p>
-                    <p>📦 50,000원 이상 구매 시 무료배송</p>
-                    <p>💳 카드 결제 시 추가 할인 혜택</p>
+                    <p>� 매장 방문 시 현금으로 결제</p>
+                    <p>📦 주문 후 매장에서 상품 수령</p>
+                    <p>🕐 운영시간: 10:00 - 22:00 (연중무휴)</p>
+                    <p>� 서울시 강남구 테헤란로 123</p>
                   </div>
                 </div>
               </div>
