@@ -18,23 +18,7 @@ interface CartItem {
 const dummyCartItems: CartItem[] = [
   {
     id: '1',
-    na                  
-                  <div className="text-xs text-gray-500 text-center">
-                    <p>주문 접수 후 계좌로 입금해주세요. 입금 확인 후 상품을 발송합니다.</p>
-                    <p className="mt-1">입금계좌: 국민은행 123-456-789012 (주)헤이즐</p>
-                  </div>
-                </div>
-
-                {/* 무통장 입금 안내 */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="font-medium mb-3">🏦 무통장 입금 안내</h3>
-                  <div className="space-y-2 text-sm text-gray-600">
-                    <p>🏛️ 국민은행 123-456-789012</p>
-                    <p>👤 예금주: (주)헤이즐</p>
-                    <p>⏰ 입금 확인 후 1-2일 내 발송</p>
-                    <p>📝 입금자명은 주문자명과 동일하게</p>
-                  </div>
-                </div>
+    name: '클래식 화이트 셔츠',
     price: 45000,
     quantity: 1,
     image: '/images/shirt-white.jpg',
