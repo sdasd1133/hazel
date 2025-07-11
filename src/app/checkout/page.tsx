@@ -49,7 +49,7 @@ export default function CheckoutPage() {
     deliveryRequest: ''
   });
 
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [paymentMethod, setPaymentMethod] = useState('bank_transfer');
   const [agreementChecks, setAgreementChecks] = useState({
     purchase: false,
     privacy: false,
@@ -88,8 +88,9 @@ export default function CheckoutPage() {
       return;
     }
 
-    // 현금결제 주문 처리 로직
-    alert('주문이 접수되었습니다! 매장 방문 시 현금으로 결제해주세요.\n\n주문번호: ORD' + Date.now() + '\n매장 주소: 서울시 강남구 테헤란로 123 HAZEL 매장\n운영시간: 10:00 - 22:00');
+    // 무통장 입금 주문 처리 로직
+    const orderNumber = 'ORD' + Date.now();
+    alert(`주문이 접수되었습니다!\n\n주문번호: ${orderNumber}\n\n입금 계좌 정보:\n• 은행: 국민은행\n• 계좌번호: 123-456-789012\n• 예금주: (주)헤이즐\n• 입금금액: ${total.toLocaleString()}원\n\n※ 입금자명을 "${shippingInfo.name}"으로 해주세요.\n※ 입금 확인 후 상품을 발송합니다.`);
   };
 
   return (
@@ -98,7 +99,7 @@ export default function CheckoutPage() {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">주문/결제</h1>
-            <p className="text-gray-600 mt-2">주문 정보를 확인하고 매장 방문 현금결제를 위한 주문접수를 진행해주세요.</p>
+            <p className="text-gray-600 mt-2">주문 정보를 확인하고 무통장 입금을 위한 주문접수를 진행해주세요.</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -232,17 +233,24 @@ export default function CheckoutPage() {
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value="cash"
-                        checked={paymentMethod === 'cash'}
+                        value="bank_transfer"
+                        checked={paymentMethod === 'bank_transfer'}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="mr-3"
                         disabled
                       />
-                      <span className="font-medium text-blue-800">💵 현금결제 (유일한 결제 방법)</span>
+                      <span className="font-medium text-blue-800">🏦 무통장 입금 (유일한 결제 방법)</span>
                     </div>
-                    <p className="text-sm text-blue-600 mt-2 ml-6">
-                      매장 방문 시 현금으로 결제해주세요. 온라인 주문 후 매장에서 상품 수령 및 결제가 가능합니다.
-                    </p>
+                    <div className="text-sm text-blue-600 mt-3 ml-6 space-y-2">
+                      <p>아래 계좌로 입금해주세요. 입금 확인 후 상품을 발송합니다.</p>
+                      <div className="bg-white p-3 rounded border">
+                        <p className="font-medium">입금 계좌 정보</p>
+                        <p>• 은행: 국민은행</p>
+                        <p>• 계좌번호: 123-456-789012</p>
+                        <p>• 예금주: (주)헤이즐</p>
+                        <p className="text-red-600 mt-1">※ 입금자명은 주문자명과 동일하게 해주세요</p>
+                      </div>
+                    </div>
                   </div>
                   
                   {/* 비활성화된 다른 결제 방법들 */}
@@ -266,7 +274,7 @@ export default function CheckoutPage() {
                         disabled
                         className="mr-3"
                       />
-                      <span className="line-through">계좌이체 (현재 사용 불가)</span>
+                      <span className="line-through">실시간 계좌이체 (현재 사용 불가)</span>
                     </label>
                     
                     <label className="flex items-center cursor-not-allowed mt-2">
@@ -377,12 +385,12 @@ export default function CheckoutPage() {
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    💵 {total.toLocaleString()}원 주문하기 (매장 현금결제)
+                    🏦 {total.toLocaleString()}원 주문하기 (무통장 입금)
                   </button>
                   
                   <div className="text-xs text-gray-500 text-center">
-                    <p>주문 접수 후 매장 방문하여 현금으로 결제 및 상품 수령이 가능합니다.</p>
-                    <p className="mt-1">매장 주소: 서울시 강남구 테헤란로 123 HAZEL 매장</p>
+                    <p>주문 접수 후 계좌로 입금해주세요. 입금 확인 후 상품을 발송합니다.</p>
+                    <p className="mt-1">입금계좌: 국민은행 123-456-789012 (주)헤이즐</p>
                   </div>
                 </div>
 
