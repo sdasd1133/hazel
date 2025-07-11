@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown } from "lucide-react";
+import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown, UserPlus } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
 import { useAuthStore } from "@/lib/supabase-auth";
 import { getParentCategories, getCategoriesByParent } from "@/lib/products";
@@ -154,17 +154,29 @@ const Header = () => {
                 </Button>
               </div>
             ) : (
-              <Link href="/login">
-                <Button 
-                  variant="gradient" 
-                  size="sm" 
-                  rounded 
-                  className="flex items-center gap-2 py-1.5 px-3 shadow-md hover:shadow-lg transition-all duration-300"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="font-medium">로그인</span>
-                </Button>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link href="/login">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-2 py-1.5 px-3 rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary/10"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">로그인</span>
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button 
+                    variant="gradient" 
+                    size="sm" 
+                    rounded 
+                    className="flex items-center gap-2 py-1.5 px-3 shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">회원가입</span>
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -215,6 +227,31 @@ const Header = () => {
             >
               전체 상품
             </Link>
+            
+            {/* 모바일 로그인/회원가입 버튼 */}
+            {!isAuthenticated && (
+              <>
+                <div className="border-t border-border my-3"></div>
+                <div className="space-y-2">
+                  <Link
+                    href="/login"
+                    className="flex items-center gap-3 py-2.5 px-3 text-foreground/80 font-medium hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4" />
+                    로그인
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="flex items-center gap-3 py-2.5 px-3 text-white font-medium bg-gradient-to-r from-primary to-secondary rounded-md hover:shadow-lg transition-all duration-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    회원가입
+                  </Link>
+                </div>
+              </>
+            )}
           </nav>
         </div>
       </div>
