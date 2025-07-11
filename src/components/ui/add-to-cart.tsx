@@ -73,7 +73,7 @@ export default function AddToCart({ product }: AddToCartProps) {
       {/* 장바구니 담기 버튼 */}
       <div className="mt-10">
         <Button 
-          className="w-full py-6 text-lg" 
+          className="w-full py-6 text-lg bg-black hover:bg-gray-800 text-white" 
           disabled={!product.inStock || !selectedSize || !selectedColor}
           onClick={handleAddToCart}
         >

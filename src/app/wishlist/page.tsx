@@ -133,7 +133,7 @@ export default function WishlistPage() {
                       </span>
                       <button
                         onClick={addSelectedToCart}
-                        className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 text-sm"
+                        className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm"
                       >
                         장바구니 담기
                       </button>
@@ -221,7 +221,7 @@ export default function WishlistPage() {
                           disabled={!item.inStock}
                           className={`flex-1 py-2 px-3 rounded-lg text-sm transition-colors ${
                             item.inStock
-                              ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                              ? 'bg-black text-white hover:bg-gray-800'
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }`}
                         >
@@ -240,7 +240,7 @@ export default function WishlistPage() {
               <p className="text-gray-500 mb-6">마음에 드는 상품을 찜해보세요!</p>
               <Link 
                 href="/products"
-                className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors inline-block"
+                className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors inline-block"
               >
                 상품 둘러보기
               </Link>

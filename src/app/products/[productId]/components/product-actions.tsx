@@ -111,7 +111,7 @@ const ProductActions = ({ product }: ProductActionsProps) => {
       {/* 장바구니 버튼 */}
       <Button
         onClick={handleAddToCart}
-        className="w-full py-6"
+        className="w-full py-6 bg-black hover:bg-gray-800 text-white"
         disabled={!product.inStock}
       >
         <ShoppingBag className="mr-2 h-5 w-5" />
