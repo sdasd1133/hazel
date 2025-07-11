@@ -1,6 +1,6 @@
 # 빌드 설정
 [build]
-  command = "npm ci && npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
   
 # 환경 변수 설정
