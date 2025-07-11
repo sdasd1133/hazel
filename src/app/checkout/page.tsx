@@ -304,18 +304,6 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* 입금 혜택 */}
-                  <div className="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl">
-                    <h5 className="font-bold text-green-800 mb-2 flex items-center">
-                      ✨ 무통장 입금 혜택
-                    </h5>
-                    <ul className="text-sm text-green-700 space-y-1">
-                      <li>• 수수료 0원! 추가 비용 없음</li>
-                      <li>• 은행 이체 시 포인트 적립</li>
-                      <li>• 24시간 언제든 입금 가능</li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </div>
