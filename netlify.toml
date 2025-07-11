@@ -6,11 +6,22 @@
 # 환경 변수 설정
 [build.environment]
   NODE_VERSION = "18"
+  NPM_VERSION = "8"
   NEXT_TELEMETRY_DISABLED = "1"
+  NODE_ENV = "production"
 
 # Netlify Next.js 플러그인 사용
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# 헤더 설정 - 보안 및 캐싱
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 # Next.js 정적 파일을 위한 리다이렉트
 [[redirects]]
@@ -22,6 +33,12 @@
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/nextjs-api/:splat"
+  status = 200
+
+# 카테고리 페이지 리다이렉트 (404 방지)
+[[redirects]]
+  from = "/category/*"
+  to = "/.netlify/functions/nextjs-server"
   status = 200
 
 # SPA 폴백 - 클라이언트 사이드 라우팅을 위함
