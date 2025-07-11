@@ -15,16 +15,8 @@ interface CartItem {
 }
 
 // 더미 장바구니 데이터
-const dummyCartItems:                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </AuthCheck>
-  );
-}
+const dummyCartItems: CartItem[] = [
+  {
     id: '1',
     name: '클래식 화이트 셔츠',
     price: 45000,
