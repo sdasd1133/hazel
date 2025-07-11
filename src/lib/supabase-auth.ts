@@ -107,6 +107,15 @@ export const useAuthStore = create<AuthStoreState>()(
     {
       name: 'auth-store',
       // storage: createJSONStorage(() => sessionStorage), // 세션 스토리지 사용으로 변경할 수도 있음
+      skipHydration: false,
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+          // 이전 버전과의 호환성을 위한 마이그레이션 로직
+          return persistedState;
+        }
+        return persistedState;
+      },
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

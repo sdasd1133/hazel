@@ -71,6 +71,17 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'cart-storage', // 로컬 스토리지에 저장될 이름
+      // hydration 시 오류 방지를 위한 설정
+      skipHydration: false,
+      // 버전 관리 및 마이그레이션
+      version: 1,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0) {
+          // 이전 버전과의 호환성을 위한 마이그레이션 로직
+          return persistedState;
+        }
+        return persistedState;
+      },
     }
   )
 );

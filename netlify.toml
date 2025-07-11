@@ -2,6 +2,11 @@
 [build]
   command = "npm run build"
   publish = ".next"
+  
+# 환경 변수 설정
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_TELEMETRY_DISABLED = "1"
 
 # Netlify Next.js 플러그인 사용
 [[plugins]]

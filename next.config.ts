@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // React Strict Mode 비활성화 (일부 라이브러리 호환성 문제 해결)
+  reactStrictMode: false,
+  // 실험적 기능 설정
+  experimental: {
+    // 서버 사이드 렌더링 최적화
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
+  // 최적화 설정
+  optimizeFonts: true,
+  swcMinify: true,
+  // 런타임 설정
+  poweredByHeader: false,
+  // 압축 활성화
+  compress: true,
   trailingSlash: true, // 슬래시로 끝나는 URL 처리
 };
 

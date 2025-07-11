@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown, UserPlus } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
@@ -9,6 +10,7 @@ import { getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
+import { useHydrated } from "@/hooks/useHydrated";
 
 const Header = () => {
   const parentCategories = getParentCategories();
@@ -16,6 +18,7 @@ const Header = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const hydrated = useHydrated();
   // 호버 효과는 CSS group-hover로 처리됨
   const headerRef = useRef<HTMLDivElement>(null);
   
@@ -59,11 +62,13 @@ const Header = () => {
             <Link href="/" className="hover:opacity-90 transition-opacity">
               <div className="h-16 w-auto relative flex items-center justify-center">
                 <span className="sr-only">GL GOOD LUCK FASHION</span>
-                <img 
+                <Image 
                   src="/logo.png" 
                   alt="GL GOOD LUCK FASHION" 
-                  className="h-full w-auto"
-                  style={{ objectFit: 'contain' }}
+                  width={120}
+                  height={64}
+                  className="h-full w-auto object-contain"
+                  priority
                 />
               </div>
             </Link>
@@ -130,7 +135,7 @@ const Header = () => {
                 <ShoppingBag className="h-[18px] w-[18px]" />
                 <span className="sr-only">장바구니</span>
               </Button>
-              {cartCount > 0 && (
+              {hydrated && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary to-secondary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center shadow-lg animate-pulse">
                   {cartCount}
                 </span>
@@ -138,44 +143,52 @@ const Header = () => {
             </Link>
             
             {/* 회원정보 */}
-            {isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="hidden md:inline text-sm font-medium text-black">
-                  {user?.name}님
-                </span>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="p-2 rounded-full transition-all duration-300 hover:scale-110 hover:bg-red-50 hover:text-red-500" 
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-[18px] w-[18px]" />
-                  <span className="sr-only">로그아웃</span>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Link href="/login">
+            {hydrated ? (
+              isAuthenticated ? (
+                <div className="flex items-center gap-3">
+                  <span className="hidden md:inline text-sm font-medium text-black">
+                    {user?.name}님
+                  </span>
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="flex items-center gap-2 py-1.5 px-3 rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary/10"
+                    className="p-2 rounded-full transition-all duration-300 hover:scale-110 hover:bg-red-50 hover:text-red-500" 
+                    onClick={handleLogout}
                   >
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline font-medium">로그인</span>
+                    <LogOut className="h-[18px] w-[18px]" />
+                    <span className="sr-only">로그아웃</span>
                   </Button>
-                </Link>
-                <Link href="/register">
-                  <Button 
-                    variant="gradient" 
-                    size="sm" 
-                    rounded 
-                    className="flex items-center gap-2 py-1.5 px-3 shadow-md hover:shadow-lg transition-all duration-300"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    <span className="hidden sm:inline font-medium">회원가입</span>
-                  </Button>
-                </Link>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/login">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-2 py-1.5 px-3 rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary/10"
+                    >
+                      <User className="h-4 w-4" />
+                      <span className="hidden sm:inline font-medium">로그인</span>
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button 
+                      variant="gradient" 
+                      size="sm" 
+                      rounded 
+                      className="flex items-center gap-2 py-1.5 px-3 shadow-md hover:shadow-lg transition-all duration-300"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      <span className="hidden sm:inline font-medium">회원가입</span>
+                    </Button>
+                  </Link>
+                </div>
+              )
+            ) : (
+              // hydration 전에는 로딩 상태 표시
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse"></div>
+                <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse"></div>
               </div>
             )}
           </div>
