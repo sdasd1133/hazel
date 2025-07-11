@@ -15,15 +15,19 @@ import {
 import { Button } from "@/components/ui/button";
 import AuthCheck from "@/components/auth-check";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
+  const router = useRouter();
 
   const handleCheckout = () => {
     setIsCheckingOut(true);
-    // 실제 구현에서는 여기서 결제 프로세스 진행
-    setTimeout(() => setIsCheckingOut(false), 2000);
+    // 결제 페이지로 이동
+    setTimeout(() => {
+      router.push('/checkout');
+    }, 500); // 짧은 로딩 애니메이션 후 이동
   };
 
   const renderCartContent = () => {
