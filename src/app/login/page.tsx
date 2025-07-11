@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, User, Lock, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/lib/supabase-auth';
+import { useHydrated } from '@/hooks/useHydrated';
 
 // 로그인 페이지 - searchParams를 사용하는 컴포넌트를 Suspense로 감싸야 합니다
 export default function LoginPage() {
@@ -31,6 +32,7 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const hydrated = useHydrated();
   
   const login = useAuthStore((state) => state.login);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -42,10 +44,10 @@ function LoginForm() {
   
   // 이미 로그인된 사용자는 리다이렉트
   useEffect(() => {
-    if (isAuthenticated) {
+    if (hydrated && isAuthenticated) {
       router.push(redirectTo);
     }
-  }, [isAuthenticated, redirectTo, router]);
+  }, [hydrated, isAuthenticated, redirectTo, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
