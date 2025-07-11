@@ -1,6 +1,6 @@
 # 빌드 설정
 [build]
-  command = "npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
   
 # 환경 변수 설정
@@ -9,6 +9,7 @@
   NPM_VERSION = "8"
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_ENV = "production"
+  NPM_FLAGS = "--prefer-offline --no-audit"
 
 # Netlify Next.js 플러그인 사용
 [[plugins]]
