@@ -54,7 +54,7 @@ export default function ProductsPage() {
     };
     
     filterProducts();
-  }, [category, parent, categories, parentCategories, isLoading]);
+  }, [category, parent, isLoading]); // 의존성 배열에서 객체 제거
   
   // 현재 선택된 상위 카테고리 확인
   const selectedParentCategory = parent

@@ -12,7 +12,7 @@ interface CategoryProductsClientProps {
 }
 
 export default function CategoryProductsClient({ category }: CategoryProductsClientProps) {
-  const [filteredProducts, setFilteredProducts] = useState([...products]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
   const parentCategories = getParentCategories();
@@ -31,7 +31,7 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
     };
     
     filterProducts();
-  }, [category]);
+  }, [category]); // category만 의존성으로 설정
   
   if (isLoading) {
     return (
