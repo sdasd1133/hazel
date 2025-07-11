@@ -78,6 +78,10 @@ const Header = () => {
               >
                 <Link
                   href={`/products?parent=${category.id}`}
+                  onClick={() => {
+                    console.log('상위 카테고리 클릭:', category.name, 'ID:', category.id);
+                    console.log('이동할 URL:', `/products?parent=${category.id}`);
+                  }}
                   className="flex items-center px-3 py-2 rounded-md text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
                 >
                   <span>{category.name}</span>
@@ -179,7 +183,10 @@ const Header = () => {
                 <Link
                   href={`/products?parent=${category.id}`}
                   className="block py-2.5 px-3 text-foreground/80 hover:text-primary hover:bg-primary/5 rounded-md font-medium transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={() => {
+                    console.log('모바일 상위 카테고리 클릭:', category.name, 'ID:', category.id);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
                   {category.name}
                 </Link>

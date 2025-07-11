@@ -22,17 +22,23 @@ export default function ProductsPage() {
   // 상품 및 카테고리 필터링 로직을 useEffect로 이동
   useEffect(() => {
     const filterProducts = () => {
+      console.log('필터링 시작 - parent:', parent, 'category:', category);
+      
       // 즉시 필터링하여 깜빡임 줄이기
       let newFilteredProducts = [...products];
       let newFilteredCategories = [...categories];
       
       // 상위 카테고리 선택 시
       if (parent) {
+        console.log('상위 카테고리 필터링:', parent);
         newFilteredProducts = getProductsByParentCategory(parent);
         newFilteredCategories = getCategoriesByParent(parent);
+        console.log('필터링된 상품 수:', newFilteredProducts.length);
+        console.log('필터링된 카테고리:', newFilteredCategories.map(c => c.name));
       } 
       // 하위 카테고리 선택 시
       else if (category) {
+        console.log('하위 카테고리 필터링:', category);
         newFilteredProducts = products.filter(product => 
           product.category.toLowerCase().replace(/\s+/g, '-') === category
         );
