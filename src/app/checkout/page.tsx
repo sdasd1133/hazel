@@ -18,7 +18,23 @@ interface CartItem {
 const dummyCartItems: CartItem[] = [
   {
     id: '1',
-    name: '클래식 화이트 셔츠',
+    na                  
+                  <div className="text-xs text-gray-500 text-center">
+                    <p>주문 접수 후 계좌로 입금해주세요. 입금 확인 후 상품을 발송합니다.</p>
+                    <p className="mt-1">입금계좌: 국민은행 123-456-789012 (주)헤이즐</p>
+                  </div>
+                </div>
+
+                {/* 무통장 입금 안내 */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="font-medium mb-3">🏦 무통장 입금 안내</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <p>🏛️ 국민은행 123-456-789012</p>
+                    <p>👤 예금주: (주)헤이즐</p>
+                    <p>⏰ 입금 확인 후 1-2일 내 발송</p>
+                    <p>📝 입금자명은 주문자명과 동일하게</p>
+                  </div>
+                </div>
     price: 45000,
     quantity: 1,
     image: '/images/shirt-white.jpg',
@@ -239,7 +255,7 @@ export default function CheckoutPage() {
                         className="mr-3"
                         disabled
                       />
-                      <span className="font-medium text-blue-800">🏦 무통장 입금 (유일한 결제 방법)</span>
+                      <span className="font-medium text-blue-800">🏦 무통장 입금</span>
                     </div>
                     <div className="text-sm text-blue-600 mt-3 ml-6 space-y-2">
                       <p>아래 계좌로 입금해주세요. 입금 확인 후 상품을 발송합니다.</p>
@@ -251,53 +267,6 @@ export default function CheckoutPage() {
                         <p className="text-red-600 mt-1">※ 입금자명은 주문자명과 동일하게 해주세요</p>
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* 비활성화된 다른 결제 방법들 */}
-                  <div className="opacity-50">
-                    <label className="flex items-center cursor-not-allowed">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="card"
-                        disabled
-                        className="mr-3"
-                      />
-                      <span className="line-through">신용카드 (현재 사용 불가)</span>
-                    </label>
-                    
-                    <label className="flex items-center cursor-not-allowed mt-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="bank"
-                        disabled
-                        className="mr-3"
-                      />
-                      <span className="line-through">실시간 계좌이체 (현재 사용 불가)</span>
-                    </label>
-                    
-                    <label className="flex items-center cursor-not-allowed mt-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="virtual"
-                        disabled
-                        className="mr-3"
-                      />
-                      <span className="line-through">가상계좌 (현재 사용 불가)</span>
-                    </label>
-                    
-                    <label className="flex items-center cursor-not-allowed mt-2">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="kakao"
-                        disabled
-                        className="mr-3"
-                      />
-                      <span className="line-through">카카오페이 (현재 사용 불가)</span>
-                    </label>
                   </div>
                 </div>
               </div>
