@@ -36,6 +36,22 @@ yarn-error.log*
 # vercel
 .vercel
 
+# netlify
+.netlify
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE and editors
+.vscode
+.idea
+*.swp
+*.swo
+
+# temporary files
+*.tmp
+*.temp
+
+# logs
+*.log
