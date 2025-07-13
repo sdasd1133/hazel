@@ -142,7 +142,7 @@ const Header = () => {
               <div className="h-14 w-auto relative flex items-center justify-center">
                 <div className="relative">
                   <Image 
-                    src="/gl-logo.svg" 
+                    src="/logo.png" 
                     alt="GL GOOD LUCK FASHION" 
                     width={200}
                     height={56}
