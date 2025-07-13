@@ -8,7 +8,12 @@ export function useHydrated() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setHydrated(true);
+    // 이중 체크로 더 안전하게 처리
+    const timer = setTimeout(() => {
+      setHydrated(true);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   return hydrated;

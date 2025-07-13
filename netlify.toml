@@ -11,6 +11,9 @@
   NODE_ENV = "production"
   NPM_FLAGS = "--prefer-offline --no-audit --legacy-peer-deps"
   NETLIFY_NEXT_PLUGIN_SKIP = "false"
+  # hydration 관련 설정
+  NEXT_PRIVATE_SKIP_BUILD_STEP = "false"
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Netlify Next.js 플러그인 사용
 [[plugins]]

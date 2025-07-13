@@ -41,13 +41,15 @@ const nextConfig: NextConfig = {
   
   // 실험적 기능 (Next.js 15)
   experimental: {
-    turbo: {
-      // Turbopack 최적화 (개발 환경)
-    },
+    // turbo: {
+    //   // Turbopack 최적화 (개발 환경)
+    // },
     // 서버 액션 사용 (필요한 경우)
     serverActions: {
       allowedOrigins: ["localhost:3000", "*.netlify.app"],
     },
+    // hydration 안정성 개선
+    optimizePackageImports: ['@/components', '@/lib', '@/hooks'],
   },
   
   // Webpack 설정
