@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 interface FooterSettings {
@@ -41,11 +42,13 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex-shrink-0">
-              <img
-                src="/logo.png"
+              <Image
+                src="/gl-logo.svg"
                 alt={footerSettings.companyName}
-                className="h-10 w-auto"
-                style={{ objectFit: 'contain' }}
+                width={120}
+                height={40}
+                className="h-10 w-auto object-contain"
+                priority
               />
             </Link>
             <div className="flex flex-col">
