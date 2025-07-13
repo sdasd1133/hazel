@@ -139,30 +139,15 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <div className="h-14 w-auto relative flex items-center justify-center">
-                <div className="relative">
-                  <Image 
-                    src="/logo.png" 
-                    alt="GL GOOD LUCK FASHION" 
-                    width={200}
-                    height={56}
-                    className="h-14 w-auto object-contain max-w-none"
-                    priority
-                    onError={(e) => {
-                      // 이미지 로드 실패 시 숨기기
-                      e.currentTarget.style.display = 'none';
-                      // fallback 텍스트 보이기
-                      const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                      if (fallback) fallback.style.display = 'block';
-                    }}
-                  />
-                  <div 
-                    className="hidden text-xl font-bold text-gray-900 dark:text-white"
-                    style={{ display: 'none' }}
-                  >
-                    GL GOOD LUCK FASHION
-                  </div>
-                </div>
+              <div className="h-14 flex items-center justify-center">
+                <Image 
+                  src="/gl-logo.svg" 
+                  alt="GL GOOD LUCK FASHION" 
+                  width={200}
+                  height={60}
+                  className="h-12 w-auto object-contain"
+                  priority
+                />
               </div>
             </Link>
           </div>
