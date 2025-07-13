@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/services/auth';
@@ -12,6 +12,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  // 이미 로그인된 사용자 체크
+  useEffect(() => {
+    const checkExistingAuth = async () => {
+      try {
+        const user = await authClient.getCurrentUser();
+        if (user) {
+          logger.log('이미 로그인된 사용자, 메인 페이지로 리다이렉트');
+          router.push('/');
+        }
+      } catch (error) {
+        // 인증되지 않은 상태이므로 계속 로그인 페이지에 머물기
+        logger.log('사용자 인증되지 않음, 로그인 페이지 유지');
+      }
+    };
+
+    checkExistingAuth();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
