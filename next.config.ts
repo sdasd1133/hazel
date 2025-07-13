@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   // Netlify 환경 최적화
   output: 'standalone', // Netlify에서 더 나은 성능을 위해
   
+  // 환경변수 기본값 설정
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key',
+  },
+  
   typescript: {
     // !! WARN !!
     // 프로덕션 빌드 시 타입 오류 무시 (임시)
