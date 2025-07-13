@@ -1,13 +1,14 @@
 import { getProductById } from "@/lib/products";
 import { Metadata } from "next";
 import ProductClientPage from "./client-page";
-import { ProductPageParams } from "./types";
 
-// Next.js 15와 Netlify 빌드 호환성을 위한 타입 정의
+type Props = {
+  params: Promise<{ productId: string }>;
+};
 
-// @ts-expect-error - Next.js 15에서의 타입 호환성 문제 해결
-export async function generateMetadata({ params }: { params: { productId: string } }): Promise<Metadata> {
-  const product = getProductById(params.productId);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { productId } = await params;
+  const product = getProductById(productId);
   
   if (!product) {
     return {
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: { params: { productId: string
   };
 }
 
-// @ts-expect-error - Next.js 15에서의 타입 호환성 문제 해결
-export default async function ProductPage({ params }: { params: { productId: string } }) {
-  return <ProductClientPage productId={params.productId} />;
+export default async function ProductPage({ params }: Props) {
+  const { productId } = await params;
+  return <ProductClientPage productId={productId} />;
 }

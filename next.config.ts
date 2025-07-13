@@ -35,7 +35,6 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@supabase/supabase-js'],
   
   // 성능 최적화
-  swcMinify: true, // SWC 압축 사용
   poweredByHeader: false,
   compress: true,
   

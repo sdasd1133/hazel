@@ -5,22 +5,95 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown, UserPlus } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
-import { useAuthStore } from "@/lib/supabase-auth";
+import { authClient } from "@/lib/services/auth";
 import { getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useHydrated } from "@/hooks/useHydrated";
+import { createClient } from "@/lib/supabase/client";
+import { logger } from "@/lib/logger";
 
 const Header = () => {
   const parentCategories = getParentCategories();
   const cartCount = useCartStore((state) => state.getTotalItems());
-  const { isAuthenticated, user, logout } = useAuthStore();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hydrated = useHydrated();
   // 호버 효과는 CSS group-hover로 처리됨
   const headerRef = useRef<HTMLDivElement>(null);
+  
+  // 인증 상태 확인
+  useEffect(() => {
+    if (!hydrated) return;
+    
+    let mounted = true;
+    
+    const checkAuth = async () => {
+      try {
+        const currentUser = await authClient.getCurrentUser();
+        if (mounted) {
+          if (currentUser) {
+            setUser(currentUser);
+            setIsAuthenticated(true);
+            logger.log('Header: 사용자 인증됨', currentUser.email);
+          } else {
+            setUser(null);
+            setIsAuthenticated(false);
+            logger.log('Header: 사용자 인증되지 않음');
+          }
+        }
+      } catch (error) {
+        logger.error('인증 상태 확인 오류:', error);
+        if (mounted) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    // Supabase 인증 상태 변화 감지
+    const supabase = createClient();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+        
+        // 로그를 줄이고 중요한 이벤트만 기록
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          logger.log('Auth state changed:', event, session?.user?.email);
+        }
+        
+        if (session?.user) {
+          setUser(session.user);
+          setIsAuthenticated(true);
+          logger.log('Header: Supabase 인증 상태 변화 - 로그인됨', session.user.email);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+          logger.log('Header: Supabase 인증 상태 변화 - 로그아웃됨');
+        }
+      }
+    );
+
+    checkAuth();
+    
+    // 관리자 로그인 성공 이벤트 리스너
+    const handleAdminLoginSuccess = () => {
+      logger.log('Header: 관리자 로그인 성공 이벤트 수신');
+      checkAuth(); // 인증 상태 재확인
+    };
+    
+    window.addEventListener('admin-login-success', handleAdminLoginSuccess);
+    
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      window.removeEventListener('admin-login-success', handleAdminLoginSuccess);
+    };
+  }, [hydrated]);
   
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -33,10 +106,16 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [isMobileMenuOpen]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-    router.refresh();
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      setUser(null);
+      setIsAuthenticated(false);
+      router.push('/');
+      router.refresh();
+    } catch (error) {
+      logger.error('로그아웃 오류:', error);
+    }
   };
 
   return (
@@ -60,14 +139,13 @@ const Header = () => {
           {/* 로고 */}
           <div className="flex-shrink-0">
             <Link href="/" className="hover:opacity-90 transition-opacity">
-              <div className="h-16 w-auto relative flex items-center justify-center">
-                <span className="sr-only">GL GOOD LUCK FASHION</span>
+              <div className="h-14 w-auto relative flex items-center justify-center">
                 <Image 
                   src="/logo.png" 
                   alt="GL GOOD LUCK FASHION" 
-                  width={120}
-                  height={64}
-                  className="h-full w-auto object-contain"
+                  width={200}
+                  height={56}
+                  className="h-14 w-auto object-contain max-w-none"
                   priority
                 />
               </div>
@@ -147,7 +225,7 @@ const Header = () => {
               isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="hidden md:inline text-sm font-medium text-black">
-                    {user?.name}님
+                    {user?.user_metadata?.name || user?.email?.split('@')[0]}님
                   </span>
                   <Button 
                     variant="ghost" 
@@ -185,10 +263,29 @@ const Header = () => {
                 </div>
               )
             ) : (
-              // hydration 전에는 로딩 상태 표시
+              // hydration 전에는 기본 상태 표시 (로그인 전 상태)
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse"></div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full animate-pulse"></div>
+                <Link href="/login">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="flex items-center gap-2 py-1.5 px-3 rounded-full transition-all duration-300 hover:scale-105 hover:bg-primary/10"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">로그인</span>
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button 
+                    variant="gradient" 
+                    size="sm" 
+                    rounded 
+                    className="flex items-center gap-2 py-1.5 px-3 shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    <span className="hidden sm:inline font-medium">회원가입</span>
+                  </Button>
+                </Link>
               </div>
             )}
           </div>
@@ -242,7 +339,7 @@ const Header = () => {
             </Link>
             
             {/* 모바일 로그인/회원가입 버튼 */}
-            {!isAuthenticated && (
+            {hydrated && !isAuthenticated && (
               <>
                 <div className="border-t border-border my-3"></div>
                 <div className="space-y-2">

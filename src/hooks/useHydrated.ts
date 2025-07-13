@@ -8,12 +8,8 @@ export function useHydrated() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // 이중 체크로 더 안전하게 처리
-    const timer = setTimeout(() => {
-      setHydrated(true);
-    }, 0);
-    
-    return () => clearTimeout(timer);
+    // 클라이언트에서만 실행되도록 보장
+    setHydrated(true);
   }, []);
 
   return hydrated;
