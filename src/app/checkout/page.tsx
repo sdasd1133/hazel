@@ -56,6 +56,7 @@ export default function CheckoutPage() {
   });
   const [isAddressSearched, setIsAddressSearched] = useState(false);
   const [errors, setErrors] = useState<Partial<ShippingInfo>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shippingFee = subtotal >= 50000 ? 0 : 3000;
@@ -132,7 +133,7 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!agreed) {
       alert('필수 약관에 동의해주세요.');
       return;
@@ -143,8 +144,22 @@ export default function CheckoutPage() {
       return;
     }
     
-    const orderNumber = 'ORD' + Date.now();
-    alert(`주문이 접수되었습니다!\n주문번호: ${orderNumber}\n총 금액: ${total.toLocaleString()}원`);
+    setIsLoading(true);
+    
+    try {
+      // 실제 주문 처리 로직 (추후 구현)
+      const orderNumber = 'ORD' + Date.now();
+      
+      // 시뮬레이션: 주문 처리 시간
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      alert(`주문이 접수되었습니다!\n주문번호: ${orderNumber}\n총 금액: ${total.toLocaleString()}원`);
+    } catch (error) {
+      console.error('주문 처리 중 오류:', error);
+      alert('주문 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -448,14 +463,21 @@ export default function CheckoutPage() {
               {/* 주문 버튼 */}
               <button
                 onClick={handleOrder}
+                disabled={!agreed || !shippingInfo.name || !shippingInfo.phone || !shippingInfo.address1 || !shippingInfo.address2 || isLoading}
                 className={`w-full mt-6 py-4 px-4 rounded-lg font-semibold text-lg transition-all duration-200 ${
-                  !agreed || !shippingInfo.name || !shippingInfo.phone || !shippingInfo.address1 || !shippingInfo.address2
+                  !agreed || !shippingInfo.name || !shippingInfo.phone || !shippingInfo.address1 || !shippingInfo.address2 || isLoading
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg transform hover:-translate-y-0.5'
                 }`}
-                disabled={!agreed || !shippingInfo.name || !shippingInfo.phone || !shippingInfo.address1 || !shippingInfo.address2}
               >
-                💳 {total.toLocaleString()}원 주문하기
+                {isLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    주문 처리 중...
+                  </div>
+                ) : (
+                  `💳 ${total.toLocaleString()}원 주문하기`
+                )}
               </button>
               
               <div className="mt-4 text-center text-xs text-gray-500">
