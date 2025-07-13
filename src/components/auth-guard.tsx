@@ -11,6 +11,7 @@ interface AuthGuardProps {
 
 // 로그인 없이 접근 가능한 페이지들
 const PUBLIC_PATHS = [
+  '/',           // 메인 페이지
   '/login',
   '/register',
   // 필요시 다른 공개 페이지 추가 가능
