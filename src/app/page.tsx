@@ -3,11 +3,11 @@ import { ArrowRight } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 text-white">
+      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 text-white min-h-[calc(100vh-80px)]">
         <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative max-w-7xl mx-auto px-4 py-24 sm:py-32">
+        <div className="relative max-w-7xl mx-auto px-4 py-20 sm:py-24 flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center">
             <h1 className="text-5xl sm:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
               HAZEL
