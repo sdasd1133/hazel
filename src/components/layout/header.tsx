@@ -141,8 +141,8 @@ const Header = () => {
             <Link href="/" className="hover:opacity-90 transition-opacity">
               <div className="h-14 w-auto relative flex items-center justify-center">
                 <Image 
-                  src="/logo.png" 
-                  alt="GL GOOD LUCK FASHION" 
+                  src="/hazel-logo.svg" 
+                  alt="HAZEL" 
                   width={200}
                   height={56}
                   className="h-14 w-auto object-contain max-w-none"

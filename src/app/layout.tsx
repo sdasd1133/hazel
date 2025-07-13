@@ -15,8 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GL GOOD LUCK FASHION - 트렌디한 의류 쇼핑몰",
-  description: "최신 트렌드의 의류와 패션 아이템을 만나보세요",
+  title: "HAZEL - 트렌디한 패션 브랜드",
+  description: "고품질의 트렌디한 의류와 패션 아이템을 만나보세요. HAZEL에서 당신만의 스타일을 찾아보세요.",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
