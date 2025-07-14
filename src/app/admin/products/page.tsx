@@ -15,8 +15,8 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [imageFiles, setImageFiles] = useState<File[]>([])
-  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([])
+  const [imageUrls, setImageUrls] = useState<string[]>([])
+  const [newImageUrl, setNewImageUrl] = useState('')
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
@@ -155,20 +155,6 @@ export default function AdminProductsPage() {
     try {
       console.log('Submitting form data:', formData);
       
-      // 이미지 URL 배열 생성 (실제 환경에서는 서버에 업로드 후 URL 받아옴)
-      const imageUrls: string[] = []
-      
-      // 임시로 미리보기 URL을 사용 (실제로는 서버 업로드 필요)
-      if (imageFiles.length > 0) {
-        // 여기서 실제 이미지 업로드 API를 호출해야 함
-        console.log('업로드할 이미지 파일들:', imageFiles)
-        
-        // 임시로 placeholder 이미지 URL 사용
-        for (let i = 0; i < imageFiles.length; i++) {
-          imageUrls.push(`/placeholder-product-${i + 1}.jpg`)
-        }
-      }
-      
       const productData = {
         ...formData,
         category_id: formData.category_id === 0 ? null : formData.category_id,
@@ -224,15 +210,14 @@ export default function AdminProductsPage() {
       featured: product.featured
     })
     
-    // 기존 이미지가 있으면 미리보기로 설정
+    // 기존 이미지 URL이 있으면 설정
     if (product.images && product.images.length > 0) {
-      setImagePreviewUrls([...product.images])
-      setImageFiles([]) // 기존 이미지는 파일이 아니므로 빈 배열
+      setImageUrls([...product.images])
     } else {
-      setImagePreviewUrls([])
-      setImageFiles([])
+      setImageUrls([])
     }
     
+    setNewImageUrl('')
     setShowForm(true)
   }
 
@@ -259,66 +244,45 @@ export default function AdminProductsPage() {
     }))
   }
 
-  // 이미지 파일 선택 핸들러
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    
-    // 총 이미지 개수 제한 (현재 + 새로 선택한 것)
-    if (imageFiles.length + files.length > 10) {
-      alert('최대 10장까지만 업로드할 수 있습니다.')
+  // 이미지 URL 추가 핸들러
+  const addImageUrl = () => {
+    if (!newImageUrl.trim()) {
+      alert('이미지 URL을 입력해주세요.')
       return
     }
     
-    // 파일 유효성 검사
-    const validFiles = files.filter(file => {
-      const isImage = file.type.startsWith('image/')
-      const isValidSize = file.size <= 5 * 1024 * 1024 // 5MB 제한
-      const isValidType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)
-      
-      if (!isImage || !isValidType) {
-        alert(`${file.name}은(는) 지원하지 않는 이미지 형식입니다. (JPG, PNG, WebP만 지원)`)
-        return false
-      }
-      if (!isValidSize) {
-        alert(`${file.name}은(는) 5MB를 초과합니다.`)
-        return false
-      }
-      return true
-    })
-
-    if (validFiles.length > 0) {
-      setImageFiles(prev => [...prev, ...validFiles])
-      
-      // 미리보기 URL 생성
-      validFiles.forEach(file => {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          setImagePreviewUrls(prev => [...prev, e.target?.result as string])
-        }
-        reader.readAsDataURL(file)
-      })
+    // URL 유효성 간단 검사
+    try {
+      new URL(newImageUrl)
+    } catch {
+      alert('올바른 URL을 입력해주세요.')
+      return
     }
     
-    // input 값 초기화 (같은 파일 재선택 가능하게)
-    e.target.value = ''
+    // 중복 검사
+    if (imageUrls.includes(newImageUrl)) {
+      alert('이미 추가된 이미지 URL입니다.')
+      return
+    }
+    
+    // 최대 10장 제한
+    if (imageUrls.length >= 10) {
+      alert('최대 10장까지만 등록할 수 있습니다.')
+      return
+    }
+    
+    setImageUrls(prev => [...prev, newImageUrl])
+    setNewImageUrl('')
   }
 
-  // 이미지 삭제 핸들러
-  const removeImage = (index: number) => {
-    setImageFiles(prev => prev.filter((_, i) => i !== index))
-    setImagePreviewUrls(prev => prev.filter((_, i) => i !== index))
+  // 이미지 URL 삭제 핸들러
+  const removeImageUrl = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index))
   }
 
   // 이미지 순서 변경 핸들러
-  const moveImage = (fromIndex: number, toIndex: number) => {
-    setImageFiles(prev => {
-      const newFiles = [...prev]
-      const [movedFile] = newFiles.splice(fromIndex, 1)
-      newFiles.splice(toIndex, 0, movedFile)
-      return newFiles
-    })
-    
-    setImagePreviewUrls(prev => {
+  const moveImageUrl = (fromIndex: number, toIndex: number) => {
+    setImageUrls(prev => {
       const newUrls = [...prev]
       const [movedUrl] = newUrls.splice(fromIndex, 1)
       newUrls.splice(toIndex, 0, movedUrl)
@@ -330,8 +294,8 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setShowForm(false)
     setEditingProduct(null)
-    setImageFiles([])
-    setImagePreviewUrls([])
+    setImageUrls([])
+    setNewImageUrl('')
     setFormData({
       name: '',
       description: '',
@@ -497,85 +461,104 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* 이미지 업로드 섹션 */}
+              {/* 이미지 URL 입력 섹션 */}
               <div>
                 <label className="block text-sm font-medium mb-2">상품 이미지</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <div className="flex flex-wrap gap-3 mb-4">
-                    {imagePreviewUrls.map((url, index) => (
-                      <div key={index} className="relative group">
-                        <img 
-                          src={url} 
-                          alt={`상품 이미지 ${index + 1}`} 
-                          className="w-24 h-24 object-cover rounded-lg border border-gray-200" 
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                            title="이미지 삭제"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                          </button>
-                          {index > 0 && (
+                
+                {/* 이미지 URL 입력 */}
+                <div className="mb-4">
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      value={newImageUrl}
+                      onChange={(e) => setNewImageUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          addImageUrl()
+                        }
+                      }}
+                      placeholder="이미지 URL을 입력하세요 (예: https://example.com/image.jpg)"
+                      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <button
+                      type="button"
+                      onClick={addImageUrl}
+                      disabled={!newImageUrl.trim()}
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
+                    >
+                      추가
+                    </button>
+                  </div>
+                </div>
+                
+                {/* 이미지 미리보기 */}
+                {imageUrls.length > 0 && (
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <div className="flex flex-wrap gap-3 mb-2">
+                      {imageUrls.map((url, index) => (
+                        <div key={index} className="relative group">
+                          <img 
+                            src={url} 
+                            alt={`상품 이미지 ${index + 1}`} 
+                            className="w-24 h-24 object-cover rounded-lg border border-gray-200" 
+                            onError={(e) => {
+                              e.currentTarget.src = '/placeholder-product.jpg'
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                             <button
                               type="button"
-                              onClick={() => moveImage(index, index - 1)}
-                              className="bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors ml-1"
-                              title="왼쪽으로 이동"
+                              onClick={() => removeImageUrl(index)}
+                              className="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                              title="이미지 삭제"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                               </svg>
                             </button>
-                          )}
-                          {index < imagePreviewUrls.length - 1 && (
-                            <button
-                              type="button"
-                              onClick={() => moveImage(index, index + 1)}
-                              className="bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors ml-1"
-                              title="오른쪽으로 이동"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                              </svg>
-                            </button>
+                            {index > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => moveImageUrl(index, index - 1)}
+                                className="bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors ml-1"
+                                title="왼쪽으로 이동"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                              </button>
+                            )}
+                            {index < imageUrls.length - 1 && (
+                              <button
+                                type="button"
+                                onClick={() => moveImageUrl(index, index + 1)}
+                                className="bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors ml-1"
+                                title="오른쪽으로 이동"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          {index === 0 && (
+                            <span className="absolute -top-2 -left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                              대표
+                            </span>
                           )}
                         </div>
-                        {index === 0 && (
-                          <span className="absolute -top-2 -left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                            대표
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {/* 이미지 추가 버튼 */}
-                    <label className="flex flex-col items-center justify-center w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
-                      <svg className="w-8 h-8 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
-                      </svg>
-                      <span className="text-xs text-gray-500">이미지 추가</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
+                      ))}
+                    </div>
                   </div>
-                  
-                  <div className="text-sm text-gray-500">
-                    <p>• 최대 10장까지 업로드 가능</p>
-                    <p>• 권장 크기: 800x800px 이상</p>
-                    <p>• 지원 형식: JPG, PNG, WebP</p>
-                    <p>• 최대 파일 크기: 5MB</p>
-                    <p>• 첫 번째 이미지가 대표 이미지로 사용됩니다</p>
-                  </div>
+                )}
+                
+                <div className="text-sm text-gray-500 mt-2">
+                  <p>• 최대 10장까지 등록 가능</p>
+                  <p>• 웹에서 접근 가능한 이미지 URL을 입력하세요</p>
+                  <p>• 권장 크기: 800x800px 이상</p>
+                  <p>• 지원 형식: JPG, PNG, WebP</p>
+                  <p>• 첫 번째 이미지가 대표 이미지로 사용됩니다</p>
                 </div>
               </div>
 
