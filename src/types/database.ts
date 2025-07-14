@@ -8,6 +8,7 @@ export interface Database {
           phone: string | null
           address: string | null
           role: 'user' | 'admin'
+          status: 'pending' | 'approved' | 'rejected'
           created_at: string
           updated_at: string
         }
@@ -17,6 +18,7 @@ export interface Database {
           phone?: string | null
           address?: string | null
           role?: 'user' | 'admin'
+          status?: 'pending' | 'approved' | 'rejected'
           created_at?: string
           updated_at?: string
         }
@@ -26,6 +28,7 @@ export interface Database {
           phone?: string | null
           address?: string | null
           role?: 'user' | 'admin'
+          status?: 'pending' | 'approved' | 'rejected'
           created_at?: string
           updated_at?: string
         }

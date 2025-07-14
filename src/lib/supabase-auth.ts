@@ -36,19 +36,36 @@ export const useAuthStore = create<AuthStoreState>()(
               id: 'admin-id',
               email: 'admin@hazel.com',
               name: '관리자',
-              isAdmin: true
+              isAdmin: true,
+              status: 'approved' as const
             },
             'user@example.com': {
               id: 'user-id-1',
               email: 'user@example.com',
               name: '테스트 사용자',
-              isAdmin: false
+              isAdmin: false,
+              status: 'approved' as const
             },
             'test@hazel.com': {
               id: 'user-id-2',
               email: 'test@hazel.com',
               name: '일반 사용자',
-              isAdmin: false
+              isAdmin: false,
+              status: 'approved' as const
+            },
+            'pending@hazel.com': {
+              id: 'user-id-3',
+              email: 'pending@hazel.com',
+              name: '승인 대기 사용자',
+              isAdmin: false,
+              status: 'pending' as const
+            },
+            'rejected@hazel.com': {
+              id: 'user-id-4',
+              email: 'rejected@hazel.com',
+              name: '승인 거부 사용자',
+              isAdmin: false,
+              status: 'rejected' as const
             }
           };
           
@@ -56,11 +73,26 @@ export const useAuthStore = create<AuthStoreState>()(
           if (testAccounts[email as keyof typeof testAccounts]) {
             console.log('테스트 계정으로 로그인 처리:', email);
             const user = testAccounts[email as keyof typeof testAccounts];
-            set({ 
-              user,
-              isAuthenticated: true 
-            });
-            return true;
+            
+            // 승인 상태 확인
+            if (user.status === 'pending') {
+              alert('계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.');
+              return false;
+            }
+            
+            if (user.status === 'rejected') {
+              alert('계정이 승인 거부되었습니다. 관리자에게 문의하세요.');
+              return false;
+            }
+            
+            // 승인된 계정만 로그인 허용
+            if (user.status === 'approved') {
+              set({ 
+                user,
+                isAuthenticated: true 
+              });
+              return true;
+            }
           }
           
           // 테스트가 아닌 계정의 경우
@@ -79,15 +111,28 @@ export const useAuthStore = create<AuthStoreState>()(
           }
           
           if (user) {
-            // 명시적으로 user.isAdmin 값을 설정 (데이터베이스에서 가져온 값 그대로 사용)
-            set({ 
-              user: {
-                ...user,
-                isAdmin: user.isAdmin === true
-              }, 
-              isAuthenticated: true 
-            });
-            return true;
+            // 승인 상태 확인
+            if (user.status === 'pending') {
+              alert('계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.');
+              return false;
+            }
+            
+            if (user.status === 'rejected') {
+              alert('계정이 승인 거부되었습니다. 관리자에게 문의하세요.');
+              return false;
+            }
+            
+            // 승인된 계정만 로그인 허용
+            if (user.status === 'approved') {
+              set({ 
+                user: {
+                  ...user,
+                  isAdmin: user.isAdmin === true
+                }, 
+                isAuthenticated: true 
+              });
+              return true;
+            }
           }
           */
         } catch (error) {

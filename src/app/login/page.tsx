@@ -195,7 +195,7 @@ export default function LoginPage() {
               </button>
               
               <div className="border-t border-gray-200 pt-3 mt-3">
-                <p className="text-sm text-gray-600 mb-2">기존 계정으로 바로 로그인:</p>
+                <p className="text-sm text-gray-600 mb-2">승인 상태별 테스트 계정:</p>
                 <div className="space-y-2">
                   <button
                     type="button"
@@ -206,18 +206,7 @@ export default function LoginPage() {
                     disabled={loading}
                     className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                   >
-                    관리자 계정으로 자동 입력 (admin@hazel.com)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('admin2@hazel.com');
-                      setPassword('admin123');
-                    }}
-                    disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-purple-300 rounded-md shadow-sm text-sm font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-                  >
-                    관리자 계정2로 자동 입력 (admin2@hazel.com)
+                    👑 관리자 계정 (admin@hazel.com)
                   </button>
                   <button
                     type="button"
@@ -228,8 +217,33 @@ export default function LoginPage() {
                     disabled={loading}
                     className="w-full flex justify-center py-2 px-4 border border-green-300 rounded-md shadow-sm text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                   >
-                    테스트 계정으로 자동 입력 (test@hazel.com)
+                    ✅ 승인된 사용자 (test@hazel.com)
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('pending@hazel.com');
+                      setPassword('password123');
+                    }}
+                    disabled={loading}
+                    className="w-full flex justify-center py-2 px-4 border border-yellow-300 rounded-md shadow-sm text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
+                  >
+                    ⏳ 승인 대기 (pending@hazel.com)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('rejected@hazel.com');
+                      setPassword('password123');
+                    }}
+                    disabled={loading}
+                    className="w-full flex justify-center py-2 px-4 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                  >
+                    ❌ 승인 거부 (rejected@hazel.com)
+                  </button>
+                </div>
+                <div className="mt-3 text-center text-xs text-gray-500">
+                  승인 대기/거부 계정으로 로그인 시 접근이 제한됩니다.
                 </div>
               </div>
             </div>

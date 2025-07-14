@@ -62,7 +62,7 @@ export default function RegisterPage() {
         phone: formData.phone
       })
 
-      alert('회원가입이 완료되었습니다! 이메일을 확인해주세요.')
+      alert('회원가입이 완료되었습니다! 관리자의 승인 후 로그인이 가능합니다. 승인까지 시간이 소요될 수 있습니다.')
       router.push('/login')
     } catch (error) {
       console.error('회원가입 오류:', error)

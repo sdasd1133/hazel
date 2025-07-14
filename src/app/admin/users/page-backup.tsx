@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, UserCheck, X, Clock, Shield, Mail, Calendar } from 'lucide-react';
+import { Search, MoreVertical, UserCheck, UserX, Mail, Calendar, Shield, Clock, X } from 'lucide-react';
 
 interface User {
   id: string;
@@ -55,7 +55,9 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<'all' | User['status']>('all');
+  const [filterRole, setFilterRole] = useState<'all' | User['role']>('all');
 
+  // 실제 구현에서는 API에서 사용자 데이터를 가져옵니다
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
@@ -79,6 +81,7 @@ export default function UsersPage() {
           role: 'user',
           status: 'pending',
           createdAt: '2024-07-14',
+          lastLogin: undefined,
           orderCount: 0,
           totalSpent: 0
         },
@@ -100,6 +103,7 @@ export default function UsersPage() {
           role: 'user',
           status: 'rejected',
           createdAt: '2024-07-10',
+          lastLogin: undefined,
           orderCount: 0,
           totalSpent: 0
         },
@@ -110,6 +114,7 @@ export default function UsersPage() {
           role: 'user',
           status: 'pending',
           createdAt: '2024-07-13',
+          lastLogin: undefined,
           orderCount: 0,
           totalSpent: 0
         }
@@ -124,6 +129,7 @@ export default function UsersPage() {
 
   const handleUserApproval = async (userId: string, newStatus: 'approved' | 'rejected') => {
     try {
+      // 실제 구현에서는 API 호출
       setUsers(prevUsers => 
         prevUsers.map(user => 
           user.id === userId 
@@ -139,73 +145,126 @@ export default function UsersPage() {
       alert('처리 중 오류가 발생했습니다.');
     }
   };
+          status: 'inactive',
+          createdAt: '2024-03-10',
+          lastLogin: '2024-06-15',
+          orderCount: 3,
+          totalSpent: 180000
+        },
+        {
+          id: '5',
+          name: '박민수',
+          email: 'park@example.com',
+          role: 'user',
+          status: 'banned',
+          createdAt: '2024-01-25',
+          lastLogin: '2024-05-20',
+          orderCount: 2,
+          totalSpent: 95000
+        }
+      ];
+      
+      setTimeout(() => {
+        setUsers(mockUsers);
+        setLoading(false);
+      }, 500);
+    };
 
+    fetchUsers();
+  }, []);
+
+  // 필터링된 사용자 목록
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
-    return matchesSearch && matchesStatus;
+    const matchesRole = filterRole === 'all' || user.role === filterRole;
+    
+    return matchesSearch && matchesStatus && matchesRole;
   });
 
-  const pendingCount = users.filter(user => user.status === 'pending').length;
+  const handleStatusChange = async (userId: string, newStatus: User['status']) => {
+    // 실제 구현에서는 API 호출
+    setUsers(prev => prev.map(user => 
+      user.id === userId ? { ...user, status: newStatus } : user
+    ));
+  };
+
+  const handleRoleChange = async (userId: string, newRole: User['role']) => {
+    // 실제 구현에서는 API 호출
+    setUsers(prev => prev.map(user => 
+      user.id === userId ? { ...user, role: newRole } : user
+    ));
+  };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">사용자 관리</h1>
-          <p className="text-gray-600">사용자 승인 및 관리</p>
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h1 className="text-2xl font-bold">사용자 관리</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-500">총 {users.length}명</span>
         </div>
-        {pendingCount > 0 && (
-          <div className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-            {pendingCount}명 승인 대기 중
-          </div>
-        )}
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="사용자 검색..."
-                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as 'all' | User['status'])}
-            >
-              <option value="all">모든 상태</option>
-              <option value="pending">승인 대기</option>
-              <option value="approved">승인됨</option>
-              <option value="rejected">승인 거부</option>
-            </select>
+      {/* 검색 및 필터 */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* 검색 */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="이름 또는 이메일로 검색..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
           </div>
-        </div>
 
+          {/* 상태 필터 */}
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as typeof filterStatus)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            <option value="all">모든 상태</option>
+            <option value="active">활성</option>
+            <option value="inactive">비활성</option>
+            <option value="banned">차단</option>
+          </select>
+
+          {/* 역할 필터 */}
+          <select
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value as typeof filterRole)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+          >
+            <option value="all">모든 역할</option>
+            <option value="user">일반 사용자</option>
+            <option value="admin">관리자</option>
+          </select>
+        </div>
+      </div>
+
+      {/* 사용자 목록 */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   사용자
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  권한
+                  역할
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   상태
@@ -214,10 +273,13 @@ export default function UsersPage() {
                   가입일
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  주문 수
+                  최근 로그인
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  작업
+                  주문/구매금액
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  관리
                 </th>
               </tr>
             </thead>
@@ -226,17 +288,15 @@ export default function UsersPage() {
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                          <span className="text-sm font-medium text-gray-700">
-                            {user.name.charAt(0)}
-                          </span>
-                        </div>
+                      <div className="h-10 w-10 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
+                        <span className="text-white font-medium text-sm">
+                          {user.name.charAt(0)}
+                        </span>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-500 flex items-center">
-                          <Mail className="h-4 w-4 mr-1" />
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <Mail className="h-3 w-3" />
                           {user.email}
                         </div>
                       </div>
@@ -249,47 +309,46 @@ export default function UsersPage() {
                     <UserStatusBadge status={user.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
                       {new Date(user.createdAt).toLocaleDateString('ko-KR')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.orderCount}건
+                    {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('ko-KR') : '없음'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {user.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleUserApproval(user.id, 'approved')}
-                          className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
-                        >
-                          승인
-                        </button>
-                        <button
-                          onClick={() => handleUserApproval(user.id, 'rejected')}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
-                        >
-                          거부
-                        </button>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div>
+                      <div className="font-medium">{user.orderCount}건</div>
+                      <div className="text-xs text-gray-500">
+                        {user.totalSpent.toLocaleString()}원
                       </div>
-                    )}
-                    {user.status === 'rejected' && (
-                      <button
-                        onClick={() => handleUserApproval(user.id, 'approved')}
-                        className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700"
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      {/* 상태 변경 버튼 */}
+                      <select
+                        value={user.status}
+                        onChange={(e) => handleStatusChange(user.id, e.target.value as User['status'])}
+                        className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-primary focus:border-transparent"
                       >
-                        승인
-                      </button>
-                    )}
-                    {user.status === 'approved' && user.role !== 'admin' && (
-                      <button
-                        onClick={() => handleUserApproval(user.id, 'rejected')}
-                        className="bg-red-600 text-white px-3 py-1 rounded text-xs hover:bg-red-700"
+                        <option value="active">활성</option>
+                        <option value="inactive">비활성</option>
+                        <option value="banned">차단</option>
+                      </select>
+
+                      {/* 역할 변경 버튼 */}
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value as User['role'])}
+                        className="text-xs border border-gray-300 rounded px-2 py-1 focus:ring-1 focus:ring-primary focus:border-transparent"
+                        disabled={user.email === 'admin@hazel.com'} // 메인 관리자는 변경 불가
                       >
-                        차단
-                      </button>
-                    )}
+                        <option value="user">일반</option>
+                        <option value="admin">관리자</option>
+                      </select>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -299,9 +358,9 @@ export default function UsersPage() {
 
         {filteredUsers.length === 0 && (
           <div className="text-center py-12">
-            <UserCheck className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">사용자가 없습니다</h3>
-            <p className="mt-1 text-sm text-gray-500">검색 조건에 맞는 사용자가 없습니다.</p>
+            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">사용자가 없습니다</h3>
+            <p className="text-gray-500">검색 조건을 변경해보세요.</p>
           </div>
         )}
       </div>
