@@ -164,6 +164,16 @@ const Header = () => {
                   <span className="hidden md:inline text-sm font-medium text-black">
                     {user?.name || user?.email?.split('@')[0]}님
                   </span>
+                  <Link href="/mypage">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="p-2 rounded-full transition-all duration-300 hover:scale-110 hover:bg-primary/10" 
+                    >
+                      <User className="h-[18px] w-[18px]" />
+                      <span className="sr-only">마이페이지</span>
+                    </Button>
+                  </Link>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -286,6 +296,33 @@ const Header = () => {
                 >
                   관리자 대시보드
                 </Link>
+              </>
+            )}
+            
+            {/* 모바일 사용자 메뉴 */}
+            {hydrated && isAuthenticated && (
+              <>
+                <div className="border-t border-border my-3"></div>
+                <div className="space-y-2">
+                  <Link
+                    href="/mypage"
+                    className="flex items-center gap-3 py-2.5 px-3 text-foreground/80 font-medium hover:text-primary hover:bg-primary/5 rounded-md transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="h-4 w-4" />
+                    마이페이지
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 py-2.5 px-3 w-full text-left text-red-600 font-medium hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    로그아웃
+                  </button>
+                </div>
               </>
             )}
             

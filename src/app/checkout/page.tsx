@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ShoppingBag, CreditCard, MapPin, Search, CheckCircle } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
 
@@ -35,7 +36,8 @@ const deliveryOptions = [
 ];
 
 export default function CheckoutPage() {
-  const { items: cartItems, getTotalPrice } = useCartStore();
+  const { items: cartItems, getTotalPrice, clearCart } = useCartStore();
+  const router = useRouter();
   
   // 장바구니가 비어있으면 안내 메시지 표시
   if (cartItems.length === 0) {
@@ -156,13 +158,41 @@ export default function CheckoutPage() {
     setIsLoading(true);
     
     try {
-      // 실제 주문 처리 로직 (추후 구현)
+      // 주문번호 생성
       const orderNumber = 'ORD' + Date.now();
+      
+      // 주문 데이터 준비
+      const orderData = {
+        id: orderNumber,
+        items: cartItems,
+        shippingInfo,
+        totalAmount: total,
+        shippingFee,
+        status: 'confirmed' as const,
+        createdAt: new Date().toISOString(),
+        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        trackingNumber: Math.random().toString(36).substr(2, 10).toUpperCase()
+      };
+      
+      // 로컬 스토리지에 주문 정보 저장 (실제로는 서버에 전송)
+      localStorage.setItem(`order_${orderNumber}`, JSON.stringify(orderData));
+      
+      // 실제로는 여기서 서버에 주문 데이터를 전송해야 합니다
+      // const response = await fetch('/api/orders', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(orderData)
+      // });
       
       // 시뮬레이션: 주문 처리 시간
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      alert(`주문이 접수되었습니다!\n주문번호: ${orderNumber}\n총 금액: ${total.toLocaleString()}원`);
+      // 주문 완료 후 장바구니 비우기
+      clearCart();
+      
+      // 주문 상세 페이지로 이동
+      router.push(`/orders/${orderNumber}`);
+      
     } catch (error) {
       console.error('주문 처리 중 오류:', error);
       alert('주문 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
