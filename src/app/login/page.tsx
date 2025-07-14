@@ -94,42 +94,6 @@ export default function LoginPage() {
     }
   };
 
-  const createTestAccount = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const result = await authClient.signUp({
-        email: 'test@hazel.com',
-        password: 'password123',
-        name: 'Test User'
-      });
-      setError('테스트 계정이 생성되었습니다. 로그인해주세요.');
-    } catch (err: any) {
-      setError(`테스트 계정 생성 실패: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createAdminAccount = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const result = await authClient.signUp({
-        email: 'admin2@hazel.com',
-        password: 'admin123',
-        name: 'Admin User'
-      });
-      setError('관리자 계정(admin2@hazel.com)이 생성되었습니다. 로그인해주세요.');
-    } catch (err: any) {
-      setError(`관리자 계정 생성 실패: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -218,80 +182,6 @@ export default function LoginPage() {
             <Link href="/register" className="text-indigo-600 hover:text-indigo-500">
               계정이 없으신가요? 회원가입
             </Link>
-          </div>
-
-          <div className="mt-6 border-t border-gray-200 pt-6">
-            <div className="space-y-3">
-              <button
-                type="button"
-                onClick={createTestAccount}
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                테스트 계정 생성 (test@hazel.com)
-              </button>
-              <button
-                type="button"
-                onClick={createAdminAccount}
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-              >
-                관리자 계정 생성 (admin2@hazel.com)
-              </button>
-              
-              <div className="border-t border-gray-200 pt-3 mt-3">
-                <p className="text-sm text-gray-600 mb-2">승인 상태별 테스트 계정:</p>
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('admin@hazel.com');
-                      setPassword('admin123');
-                    }}
-                    disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                  >
-                    👑 관리자 계정 (admin@hazel.com)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('test@hazel.com');
-                      setPassword('password123');
-                    }}
-                    disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-green-300 rounded-md shadow-sm text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
-                  >
-                    ✅ 승인된 사용자 (test@hazel.com)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('pending@hazel.com');
-                      setPassword('password123');
-                    }}
-                    disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-yellow-300 rounded-md shadow-sm text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50"
-                  >
-                    ⏳ 승인 대기 (pending@hazel.com)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmail('rejected@hazel.com');
-                      setPassword('password123');
-                    }}
-                    disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
-                  >
-                    ❌ 승인 거부 (rejected@hazel.com)
-                  </button>
-                </div>
-                <div className="mt-3 text-center text-xs text-gray-500">
-                  승인 대기/거부 계정으로 로그인 시 접근이 제한됩니다.
-                </div>
-              </div>
-            </div>
           </div>
         </form>
       </div>
