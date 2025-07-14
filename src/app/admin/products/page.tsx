@@ -84,19 +84,19 @@ export default function AdminProductsPage() {
         }));
       }
       
-      // DB에 카테고리가 없으면 기본 카테고리 사용
-      console.log('DB에 카테고리가 없어서 기본 카테고리를 사용합니다.');
+      // DB에 카테고리가 없으면 메인 사이트와 동일한 카테고리 사용
+      console.log('DB에 카테고리가 없어서 메인 사이트 카테고리를 사용합니다.');
       const categories = [
         { id: 'women-clothing', name: '여성의류' },
         { id: 'men-clothing', name: '남성의류' },
+        { id: 'sports-clothing', name: '스포츠의류' },
         { id: 'bags', name: '가방' },
         { id: 'shoes', name: '신발' },
-        { id: 'accessories', name: '악세서리' },
         { id: 'watches', name: '시계' },
         { id: 'hats', name: '모자' },
         { id: 'belts', name: '벨트' },
-        { id: 'sports-clothing', name: '스포츠의류' },
-        { id: 'coordinated-sets', name: '코디세트' },
+        { id: 'accessories', name: '악세사리' },
+        { id: 'coordinated-sets', name: '깔맞춤' },
         { id: 'used-luxury', name: '중고명품' }
       ];
       
@@ -109,18 +109,18 @@ export default function AdminProductsPage() {
     } catch (error) {
       console.error('카테고리 로드 오류:', error);
       
-      // 오류 발생 시에도 기본 카테고리 반환
+      // 오류 발생 시에도 메인 사이트 카테고리 반환
       const categories = [
         { id: 'women-clothing', name: '여성의류' },
         { id: 'men-clothing', name: '남성의류' },
+        { id: 'sports-clothing', name: '스포츠의류' },
         { id: 'bags', name: '가방' },
         { id: 'shoes', name: '신발' },
-        { id: 'accessories', name: '악세서리' },
         { id: 'watches', name: '시계' },
         { id: 'hats', name: '모자' },
         { id: 'belts', name: '벨트' },
-        { id: 'sports-clothing', name: '스포츠의류' },
-        { id: 'coordinated-sets', name: '코디세트' },
+        { id: 'accessories', name: '악세사리' },
+        { id: 'coordinated-sets', name: '깔맞춤' },
         { id: 'used-luxury', name: '중고명품' }
       ];
       
