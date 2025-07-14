@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/supabase-auth'
 import { logger } from '@/lib/logger'
+import { createUser } from '@/lib/supabase-users-temp'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -53,28 +54,19 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      // 기존 테스트 계정과 중복 체크
-      const existingTestEmails = [
-        'admin@hazel.com',
-        'test@hazel.com', 
-        'pending@hazel.com',
-        'rejected@hazel.com',
-        'admin2@hazel.com'
-      ]
-      
-      if (existingTestEmails.includes(formData.email.toLowerCase())) {
-        setError('이미 등록된 테스트 계정입니다. 다른 이메일을 사용해주세요.')
-        setLoading(false)
-        return
-      }
-
-      // 간단한 회원가입 처리 (실제 환경에서는 실제 데이터베이스에 저장)
-      console.log('회원가입 요청:', {
-        email: formData.email,
+      // 실제 데이터베이스에 사용자 생성
+      const result = await createUser({
         name: formData.name,
-        phone: formData.phone,
-        status: 'pending' // 기본적으로 승인 대기 상태
+        email: formData.email,
+        phone: formData.phone || undefined,
+        password: formData.password
       });
+
+      if (!result.success) {
+        setError(result.error || '회원가입 중 오류가 발생했습니다.');
+        setLoading(false);
+        return;
+      }
 
       // 성공 메시지 표시
       alert(`회원가입이 완료되었습니다! 
@@ -83,23 +75,14 @@ export default function RegisterPage() {
 ⏳ 상태: 승인 대기 중
 👨‍💼 관리자의 승인 후 로그인이 가능합니다.
 
-테스트용 계정:
-• pending@hazel.com (승인 대기)
-• rejected@hazel.com (승인 거부)
-• test@hazel.com (승인 완료)
-
-로그인 페이지에서 테스트 계정으로 승인 시스템을 확인해보세요.`);
+관리자 페이지에서 승인 상태를 확인할 수 있습니다.`);
       router.push('/login')
     } catch (error) {
       console.error('회원가입 오류:', error)
       
       // 구체적인 에러 메시지 제공
       if (error instanceof Error) {
-        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-          setError('이미 등록된 이메일입니다. 다른 이메일을 사용하거나 로그인 페이지에서 로그인해주세요.')
-        } else {
-          setError(`회원가입 중 오류가 발생했습니다: ${error.message}`)
-        }
+        setError(`회원가입 중 오류가 발생했습니다: ${error.message}`)
       } else {
         setError('회원가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
       }

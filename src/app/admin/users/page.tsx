@@ -2,18 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { Search, UserCheck, X, Clock, Shield, Mail, Calendar } from 'lucide-react';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'user' | 'admin';
-  status: 'pending' | 'approved' | 'rejected';
-  createdAt: string;
-  lastLogin?: string;
-  orderCount: number;
-  totalSpent: number;
-}
+import { getAllUsers, updateUserStatus, User } from '@/lib/supabase-users-temp';
+import { logger } from '@/lib/logger';
 
 const UserStatusBadge = ({ status }: { status: User['status'] }) => {
   const statusConfig = {
@@ -59,64 +49,23 @@ export default function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
-      // 가상의 사용자 데이터 (승인 시스템 포함)
-      const mockUsers: User[] = [
-        {
-          id: '1',
-          name: '홍길동',
-          email: 'hong@example.com',
-          role: 'user',
-          status: 'approved',
-          createdAt: '2024-01-15',
-          lastLogin: '2024-07-13',
-          orderCount: 12,
-          totalSpent: 1250000
-        },
-        {
-          id: '2',
-          name: '김영희',
-          email: 'kim@example.com',
-          role: 'user',
-          status: 'pending',
-          createdAt: '2024-07-14',
-          orderCount: 0,
-          totalSpent: 0
-        },
-        {
-          id: '3',
-          name: '관리자',
-          email: 'admin@hazel.com',
-          role: 'admin',
-          status: 'approved',
-          createdAt: '2023-12-01',
-          lastLogin: '2024-07-13',
-          orderCount: 0,
-          totalSpent: 0
-        },
-        {
-          id: '4',
-          name: '이철수',
-          email: 'lee@example.com',
-          role: 'user',
-          status: 'rejected',
-          createdAt: '2024-07-10',
-          orderCount: 0,
-          totalSpent: 0
-        },
-        {
-          id: '5',
-          name: '박지영',
-          email: 'park@example.com',
-          role: 'user',
-          status: 'pending',
-          createdAt: '2024-07-13',
-          orderCount: 0,
-          totalSpent: 0
+      try {
+        const result = await getAllUsers();
+        
+        if (result.success && result.users) {
+          setUsers(result.users);
+          logger.log('사용자 목록 로드 성공:', result.users.length, '명');
+        } else {
+          console.error('사용자 목록 로드 실패:', result.error);
+          // 실패 시 빈 배열로 설정
+          setUsers([]);
         }
-      ];
-      
-      setUsers(mockUsers);
-      setLoading(false);
+      } catch (error) {
+        console.error('사용자 목록 로드 중 오류:', error);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchUsers();
@@ -124,18 +73,26 @@ export default function UsersPage() {
 
   const handleUserApproval = async (userId: string, newStatus: 'approved' | 'rejected') => {
     try {
-      setUsers(prevUsers => 
-        prevUsers.map(user => 
-          user.id === userId 
-            ? { ...user, status: newStatus }
-            : user
-        )
-      );
+      const result = await updateUserStatus(userId, newStatus);
       
-      const user = users.find(u => u.id === userId);
-      const statusText = newStatus === 'approved' ? '승인' : '거부';
-      alert(`${user?.name}님의 계정이 ${statusText}되었습니다.`);
+      if (result.success) {
+        // 로컬 상태 업데이트
+        setUsers(prevUsers => 
+          prevUsers.map(user => 
+            user.id === userId 
+              ? { ...user, status: newStatus }
+              : user
+          )
+        );
+        
+        const user = users.find(u => u.id === userId);
+        const statusText = newStatus === 'approved' ? '승인' : '거부';
+        alert(`${user?.name}님의 계정이 ${statusText}되었습니다.`);
+      } else {
+        alert(`처리 중 오류가 발생했습니다: ${result.error}`);
+      }
     } catch (error) {
+      console.error('사용자 상태 업데이트 오류:', error);
       alert('처리 중 오류가 발생했습니다.');
     }
   };
@@ -251,11 +208,11 @@ export default function UsersPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+                      {new Date(user.created_at).toLocaleDateString('ko-KR')}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.orderCount}건
+                    {user.order_count || 0}건
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {user.status === 'pending' && (
