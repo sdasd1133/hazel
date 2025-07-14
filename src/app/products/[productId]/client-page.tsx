@@ -3,8 +3,10 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Heart } from "lucide-react";
 import { mainProductService, convertMainProductToProduct } from "@/lib/services/main-products";
 import { useCartStore } from "@/lib/cartStore";
+import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
 
 interface ProductClientPageProps {
@@ -16,6 +18,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
@@ -113,6 +116,16 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     addItem(product, quantity, selectedSize, selectedColor);
     
     alert('장바구니에 추가되었습니다.');
+  };
+
+  const handleWishlistToggle = () => {
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+      alert('찜 목록에서 제거되었습니다.');
+    } else {
+      addToWishlist(product);
+      alert('찜 목록에 추가되었습니다.');
+    }
   };
 
   const incrementQuantity = () => {
@@ -266,6 +279,19 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
 
           {/* 구매 버튼들 */}
           <div className="space-y-3 mb-8">
+            {/* 찜하기 버튼 */}
+            <button
+              onClick={handleWishlistToggle}
+              className={`w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-colors border ${
+                isInWishlist(product.id)
+                  ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+              {isInWishlist(product.id) ? '찜 취소' : '찜하기'}
+            </button>
+            
             <button
               onClick={handleAddToCart}
               className="w-full bg-indigo-600 text-white py-4 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
