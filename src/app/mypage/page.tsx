@@ -2,21 +2,38 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { User, Package, Heart, Settings, ShoppingBag, CreditCard, MapPin, Bell, LogOut, Edit3 } from 'lucide-react';
+import { User, Package, Heart, Settings, ShoppingBag, LogOut } from 'lucide-react';
 import { useAuthStore } from '@/lib/supabase-auth';
 import { useRouter } from 'next/navigation';
 
+interface OrderItem {
+  id: string;
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    images: string[];
+  };
+  quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+}
+
 interface Order {
   id: string;
-  date: string;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  total: number;
-  items: {
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  items: OrderItem[];
+  shippingInfo: {
     name: string;
-    image: string;
-    quantity: number;
-    price: number;
-  }[];
+    phone: string;
+    zipcode: string;
+    address1: string;
+    address2: string;
+    deliveryRequest: string;
+  };
+  totalAmount: number;
+  shippingFee: number;
+  createdAt: string;
 }
 
 export default function MyPage() {
@@ -55,7 +72,7 @@ export default function MyPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending': return '주문 접수';
-      case 'processing': return '상품 준비중';
+      case 'confirmed': return '주문 확인';
       case 'shipped': return '배송중';
       case 'delivered': return '배송 완료';
       case 'cancelled': return '주문 취소';
@@ -66,7 +83,7 @@ export default function MyPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'confirmed': return 'bg-blue-100 text-blue-800';
       case 'shipped': return 'bg-purple-100 text-purple-800';
       case 'delivered': return 'bg-green-100 text-green-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
@@ -166,9 +183,9 @@ export default function MyPage() {
                 <div className="space-y-6">
                   {/* 퀵 액션 */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Link
-                      href="/orders"
-                      className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    <button
+                      onClick={() => setActiveTab('orders')}
+                      className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow text-left"
                     >
                       <div className="flex items-center space-x-3">
                         <Package className="h-8 w-8 text-blue-600" />
@@ -177,7 +194,7 @@ export default function MyPage() {
                           <p className="text-sm text-gray-600">{orders.length}개 주문</p>
                         </div>
                       </div>
-                    </Link>
+                    </button>
                     <Link
                       href="/wishlist"
                       className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
@@ -204,42 +221,16 @@ export default function MyPage() {
                     </Link>
                   </div>
 
-                  {/* 최근 주문 */}
+                  {/* 환영 메시지 */}
                   <div className="bg-white rounded-lg shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4">최근 주문</h2>
-                    {orders.length > 0 ? (
-                      <div className="space-y-4">
-                        {orders.slice(0, 3).map((order) => (
-                          <div key={order.id} className="border rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium">주문 #{order.id.slice(0, 8)}</span>
-                              <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(order.status)}`}>
-                                {getStatusText(order.status)}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-600 mb-2">{order.date}</p>
-                            <p className="font-semibold">{order.total.toLocaleString()}원</p>
-                          </div>
-                        ))}
-                        <Link
-                          href="/orders"
-                          className="block text-center text-blue-600 hover:text-blue-700 mt-4"
-                        >
-                          모든 주문 보기
-                        </Link>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                        <p className="text-gray-600">아직 주문 내역이 없습니다.</p>
-                        <Link
-                          href="/products"
-                          className="inline-block mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          쇼핑하러 가기
-                        </Link>
-                      </div>
-                    )}
+                    <h2 className="text-lg font-semibold mb-4">환영합니다!</h2>
+                    <p className="text-gray-600 mb-6">HAZEL에서 트렌디하고 고품질의 패션을 만나보세요.</p>
+                    <Link
+                      href="/products"
+                      className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      쇼핑하러 가기
+                    </Link>
                   </div>
                 </div>
               )}
@@ -254,7 +245,9 @@ export default function MyPage() {
                           <div className="flex items-center justify-between mb-4">
                             <div>
                               <h3 className="font-medium">주문 #{order.id.slice(0, 8)}</h3>
-                              <p className="text-sm text-gray-600">{order.date}</p>
+                              <p className="text-sm text-gray-600">
+                                {new Date(order.createdAt).toLocaleDateString('ko-KR')}
+                              </p>
                             </div>
                             <span className={`px-3 py-1 text-sm rounded-full ${getStatusColor(order.status)}`}>
                               {getStatusText(order.status)}
@@ -264,26 +257,45 @@ export default function MyPage() {
                             {order.items.map((item, index) => (
                               <div key={index} className="flex items-center space-x-3">
                                 <div className="w-12 h-12 bg-gray-200 rounded">
-                                  {item.image && (
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded" />
+                                  {item.product.images && item.product.images[0] ? (
+                                    <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover rounded" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded">
+                                      <span className="text-xs text-gray-500">이미지 없음</span>
+                                    </div>
                                   )}
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-medium">{item.name}</p>
+                                  <p className="font-medium">{item.product.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {item.selectedSize && `사이즈: ${item.selectedSize}`} 
+                                    {item.selectedColor && ` · 색상: ${item.selectedColor}`}
+                                  </p>
                                   <p className="text-sm text-gray-600">수량: {item.quantity}개</p>
                                 </div>
-                                <p className="font-semibold">{(item.price * item.quantity).toLocaleString()}원</p>
+                                <p className="font-semibold">{(item.product.price * item.quantity).toLocaleString()}원</p>
                               </div>
                             ))}
                           </div>
                           <div className="border-t pt-4 flex justify-between items-center">
-                            <span className="font-semibold">총 결제금액: {order.total.toLocaleString()}원</span>
-                            <Link
-                              href={`/orders/${order.id}`}
-                              className="text-blue-600 hover:text-blue-700"
-                            >
-                              상세 보기
-                            </Link>
+                            <span className="font-semibold">총 결제금액: {order.totalAmount.toLocaleString()}원</span>
+                            <div className="flex space-x-2">
+                              {order.status === 'shipped' && (
+                                <button className="text-blue-600 hover:text-blue-700 text-sm">
+                                  배송 조회
+                                </button>
+                              )}
+                              {order.status === 'delivered' && (
+                                <button className="text-blue-600 hover:text-blue-700 text-sm">
+                                  리뷰 작성
+                                </button>
+                              )}
+                              {(order.status === 'pending' || order.status === 'confirmed') && (
+                                <button className="text-red-600 hover:text-red-700 text-sm">
+                                  주문 취소
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -291,7 +303,13 @@ export default function MyPage() {
                   ) : (
                     <div className="text-center py-8">
                       <Package className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-600">주문 내역이 없습니다.</p>
+                      <p className="text-gray-600 mb-4">주문 내역이 없습니다.</p>
+                      <Link
+                        href="/products"
+                        className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        쇼핑하러 가기
+                      </Link>
                     </div>
                   )}
                 </div>

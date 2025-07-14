@@ -150,37 +150,55 @@ export default function CheckoutPage() {
       // 주문번호 생성
       const orderNumber = 'ORD' + Date.now();
       
-      // 주문 데이터 준비
+      // 주문 정보 생성
       const orderData = {
         id: orderNumber,
-        items: cartItems,
-        shippingInfo,
+        status: 'pending',
+        items: cartItems.map(item => ({
+          id: `${item.product.id}-${item.selectedSize}-${item.selectedColor}`,
+          product: {
+            id: item.product.id,
+            name: item.product.name,
+            price: item.product.price,
+            images: item.product.images || []
+          },
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          selectedColor: item.selectedColor
+        })),
+        shippingInfo: {
+          name: shippingInfo.name,
+          phone: shippingInfo.phone,
+          zipcode: shippingInfo.zipcode,
+          address1: shippingInfo.address1,
+          address2: shippingInfo.address2,
+          deliveryRequest: shippingInfo.deliveryRequest || shippingInfo.deliveryNote
+        },
         totalAmount: total,
-        shippingFee,
-        status: 'confirmed' as const,
-        createdAt: new Date().toISOString(),
-        estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        trackingNumber: Math.random().toString(36).substr(2, 10).toUpperCase()
+        shippingFee: shippingFee,
+        createdAt: new Date().toISOString()
       };
-      
-      // 로컬 스토리지에 주문 정보 저장 (실제로는 서버에 전송)
-      localStorage.setItem(`order_${orderNumber}`, JSON.stringify(orderData));
-      
-      // 실제로는 여기서 서버에 주문 데이터를 전송해야 합니다
-      // const response = await fetch('/api/orders', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(orderData)
-      // });
       
       // 시뮬레이션: 주문 처리 시간
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // 기존 주문 목록 가져오기
+      const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+      
+      // 새 주문 추가
+      const updatedOrders = [orderData, ...existingOrders];
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('userOrders', JSON.stringify(updatedOrders));
+      
       // 주문 완료 후 장바구니 비우기
       clearCart();
       
-      // 주문 상세 페이지로 이동
-      router.push(`/orders/${orderNumber}`);
+      // 주문 완료 알림
+      alert(`주문이 완료되었습니다!\n주문번호: ${orderNumber}\n\n주문해 주셔서 감사합니다.`);
+      
+      // 메인 페이지로 이동
+      router.push('/');
       
     } catch (error) {
       console.error('주문 처리 중 오류:', error);
