@@ -154,6 +154,12 @@ export default function AdminProductsPage() {
     
     try {
       console.log('Submitting form data:', formData);
+      console.log('Selected category_id:', formData.category_id);
+      console.log('Available categories:', categories);
+      
+      // 선택된 카테고리 정보 찾기
+      const selectedCategory = categories.find(cat => cat.id === formData.category_id);
+      console.log('Selected category info:', selectedCategory);
       
       const productData = {
         ...formData,

@@ -6,6 +6,7 @@ import ProductCard from "@/components/ui/product-card";
 import { useState, useEffect } from "react";
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
+import { getAllProducts } from "@/lib/services/main-products";
 
 interface CategoryProductsClientProps {
   category: string;
@@ -24,14 +25,44 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
     parentCategories.find(parent => parent.id === currentCategory.parentId) : null;
   
   useEffect(() => {
-    const filterProducts = () => {
-      const categoryProducts = products.filter(product => product.category === category);
-      setFilteredProducts(categoryProducts);
-      setIsLoading(false);
+    const filterProducts = async () => {
+      setIsLoading(true);
+      try {
+        console.log('카테고리별 상품 로딩 시작:', category);
+        
+        // 데이터베이스에서 모든 상품 가져오기
+        const allProducts = await getAllProducts();
+        console.log('전체 상품 데이터:', allProducts);
+        
+        // 현재 카테고리에 맞는 상품 필터링
+        const categoryProducts = allProducts.filter(product => {
+          console.log(`상품 "${product.name}"의 카테고리:`, product.category, '찾는 카테고리:', category);
+          return product.category === category;
+        });
+        
+        console.log('필터링된 카테고리 상품:', categoryProducts);
+        
+        // 하드코딩된 상품도 포함 (기존 데모 상품)
+        const hardcodedProducts = products.filter(product => product.category === category);
+        console.log('하드코딩된 상품:', hardcodedProducts);
+        
+        // 두 데이터 소스 합치기
+        const allCategoryProducts = [...categoryProducts, ...hardcodedProducts];
+        console.log('최종 표시될 상품:', allCategoryProducts);
+        
+        setFilteredProducts(allCategoryProducts);
+      } catch (error) {
+        console.error('상품 데이터 로드 실패:', error);
+        // 오류 시 하드코딩된 상품만 표시
+        const categoryProducts = products.filter(product => product.category === category);
+        setFilteredProducts(categoryProducts);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     filterProducts();
-  }, [category]); // category만 의존성으로 설정
+  }, [category]);
   
   if (isLoading) {
     return (

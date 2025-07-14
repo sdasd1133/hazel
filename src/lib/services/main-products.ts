@@ -176,6 +176,24 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   }
 }
 
+// 메인사이트에서 사용할 전체 상품 조회 함수
+export const getAllProducts = async (): Promise<Product[]> => {
+  try {
+    console.log('getAllProducts 호출됨')
+    const mainProducts = await mainProductService.getActiveProducts()
+    console.log('DB에서 가져온 상품 수:', mainProducts.length)
+    console.log('DB 상품 데이터:', mainProducts)
+    
+    const products = convertMainProductsToProducts(mainProducts)
+    console.log('변환된 상품 데이터:', products)
+    
+    return products
+  } catch (error) {
+    console.error('getAllProducts 오류:', error)
+    return []
+  }
+}
+
 // 여러 MainProduct를 Product 배열로 변환
 export const convertMainProductsToProducts = (mainProducts: MainProduct[]): Product[] => {
   return mainProducts.map(convertMainProductToProduct)
