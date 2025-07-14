@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
+import { getUserByEmail, updateLastLogin } from '@/lib/supabase-users-temp';
 
 type AuthStoreState = AuthState & {
   login: (email: string, password: string) => Promise<{ success: boolean; user?: any; error?: string }>; 
@@ -107,7 +108,49 @@ export const useAuthStore = create<AuthStoreState>()(
             }
           }
           
-          // 테스트가 아닌 계정의 경우
+          // 실제 등록된 사용자 확인 (로컬 스토리지에서)
+          const userResult = await getUserByEmail(email);
+          if (userResult.success && userResult.user) {
+            const user = userResult.user;
+            console.log('등록된 사용자 로그인 시도:', email, '상태:', user.status);
+            
+            // 승인 상태 확인
+            if (user.status === 'pending') {
+              return { 
+                success: false, 
+                error: '계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.' 
+              };
+            }
+            
+            if (user.status === 'rejected') {
+              return { 
+                success: false, 
+                error: '계정이 승인 거부되었습니다. 관리자에게 문의하세요.' 
+              };
+            }
+            
+            // 승인된 계정만 로그인 허용
+            if (user.status === 'approved') {
+              const authUser = {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                isAdmin: user.role === 'admin',
+                status: user.status
+              };
+              
+              // 마지막 로그인 시간 업데이트
+              await updateLastLogin(user.id);
+              
+              set({ 
+                user: authUser,
+                isAuthenticated: true 
+              });
+              return { success: true, user: authUser };
+            }
+          }
+          
+          // 등록되지 않은 계정의 경우
           console.log('등록되지 않은 계정입니다:', email);
           return { 
             success: false, 
