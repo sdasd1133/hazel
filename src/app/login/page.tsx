@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authClient } from '@/lib/services/auth';
+import { useAuthStore } from '@/lib/supabase-auth';
 import { logger } from '@/lib/logger';
 
 export default function LoginPage() {
@@ -12,24 +13,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login, isAdmin, user, isAuthenticated } = useAuthStore();
 
   // 이미 로그인된 사용자 체크
   useEffect(() => {
-    const checkExistingAuth = async () => {
-      try {
-        const user = await authClient.getCurrentUser();
-        if (user) {
-          logger.log('이미 로그인된 사용자, 메인 페이지로 리다이렉트');
-          router.push('/');
-        }
-      } catch (error) {
-        // 인증되지 않은 상태이므로 계속 로그인 페이지에 머물기
-        logger.log('사용자 인증되지 않음, 로그인 페이지 유지');
-      }
-    };
-
-    checkExistingAuth();
-  }, [router]);
+    if (isAuthenticated && user) {
+      logger.log('이미 로그인된 사용자, 메인 페이지로 리다이렉트');
+      router.push('/');
+    }
+  }, [isAuthenticated, user, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,44 +29,29 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const result = await authClient.signIn({ email, password });
+      console.log('로그인 시도:', email);
       
-      if (!result.user) {
-        throw new Error('로그인에 실패했습니다.');
+      // 우리의 승인 시스템을 사용 (supabase-auth.ts)
+      const success = await login(email, password);
+      
+      if (!success) {
+        setError('이메일 또는 비밀번호가 올바르지 않거나 승인되지 않은 계정입니다.');
+        setLoading(false);
+        return;
       }
-      
-      // 관리자인지 확인
-      const user = result.user;
-      const isAdminUser = authClient.isAdmin(user);
-      
-      console.log('로그인 성공, 사용자:', user?.email, '관리자:', isAdminUser);
-      
-      // 로그인 성공 후 잠시 대기하고 페이지 이동
+
+      // 로그인 성공 후 페이지 이동
       setTimeout(() => {
-        if (isAdminUser) {
-          // 관리자라면 관리자 페이지로 이동
+        if (isAdmin()) {
           router.push('/admin');
         } else {
-          // 일반 사용자라면 홈페이지로 이동
           router.push('/');
         }
         router.refresh();
       }, 500);
     } catch (err: any) {
       logger.error('로그인 오류:', err);
-      
-      // 사용자 친화적인 오류 메시지
-      let errorMessage = '로그인 중 오류가 발생했습니다.';
-      
-      if (err.message?.includes('Invalid login credentials')) {
-        errorMessage = '이메일 또는 비밀번호가 올바르지 않습니다.';
-      } else if (err.message?.includes('Email not confirmed')) {
-        errorMessage = '이메일 인증이 필요합니다.';
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(errorMessage);
+      setError(err.message || '로그인 중 오류가 발생했습니다.');
       setLoading(false);
     }
   };
