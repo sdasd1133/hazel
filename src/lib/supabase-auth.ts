@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
-import { getUserByEmail, updateLastLogin } from '@/lib/supabase-users-temp';
+import { getUserByEmail, updateLastLogin } from '@/lib/supabase-users-hybrid';
 
 type AuthStoreState = AuthState & {
   login: (email: string, password: string) => Promise<{ success: boolean; user?: any; error?: string }>; 

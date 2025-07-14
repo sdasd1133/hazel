@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Search, UserCheck, X, Clock, Shield, Mail, Calendar } from 'lucide-react';
-import { getAllUsers, updateUserStatus, User } from '@/lib/supabase-users-temp';
+import { getAllUsers, updateUserStatus, User } from '@/lib/supabase-users-hybrid';
 import { logger } from '@/lib/logger';
 
 const UserStatusBadge = ({ status }: { status: User['status'] }) => {
@@ -87,7 +87,18 @@ export default function UsersPage() {
         
         const user = users.find(u => u.id === userId);
         const statusText = newStatus === 'approved' ? '승인' : '거부';
-        alert(`${user?.name}님의 계정이 ${statusText}되었습니다.`);
+        
+        if (newStatus === 'approved') {
+          alert(`✅ ${user?.name}님의 계정이 ${statusText}되었습니다.\n🗄️ 데이터베이스에 자동으로 등록되어 로그인이 가능합니다.`);
+        } else {
+          alert(`❌ ${user?.name}님의 계정이 ${statusText}되었습니다.`);
+        }
+        
+        // 사용자 목록 새로고침
+        const refreshResult = await getAllUsers();
+        if (refreshResult.success && refreshResult.users) {
+          setUsers(refreshResult.users);
+        }
       } else {
         alert(`처리 중 오류가 발생했습니다: ${result.error}`);
       }

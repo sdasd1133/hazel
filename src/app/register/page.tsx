@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/supabase-auth'
 import { logger } from '@/lib/logger'
-import { createUser } from '@/lib/supabase-users-temp'
+import { createUser } from '@/lib/supabase-users-hybrid'
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

@@ -39,8 +39,15 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'users 테이블 생성 SQL이 준비되었습니다. Supabase Dashboard에서 수동으로 실행해주세요.',
-      sql: createTableSQL
+      message: 'users 테이블 생성 SQL이 준비되었습니다. Supabase Dashboard의 SQL Editor에서 다음 SQL을 실행해주세요.',
+      sql: createTableSQL,
+      instructions: [
+        '1. Supabase Dashboard로 이동',
+        '2. SQL Editor 메뉴 클릭',
+        '3. 위의 SQL 코드를 복사하여 붙여넣기',
+        '4. Run 버튼 클릭하여 실행',
+        '5. 테이블 생성 완료'
+      ]
     });
   } catch (error) {
     console.error('테이블 확인 중 오류:', error);
