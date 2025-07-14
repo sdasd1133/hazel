@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { productClient, type Product, type CreateProductData } from '@/lib/services/products'
-import { createClient } from '@/lib/supabase/client'
-import { getCategories } from '@/lib/products'
 
 interface Category {
   id: number
@@ -40,35 +38,123 @@ export default function AdminProductsPage() {
   const loadData = async () => {
     try {
       setLoading(true)
+      console.log('Loading data...')
+      
       const [productsData, categoriesData] = await Promise.all([
         productClient.getProducts(),
         loadCategories()
       ])
+      
+      console.log('Data loaded successfully:', {
+        products: productsData?.length || 0,
+        categories: categoriesData?.length || 0
+      })
+      
       setProducts(productsData)
       setCategories(categoriesData)
     } catch (error) {
       console.error('데이터 로드 오류:', error)
-      alert('데이터를 불러오는 중 오류가 발생했습니다.')
+      
+      // 에러 메시지를 더 구체적으로 표시
+      let errorMessage = '데이터를 불러오는 중 오류가 발생했습니다.'
+      
+      if (error instanceof Error) {
+        errorMessage = `데이터 로드 실패: ${error.message}`
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      }
+      
+      alert(errorMessage)
     } finally {
       setLoading(false)
     }
   }
 
   const loadCategories = async () => {
-    // 메인 사이트의 카테고리 구조를 사용
-    const categories = getCategories();
-    
-    // Category 인터페이스에 맞게 변환
-    return categories.map((category, index) => ({
-      id: index + 1, // 임시 ID (1부터 시작)
-      name: category.name,
-      slug: category.id
-    }));
+    try {
+      // 먼저 DB에서 카테고리를 가져와보고, 없으면 기본 카테고리 사용
+      const response = await fetch('/api/categories');
+      const result = await response.json();
+      
+      if (result.success && result.data.length > 0) {
+        return result.data.map((category: any) => ({
+          id: category.id,
+          name: category.name,
+          slug: category.slug
+        }));
+      }
+      
+      // DB에 카테고리가 없으면 기본 카테고리 사용
+      console.log('DB에 카테고리가 없어서 기본 카테고리를 사용합니다.');
+      const categories = [
+        { id: 'women-clothing', name: '여성의류' },
+        { id: 'men-clothing', name: '남성의류' },
+        { id: 'bags', name: '가방' },
+        { id: 'shoes', name: '신발' },
+        { id: 'accessories', name: '악세서리' },
+        { id: 'watches', name: '시계' },
+        { id: 'hats', name: '모자' },
+        { id: 'belts', name: '벨트' },
+        { id: 'sports-clothing', name: '스포츠의류' },
+        { id: 'coordinated-sets', name: '코디세트' },
+        { id: 'used-luxury', name: '중고명품' }
+      ];
+      
+      // Category 인터페이스에 맞게 변환
+      return categories.map((category, index) => ({
+        id: index + 1, // 임시 ID (1부터 시작)
+        name: category.name,
+        slug: category.id
+      }));
+    } catch (error) {
+      console.error('카테고리 로드 오류:', error);
+      
+      // 오류 발생 시에도 기본 카테고리 반환
+      const categories = [
+        { id: 'women-clothing', name: '여성의류' },
+        { id: 'men-clothing', name: '남성의류' },
+        { id: 'bags', name: '가방' },
+        { id: 'shoes', name: '신발' },
+        { id: 'accessories', name: '악세서리' },
+        { id: 'watches', name: '시계' },
+        { id: 'hats', name: '모자' },
+        { id: 'belts', name: '벨트' },
+        { id: 'sports-clothing', name: '스포츠의류' },
+        { id: 'coordinated-sets', name: '코디세트' },
+        { id: 'used-luxury', name: '중고명품' }
+      ];
+      
+      return categories.map((category, index) => ({
+        id: index + 1,
+        name: category.name,
+        slug: category.id
+      }));
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // 폼 유효성 검사
+    if (!formData.name.trim()) {
+      alert('상품명을 입력해주세요.')
+      return
+    }
+    
+    if (formData.price <= 0) {
+      alert('올바른 가격을 입력해주세요.')
+      return
+    }
+    
+    // 카테고리는 선택사항으로 변경 (DB 스키마에서 nullable이므로)
+    // if (!formData.category_id || formData.category_id === 0) {
+    //   alert('카테고리를 선택해주세요.')
+    //   return
+    // }
+    
     try {
+      console.log('Submitting form data:', formData);
+      
       // 이미지 URL 배열 생성 (실제 환경에서는 서버에 업로드 후 URL 받아옴)
       const imageUrls: string[] = []
       
@@ -85,17 +171,22 @@ export default function AdminProductsPage() {
       
       const productData = {
         ...formData,
+        category_id: formData.category_id === 0 ? null : formData.category_id,
         images: imageUrls.length > 0 ? imageUrls : formData.images
       }
       
+      console.log('Final product data to submit:', productData);
+      
       if (editingProduct) {
-        await productClient.updateProduct({
+        const result = await productClient.updateProduct({
           ...productData,
           id: editingProduct.id
         })
+        console.log('Product updated:', result);
         alert('상품이 수정되었습니다.')
       } else {
-        await productClient.createProduct(productData)
+        const result = await productClient.createProduct(productData)
+        console.log('Product created:', result);
         alert('상품이 등록되었습니다.')
       }
       
@@ -103,7 +194,17 @@ export default function AdminProductsPage() {
       loadData()
     } catch (error) {
       console.error('상품 저장 오류:', error)
-      alert('상품 저장 중 오류가 발생했습니다.')
+      
+      // 에러 메시지를 더 구체적으로 표시
+      let errorMessage = '상품 저장 중 오류가 발생했습니다.'
+      
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      }
+      
+      alert(errorMessage)
     }
   }
 
