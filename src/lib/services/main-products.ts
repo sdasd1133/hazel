@@ -34,7 +34,7 @@ export const mainProductService = {
           *,
           categories(id, name, slug)
         `)
-        .eq('status', 'active')
+        // .eq('status', 'active') // 임시로 주석 처리하여 모든 상품 조회 가능
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -78,6 +78,8 @@ export const mainProductService = {
   // 특정 상품 조회
   async getProduct(id: number): Promise<MainProduct | null> {
     try {
+      console.log('Fetching product with ID:', id);
+      
       const { data, error } = await supabase
         .from('products')
         .select(`
@@ -85,17 +87,19 @@ export const mainProductService = {
           categories(id, name, slug)
         `)
         .eq('id', id)
-        .eq('status', 'active')
+        // .eq('status', 'active') // 임시로 주석 처리하여 모든 상품 조회 가능
         .single()
 
       if (error) {
+        console.error('Product fetch error:', error);
         if (error.code === 'PGRST116') {
+          console.log('Product not found with ID:', id);
           return null // 상품이 없음
         }
-        console.error('Product fetch error:', error)
         throw new Error(`상품 조회 실패: ${error.message}`)
       }
 
+      console.log('Fetched product:', data);
       return data as MainProduct
     } catch (error) {
       console.error('Get product error:', error)
