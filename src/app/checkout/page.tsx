@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { ShoppingBag, CreditCard, MapPin, Search, CheckCircle } from 'lucide-react';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  size?: string;
-  color?: string;
-}
+import { useCartStore } from '@/lib/cartStore';
 
 interface ShippingInfo {
   name: string;
@@ -43,7 +35,24 @@ const deliveryOptions = [
 ];
 
 export default function CheckoutPage() {
-  const [cartItems] = useState<CartItem[]>(dummyCartItems);
+  const { items: cartItems, getTotalPrice } = useCartStore();
+  
+  // 장바구니가 비어있으면 안내 메시지 표시
+  if (cartItems.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-md mx-auto text-center">
+          <ShoppingBag className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h1 className="text-2xl font-bold mb-2">장바구니가 비어있습니다</h1>
+          <p className="text-gray-600 mb-6">주문할 상품을 먼저 장바구니에 담아주세요.</p>
+          <a href="/products" className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            쇼핑 계속하기
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   const [agreed, setAgreed] = useState(false);
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
     name: '',
@@ -58,7 +67,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<ShippingInfo>>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shippingFee = subtotal >= 50000 ? 0 : 3000;
   const total = subtotal + shippingFee;
 
@@ -180,20 +189,32 @@ export default function CheckoutPage() {
                 주문 상품
               </h2>
               <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
+                {cartItems.map((item, index) => (
+                  <div key={`${item.product.id}-${item.selectedSize}-${item.selectedColor}-${index}`} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center">
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4"></div>
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg mr-4 relative overflow-hidden">
+                        {item.product.images && item.product.images[0] ? (
+                          <img 
+                            src={item.product.images[0]} 
+                            alt={item.product.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                            <span className="text-xs text-gray-500">이미지 없음</span>
+                          </div>
+                        )}
+                      </div>
                       <div>
-                        <h3 className="font-medium">{item.name}</h3>
+                        <h3 className="font-medium">{item.product.name}</h3>
                         <p className="text-sm text-gray-500">
-                          {item.size && `사이즈: ${item.size}`} {item.color && `색상: ${item.color}`}
+                          {item.selectedSize && `사이즈: ${item.selectedSize}`} {item.selectedColor && `색상: ${item.selectedColor}`}
                         </p>
                         <p className="text-sm text-gray-500">수량: {item.quantity}개</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{item.price.toLocaleString()}원</p>
+                      <p className="font-semibold">{(item.product.price * item.quantity).toLocaleString()}원</p>
                     </div>
                   </div>
                 ))}
