@@ -1,7 +1,9 @@
 "use client";
 
-import { products, getCategories, getParentCategories, getCategoriesByParent, getProductsByParentCategory } from "@/lib/products";
+import { mainProductService, type MainProduct, convertMainProductsToProducts } from "@/lib/services/main-products";
+import { getCategories, getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
+import { Product } from "@/types";
 import ProductCard from "@/components/ui/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -15,46 +17,87 @@ export default function ProductsPage() {
   const parentCategories = getParentCategories();
   const categories = getCategories();
   
-  const [filteredProducts, setFilteredProducts] = useState([...products]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [filteredCategories, setFilteredCategories] = useState([...categories]);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // 상품 및 카테고리 필터링 로직을 useEffect로 이동
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 데이터베이스에서 상품 로드
   useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log('Loading products from database...');
+        
+        const mainProducts = await mainProductService.getActiveProducts();
+        const products = convertMainProductsToProducts(mainProducts);
+        console.log('Loaded and converted products:', products.length);
+        
+        setAllProducts(products);
+        setFilteredProducts(products);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+        setError('상품을 불러오는 중 오류가 발생했습니다.');
+        setAllProducts([]);
+        setFilteredProducts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+  
+  // 상품 및 카테고리 필터링 로직
+  useEffect(() => {
+    if (allProducts.length === 0) return;
+    
     const filterProducts = () => {
       console.log('필터링 시작 - parent:', parent, 'category:', category);
       
-      // 즉시 필터링하여 깜빡임 줄이기
-      let newFilteredProducts = [...products];
+      let newFilteredProducts = [...allProducts];
       let newFilteredCategories = [...categories];
       
       // 상위 카테고리 선택 시
       if (parent) {
         console.log('상위 카테고리 필터링:', parent);
-        newFilteredProducts = getProductsByParentCategory(parent);
         newFilteredCategories = getCategoriesByParent(parent);
+        
+        // 상위 카테고리에 속하는 하위 카테고리들의 이름 목록 생성
+        const childCategoryNames = newFilteredCategories.map(cat => cat.name);
+        
+        // 해당 카테고리에 속하는 상품 필터링
+        newFilteredProducts = allProducts.filter(product => 
+          childCategoryNames.includes(product.category)
+        );
+        
         console.log('필터링된 상품 수:', newFilteredProducts.length);
         console.log('필터링된 카테고리:', newFilteredCategories.map(c => c.name));
       } 
       // 하위 카테고리 선택 시
       else if (category) {
         console.log('하위 카테고리 필터링:', category);
-        newFilteredProducts = products.filter(product => 
-          product.category.toLowerCase().replace(/\s+/g, '-') === category
+        
+        // 카테고리 slug를 이름으로 변환
+        const categoryObj = categories.find(cat => 
+          cat.id.replace(/\s+/g, '-').toLowerCase() === category
         );
+        
+        if (categoryObj) {
+          newFilteredProducts = allProducts.filter(product => 
+            product.category === categoryObj.name
+          );
+        }
       }
       
       setFilteredProducts(newFilteredProducts);
       setFilteredCategories(newFilteredCategories);
-      
-      // 필터링 완료 후 로딩 상태 해제
-      if (isLoading) {
-        setTimeout(() => setIsLoading(false), 100);
-      }
     };
     
     filterProducts();
-  }, [category, parent, isLoading]); // 의존성 배열에서 객체 제거
+  }, [category, parent, allProducts]);
   
   // 현재 선택된 상위 카테고리 확인
   const selectedParentCategory = parent
@@ -96,7 +139,37 @@ export default function ProductsPage() {
       <h1 className="text-2xl md:text-3xl font-bold mb-2">
         {selectedParentCategory?.name || "전체 상품"}
       </h1>
-        
+
+      {/* 에러 표시 */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-2 text-red-700 underline hover:no-underline"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
+      {/* 로딩 상태 */}
+      {isLoading && (
+        <div className="mb-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="h-64 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 메인 콘텐츠 - 로딩 중이 아닐 때만 표시 */}
+      {!isLoading && !error && (
+        <>
         {/* 상위 카테고리 필터 */}
         <div className="mb-8">
           <div className="flex flex-wrap gap-3 border-b pb-6 mb-6">
@@ -221,6 +294,8 @@ export default function ProductsPage() {
             )}
           </div>
         </div>
-      </div>
+        </>
+      )}
+    </div>
   );
 }
