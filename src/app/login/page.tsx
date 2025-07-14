@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const router = useRouter();
   const { login, isAdmin, user, isAuthenticated } = useAuthStore();
 
@@ -27,19 +28,38 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     try {
       console.log('로그인 시도:', email);
+      
+      // 이메일 형식 확인
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        setError('올바른 이메일 형식을 입력해주세요.');
+        setLoading(false);
+        return;
+      }
+
+      // 비밀번호 길이 확인
+      if (password.length < 6) {
+        setError('비밀번호는 최소 6자 이상이어야 합니다.');
+        setLoading(false);
+        return;
+      }
       
       // 우리의 승인 시스템을 사용 (supabase-auth.ts)
       const success = await login(email, password);
       
       if (!success) {
-        setError('이메일 또는 비밀번호가 올바르지 않거나 승인되지 않은 계정입니다.');
+        setError('이메일 또는 비밀번호가 올바르지 않거나 등록되지 않은 계정입니다. 테스트 계정을 사용하거나 회원가입을 진행해주세요.');
         setLoading(false);
         return;
       }
 
+      // 로그인 성공 메시지
+      setSuccess('로그인 성공! 페이지를 이동합니다...');
+      
       // 로그인 성공 후 페이지 이동
       setTimeout(() => {
         if (isAdmin()) {
@@ -48,10 +68,26 @@ export default function LoginPage() {
           router.push('/');
         }
         router.refresh();
-      }, 500);
+      }, 1500);
     } catch (err: any) {
       logger.error('로그인 오류:', err);
-      setError(err.message || '로그인 중 오류가 발생했습니다.');
+      
+      // 구체적인 에러 메시지 제공
+      if (err.message) {
+        if (err.message.includes('Invalid login credentials')) {
+          setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+        } else if (err.message.includes('Email not confirmed')) {
+          setError('이메일 인증이 완료되지 않았습니다. 이메일을 확인해주세요.');
+        } else if (err.message.includes('pending')) {
+          setError('계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.');
+        } else if (err.message.includes('rejected')) {
+          setError('계정이 승인 거부되었습니다. 관리자에게 문의하세요.');
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
       setLoading(false);
     }
   };
@@ -102,8 +138,38 @@ export default function LoginPage() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
+            <div className="rounded-md bg-red-50 p-4 border border-red-200">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">로그인 오류</h3>
+                  <div className="mt-2 text-sm text-red-700">
+                    {error}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {success && (
+            <div className="rounded-md bg-green-50 p-4 border border-green-200">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-green-800">로그인 성공</h3>
+                  <div className="mt-2 text-sm text-green-700">
+                    {success}
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           

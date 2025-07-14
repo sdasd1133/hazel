@@ -5,96 +5,24 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Search, ShoppingBag, User, Menu, LogOut, ChevronDown, UserPlus } from "lucide-react";
 import { useCartStore } from "@/lib/cartStore";
-import { authClient } from "@/lib/services/auth";
+import { useAuthStore } from "@/lib/supabase-auth";
 import { getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { useHydrated } from "@/hooks/useHydrated";
-import { createClient } from "@/lib/supabase/client";
 import { logger } from "@/lib/logger";
 
 const Header = () => {
   const parentCategories = getParentCategories();
   const cartCount = useCartStore((state) => state.getTotalItems());
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, logout, isAdmin } = useAuthStore();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hydrated = useHydrated();
-  // 호버 효과는 CSS group-hover로 처리됨
   const headerRef = useRef<HTMLDivElement>(null);
   
-  // 인증 상태 확인
-  useEffect(() => {
-    if (!hydrated) return;
-    
-    let mounted = true;
-    
-    const checkAuth = async () => {
-      try {
-        const currentUser = await authClient.getCurrentUser();
-        if (mounted) {
-          if (currentUser) {
-            setUser(currentUser);
-            setIsAuthenticated(true);
-            logger.log('Header: 사용자 인증됨', currentUser.email);
-          } else {
-            setUser(null);
-            setIsAuthenticated(false);
-            logger.log('Header: 사용자 인증되지 않음');
-          }
-        }
-      } catch (error) {
-        logger.error('인증 상태 확인 오류:', error);
-        if (mounted) {
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      }
-    };
-
-    // Supabase 인증 상태 변화 감지
-    const supabase = createClient();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-        
-        // 로그를 줄이고 중요한 이벤트만 기록
-        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          logger.log('Auth state changed:', event, session?.user?.email);
-        }
-        
-        if (session?.user) {
-          setUser(session.user);
-          setIsAuthenticated(true);
-          logger.log('Header: Supabase 인증 상태 변화 - 로그인됨', session.user.email);
-        } else {
-          setUser(null);
-          setIsAuthenticated(false);
-          logger.log('Header: Supabase 인증 상태 변화 - 로그아웃됨');
-        }
-      }
-    );
-
-    checkAuth();
-    
-    // 관리자 로그인 성공 이벤트 리스너
-    const handleAdminLoginSuccess = () => {
-      logger.log('Header: 관리자 로그인 성공 이벤트 수신');
-      checkAuth(); // 인증 상태 재확인
-    };
-    
-    window.addEventListener('admin-login-success', handleAdminLoginSuccess);
-    
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-      window.removeEventListener('admin-login-success', handleAdminLoginSuccess);
-    };
-  }, [hydrated]);
-  
+  // 클릭 이벤트 핸들러
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       if (isMobileMenuOpen && headerRef.current && !headerRef.current.contains(event.target as Node)) {
@@ -108,9 +36,8 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
-      setUser(null);
-      setIsAuthenticated(false);
+      logout();
+      logger.log('로그아웃 성공');
       router.push('/');
       router.refresh();
     } catch (error) {
@@ -189,6 +116,16 @@ const Header = () => {
                 </div>
               </div>
             ))}
+            
+            {/* 관리자 메뉴 */}
+            {hydrated && isAuthenticated && isAdmin() && (
+              <Link
+                href="/admin"
+                className="flex items-center px-3 py-2 rounded-md text-red-600 hover:text-red-500 hover:bg-red-50 transition-all duration-300 font-medium"
+              >
+                <span>관리자</span>
+              </Link>
+            )}
           </nav>
 
           {/* 검색, 장바구니, 로그인 아이콘 */}
@@ -225,7 +162,7 @@ const Header = () => {
               isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   <span className="hidden md:inline text-sm font-medium text-black">
-                    {user?.user_metadata?.name || user?.email?.split('@')[0]}님
+                    {user?.name || user?.email?.split('@')[0]}님
                   </span>
                   <Button 
                     variant="ghost" 
@@ -337,6 +274,20 @@ const Header = () => {
             >
               전체 상품
             </Link>
+            
+            {/* 관리자 메뉴 (모바일) */}
+            {hydrated && isAuthenticated && isAdmin() && (
+              <>
+                <div className="border-t border-border my-3"></div>
+                <Link
+                  href="/admin"
+                  className="block py-2.5 px-3 text-red-600 font-medium hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  관리자 대시보드
+                </Link>
+              </>
+            )}
             
             {/* 모바일 로그인/회원가입 버튼 */}
             {hydrated && !isAuthenticated && (
