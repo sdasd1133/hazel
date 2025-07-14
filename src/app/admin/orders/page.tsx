@@ -17,7 +17,8 @@ import {
   MapPin,
   Phone,
   Mail,
-  MoreVertical
+  MoreVertical,
+  Plus
 } from 'lucide-react';
 
 interface OrderItem {
@@ -262,132 +263,67 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 실제 구현에서는 API에서 주문 데이터를 가져옵니다
+  // 실제 주문 데이터를 로컬 스토리지에서 가져옵니다
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
-      // 가상의 주문 데이터
-      const mockOrders: Order[] = [
-        {
-          id: '1',
-          orderNumber: 'ORDER-2024-001',
-          customerId: '1',
-          customerName: '홍길동',
-          customerEmail: 'hong@example.com',
-          customerPhone: '010-1234-5678',
-          status: 'processing',
-          paymentMethod: 'credit_card',
-          paymentStatus: 'paid',
-          shippingAddress: {
-            name: '홍길동',
-            phone: '010-1234-5678',
-            address: '서울시 강남구 테헤란로 123',
-            city: '서울',
-            zipCode: '06234'
-          },
-          items: [
-            {
-              id: '1',
-              productName: '오버사이즈 니트',
-              productImage: '/placeholder-product.jpg',
-              size: 'L',
-              color: '베이지',
-              quantity: 1,
-              price: 89000
+      try {
+        // 로컬 스토리지에서 주문 데이터 가져오기
+        const savedOrders = localStorage.getItem('userOrders');
+        console.log('로컬스토리지 userOrders:', savedOrders); // 디버깅용
+        
+        if (savedOrders) {
+          const userOrders = JSON.parse(savedOrders);
+          console.log('파싱된 주문 데이터:', userOrders); // 디버깅용
+          
+          // 로컬 스토리지 주문 데이터를 관리자 주문 형식으로 변환
+          const convertedOrders: Order[] = userOrders.map((order: any, index: number) => ({
+            id: order.id || `order-${index}`,
+            orderNumber: order.id || `ORDER-${Date.now()}-${index}`,
+            customerId: 'user-1', // 임시 고객 ID
+            customerName: order.shippingInfo?.name || '고객',
+            customerEmail: 'customer@example.com', // 실제로는 주문자 정보에서 가져와야 함
+            customerPhone: order.shippingInfo?.phone || '',
+            status: order.status || 'pending',
+            paymentMethod: 'bank_transfer' as const,
+            paymentStatus: 'paid' as const,
+            shippingAddress: {
+              name: order.shippingInfo?.name || '',
+              phone: order.shippingInfo?.phone || '',
+              address: `${order.shippingInfo?.address1 || ''} ${order.shippingInfo?.address2 || ''}`.trim(),
+              city: '서울', // 실제로는 주소에서 파싱해야 함
+              zipCode: order.shippingInfo?.zipcode || ''
             },
-            {
-              id: '2',
-              productName: '와이드 팬츠',
-              productImage: '/placeholder-product.jpg',
-              size: 'M',
-              color: '블랙',
-              quantity: 2,
-              price: 65000
-            }
-          ],
-          subtotal: 219000,
-          shippingCost: 3000,
-          tax: 22200,
-          total: 244200,
-          createdAt: '2024-07-13T10:30:00Z',
-          updatedAt: '2024-07-13T14:15:00Z'
-        },
-        {
-          id: '2',
-          orderNumber: 'ORDER-2024-002',
-          customerId: '2',
-          customerName: '김영희',
-          customerEmail: 'kim@example.com',
-          customerPhone: '010-9876-5432',
-          status: 'shipped',
-          paymentMethod: 'bank_transfer',
-          paymentStatus: 'paid',
-          shippingAddress: {
-            name: '김영희',
-            phone: '010-9876-5432',
-            address: '부산시 해운대구 센텀로 456',
-            city: '부산',
-            zipCode: '48058'
-          },
-          items: [
-            {
-              id: '3',
-              productName: '코튼 티셔츠',
-              productImage: '/placeholder-product.jpg',
-              size: 'S',
-              color: '화이트',
-              quantity: 3,
-              price: 39000
-            }
-          ],
-          subtotal: 117000,
-          shippingCost: 3000,
-          tax: 12000,
-          total: 132000,
-          createdAt: '2024-07-12T15:20:00Z',
-          updatedAt: '2024-07-13T09:45:00Z'
-        },
-        {
-          id: '3',
-          orderNumber: 'ORDER-2024-003',
-          customerId: '3',
-          customerName: '이철수',
-          customerEmail: 'lee@example.com',
-          customerPhone: '010-5555-1234',
-          status: 'pending',
-          paymentMethod: 'credit_card',
-          paymentStatus: 'pending',
-          shippingAddress: {
-            name: '이철수',
-            phone: '010-5555-1234',
-            address: '대구시 수성구 범어로 789',
-            city: '대구',
-            zipCode: '42195'
-          },
-          items: [
-            {
-              id: '4',
-              productName: '데님 재킷',
-              productImage: '/placeholder-product.jpg',
-              size: 'XL',
-              color: '인디고',
-              quantity: 1,
-              price: 159000
-            }
-          ],
-          subtotal: 159000,
-          shippingCost: 3000,
-          tax: 16200,
-          total: 178200,
-          createdAt: '2024-07-13T16:45:00Z',
-          updatedAt: '2024-07-13T16:45:00Z'
+            items: order.items?.map((item: any, itemIndex: number) => ({
+              id: item.id || `item-${itemIndex}`,
+              productName: item.product?.name || '상품명 없음',
+              productImage: item.product?.images?.[0] || '/placeholder-product.jpg',
+              size: item.selectedSize || '',
+              color: item.selectedColor || '',
+              quantity: item.quantity || 1,
+              price: item.product?.price || 0
+            })) || [],
+            subtotal: order.totalAmount - (order.shippingFee || 0),
+            shippingCost: order.shippingFee || 0,
+            tax: 0, // 실제로는 계산해야 함
+            total: order.totalAmount || 0,
+            createdAt: order.createdAt || new Date().toISOString(),
+            updatedAt: order.createdAt || new Date().toISOString(),
+            notes: order.shippingInfo?.deliveryRequest || ''
+          }));
+          
+          console.log('변환된 주문 데이터:', convertedOrders); // 디버깅용
+          setOrders(convertedOrders);
+        } else {
+          console.log('로컬스토리지에 주문 데이터 없음'); // 디버깅용
+          setOrders([]);
         }
-      ];
-      
-      setTimeout(() => {
-        setOrders(mockOrders);
+      } catch (error) {
+        console.error('주문 데이터 로드 실패:', error);
+        setOrders([]);
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
     fetchOrders();
@@ -406,9 +342,25 @@ export default function OrdersPage() {
   });
 
   const handleStatusUpdate = (orderId: string, newStatus: Order['status']) => {
+    // 관리자 페이지의 주문 목록 업데이트
     setOrders(prev => prev.map(order => 
       order.id === orderId ? { ...order, status: newStatus, updatedAt: new Date().toISOString() } : order
     ));
+    
+    // 로컬 스토리지의 사용자 주문도 업데이트
+    try {
+      const savedOrders = localStorage.getItem('userOrders');
+      if (savedOrders) {
+        const userOrders = JSON.parse(savedOrders);
+        const updatedUserOrders = userOrders.map((order: any) => 
+          order.id === orderId ? { ...order, status: newStatus } : order
+        );
+        localStorage.setItem('userOrders', JSON.stringify(updatedUserOrders));
+      }
+    } catch (error) {
+      console.error('로컬 스토리지 주문 상태 업데이트 실패:', error);
+    }
+    
     if (selectedOrder?.id === orderId) {
       setSelectedOrder(prev => prev ? { ...prev, status: newStatus } : null);
     }
@@ -417,6 +369,120 @@ export default function OrdersPage() {
   const openOrderDetail = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
+  };
+
+  // 로컬스토리지 주문 데이터 초기화 함수
+  const clearAllOrders = () => {
+    if (confirm('모든 주문 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+      localStorage.removeItem('userOrders');
+      setOrders([]);
+      alert('모든 주문 데이터가 삭제되었습니다.');
+    }
+  };
+
+  // 테스트 주문 데이터 생성 함수
+  const createTestOrder = () => {
+    try {
+      const testOrder = {
+        id: `ORDER-${Date.now()}`,
+        status: 'pending' as const,
+        items: [
+          {
+            id: 'test-product-1',
+            product: {
+              id: 'prod-1',
+              name: '테스트 티셔츠',
+              price: 50000,
+              images: ['/placeholder-product.jpg']
+            },
+            quantity: 2,
+            selectedSize: 'M',
+            selectedColor: '블랙'
+          },
+          {
+            id: 'test-product-2',
+            product: {
+              id: 'prod-2',
+              name: '테스트 후디',
+              price: 75000,
+              images: ['/placeholder-product.jpg']
+            },
+            quantity: 1,
+            selectedSize: 'L',
+            selectedColor: '화이트'
+          }
+        ],
+        shippingInfo: {
+          name: '김테스트',
+          phone: '010-1234-5678',
+          zipcode: '12345',
+          address1: '서울특별시 강남구 테헤란로 123',
+          address2: '101호',
+          deliveryRequest: '문앞에 놓아주세요'
+        },
+        totalAmount: 178000, // 상품 175000 + 배송비 3000
+        shippingFee: 3000,
+        createdAt: new Date().toISOString()
+      };
+      
+      console.log('생성할 테스트 주문:', testOrder);
+      
+      // 기존 주문 목록 가져오기
+      const existingOrders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+      console.log('기존 주문들:', existingOrders);
+      
+      // 새 주문 추가
+      const updatedOrders = [testOrder, ...existingOrders];
+      console.log('업데이트된 주문들:', updatedOrders);
+      
+      // 로컬 스토리지에 저장
+      localStorage.setItem('userOrders', JSON.stringify(updatedOrders));
+      
+      // 상태 업데이트로 즉시 반영
+      const convertedOrder: Order = {
+        id: testOrder.id,
+        orderNumber: testOrder.id,
+        customerId: 'user-1',
+        customerName: testOrder.shippingInfo.name,
+        customerEmail: 'customer@example.com',
+        customerPhone: testOrder.shippingInfo.phone,
+        status: testOrder.status,
+        paymentMethod: 'bank_transfer' as const,
+        paymentStatus: 'paid' as const,
+        shippingAddress: {
+          name: testOrder.shippingInfo.name,
+          phone: testOrder.shippingInfo.phone,
+          address: `${testOrder.shippingInfo.address1} ${testOrder.shippingInfo.address2}`.trim(),
+          city: '서울',
+          zipCode: testOrder.shippingInfo.zipcode
+        },
+        items: testOrder.items.map((item, itemIndex) => ({
+          id: item.id,
+          productName: item.product.name,
+          productImage: item.product.images[0],
+          size: item.selectedSize,
+          color: item.selectedColor,
+          quantity: item.quantity,
+          price: item.product.price
+        })),
+        subtotal: testOrder.totalAmount - testOrder.shippingFee,
+        shippingCost: testOrder.shippingFee,
+        tax: 0,
+        total: testOrder.totalAmount,
+        createdAt: testOrder.createdAt,
+        updatedAt: testOrder.createdAt,
+        notes: testOrder.shippingInfo.deliveryRequest
+      };
+      
+      // 기존 주문 목록에 새 주문 추가
+      setOrders(prev => [convertedOrder, ...prev]);
+      
+      alert(`테스트 주문이 생성되었습니다!\n주문번호: ${testOrder.id}`);
+      
+    } catch (error) {
+      console.error('테스트 주문 생성 실패:', error);
+      alert('테스트 주문 생성에 실패했습니다.');
+    }
   };
 
   if (loading) {
@@ -432,6 +498,20 @@ export default function OrdersPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-2xl font-bold">주문 관리</h1>
         <div className="flex items-center gap-4">
+          <button
+            onClick={createTestOrder}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            테스트 주문 추가
+          </button>
+          <button
+            onClick={clearAllOrders}
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+          >
+            <XCircle className="h-4 w-4" />
+            주문 데이터 초기화
+          </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
             <Download className="h-4 w-4" />
             엑셀 다운로드
