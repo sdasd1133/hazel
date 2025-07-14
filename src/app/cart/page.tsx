@@ -13,7 +13,6 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AuthCheck from "@/components/auth-check";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -220,11 +219,9 @@ export default function CartPage() {
   };
 
   return (
-    <AuthCheck>
-      <div className="container mx-auto px-4 py-10">
-        <h1 className="text-2xl md:text-3xl font-bold mb-8">장바구니</h1>
-        {renderCartContent()}
-      </div>
-    </AuthCheck>
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="text-2xl md:text-3xl font-bold mb-8">장바구니</h1>
+      {renderCartContent()}
+    </div>
   );
 }

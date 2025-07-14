@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import AuthCheck from '@/components/auth-check';
 import Link from 'next/link';
 
 interface Order {
@@ -87,9 +86,8 @@ export default function OrdersPage() {
     : orders.filter(order => order.status === filter);
 
   return (
-    <AuthCheck>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">주문내역</h1>
             <p className="text-gray-600 mt-2">주문하신 상품의 주문내역을 확인하실 수 있습니다.</p>
@@ -217,6 +215,6 @@ export default function OrdersPage() {
           </div>
         </div>
       </div>
-    </AuthCheck>
+    </div>
   );
 }

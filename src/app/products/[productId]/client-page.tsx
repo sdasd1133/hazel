@@ -4,7 +4,6 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/products";
 import ProductActions from "./components/product-actions";
-import AuthCheck from "@/components/auth-check";
 
 interface ProductClientPageProps {
   productId: string;
@@ -18,9 +17,8 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   }
   
   return (
-    <AuthCheck>
-      <div className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="container mx-auto px-4 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 상품 이미지 */}
           <div>
             <div className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden">
@@ -87,6 +85,6 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           </div>
         </div>
       </div>
-    </AuthCheck>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
-import AuthCheck from '@/components/auth-check';
 import Link from 'next/link';
 
 interface WishlistItem {
@@ -92,9 +91,8 @@ export default function WishlistPage() {
   };
 
   return (
-    <AuthCheck>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900">찜목록</h1>
             <p className="text-gray-600 mt-2">관심있는 상품들을 모아두었습니다.</p>
@@ -248,6 +246,6 @@ export default function WishlistPage() {
           )}
         </div>
       </div>
-    </AuthCheck>
+    </div>
   );
 }
