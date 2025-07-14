@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ShoppingBag, CreditCard, MapPin, Search, CheckCircle } from 'lucide-react';
 import { useCartStore } from '@/lib/cartStore';
 
@@ -27,9 +28,11 @@ const deliveryOptions = [
 export default function CheckoutPage() {
   const { items: cartItems, getTotalPrice, clearCart } = useCartStore();
   const router = useRouter();
+  const [orderCompleted, setOrderCompleted] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
   
-  // 장바구니가 비어있으면 안내 메시지 표시
-  if (cartItems.length === 0) {
+  // 장바구니가 비어있고 주문 완료 상태가 아닐 때만 안내 메시지 표시
+  if (cartItems.length === 0 && !orderCompleted) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto text-center">
@@ -191,14 +194,17 @@ export default function CheckoutPage() {
       // 로컬 스토리지에 저장
       localStorage.setItem('userOrders', JSON.stringify(updatedOrders));
       
+      // 주문 완료 상태 설정
+      setOrderCompleted(true);
+      setOrderNumber(orderNumber);
+      
       // 주문 완료 후 장바구니 비우기
       clearCart();
       
       // 주문 완료 알림
       alert(`주문이 완료되었습니다!\n주문번호: ${orderNumber}\n\n주문해 주셔서 감사합니다.`);
       
-      // 메인 페이지로 이동
-      router.push('/');
+      // 페이지 이동 제거 - 현재 페이지에 그대로 유지
       
     } catch (error) {
       console.error('주문 처리 중 오류:', error);
@@ -211,6 +217,35 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
+        {/* 주문 완료 상태 */}
+        {orderCompleted ? (
+          <div className="text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8 mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">주문이 완료되었습니다!</h1>
+              <p className="text-gray-600 mb-4">주문번호: {orderNumber}</p>
+              <p className="text-gray-600 mb-6">주문해 주셔서 감사합니다.</p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/products"
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  계속 쇼핑하기
+                </Link>
+                <Link
+                  href="/mypage"
+                  className="bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  주문 내역 확인
+                </Link>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
         {/* 헤더 */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">주문/결제</h1>
@@ -544,6 +579,8 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   );
