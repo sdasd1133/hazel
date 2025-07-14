@@ -34,7 +34,7 @@ export const mainProductService = {
           *,
           categories(id, name, slug)
         `)
-        // .eq('status', 'active') // 임시로 주석 처리하여 모든 상품 조회 가능
+        // 모든 상품을 가져오도록 상태 필터 제거
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -43,6 +43,7 @@ export const mainProductService = {
       }
 
       console.log('Fetched products from DB:', data?.length || 0)
+      console.log('Raw DB data:', data)
       return data as MainProduct[]
     } catch (error) {
       console.error('Get active products error:', error)
@@ -87,7 +88,7 @@ export const mainProductService = {
           categories(id, name, slug)
         `)
         .eq('id', id)
-        // .eq('status', 'active') // 임시로 주석 처리하여 모든 상품 조회 가능
+        // 모든 상품을 가져오도록 상태 필터 제거
         .single()
 
       if (error) {

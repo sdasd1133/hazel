@@ -5,6 +5,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Heart } from "lucide-react";
 import { mainProductService, convertMainProductToProduct } from "@/lib/services/main-products";
+import { products as fallbackProducts } from "@/lib/products";
 import { useCartStore } from "@/lib/cartStore";
 import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
@@ -33,17 +34,30 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
         setError(null);
         console.log('Loading product:', productId);
         
-        const mainProduct = await mainProductService.getProduct(parseInt(productId));
-        
-        if (!mainProduct) {
-          console.log('Product not found:', productId);
-          notFound();
-          return;
+        // 먼저 DB에서 상품 검색
+        try {
+          const mainProduct = await mainProductService.getProduct(parseInt(productId));
+          
+          if (mainProduct) {
+            const convertedProduct = convertMainProductToProduct(mainProduct);
+            console.log('Loaded product from DB:', convertedProduct);
+            setProduct(convertedProduct);
+            return;
+          }
+        } catch (dbError) {
+          console.log('DB 조회 실패, fallback 상품에서 검색:', dbError);
         }
         
-        const convertedProduct = convertMainProductToProduct(mainProduct);
-        console.log('Loaded product:', convertedProduct);
-        setProduct(convertedProduct);
+        // DB에서 찾지 못했거나 오류가 발생하면 fallback 상품에서 검색
+        const fallbackProduct = fallbackProducts.find(p => p.id === productId);
+        
+        if (fallbackProduct) {
+          console.log('Loaded product from fallback:', fallbackProduct);
+          setProduct(fallbackProduct);
+        } else {
+          console.log('Product not found:', productId);
+          notFound();
+        }
       } catch (error) {
         console.error('Failed to load product:', error);
         setError('상품을 불러오는 중 오류가 발생했습니다.');

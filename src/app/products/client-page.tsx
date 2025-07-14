@@ -1,7 +1,7 @@
 "use client";
 
 import { mainProductService, type MainProduct, convertMainProductsToProducts } from "@/lib/services/main-products";
-import { getCategories, getParentCategories, getCategoriesByParent } from "@/lib/products";
+import { getCategories, getParentCategories, getCategoriesByParent, products as fallbackProducts } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Product } from "@/types";
 import ProductCard from "@/components/ui/product-card";
@@ -32,16 +32,25 @@ export default function ProductsPage() {
         console.log('Loading products from database...');
         
         const mainProducts = await mainProductService.getActiveProducts();
-        const products = convertMainProductsToProducts(mainProducts);
-        console.log('Loaded and converted products:', products.length);
+        console.log('Raw products from DB:', mainProducts);
         
-        setAllProducts(products);
-        setFilteredProducts(products);
+        const dbProducts = convertMainProductsToProducts(mainProducts);
+        console.log('Converted DB products:', dbProducts);
+        
+        // 데이터베이스 상품과 fallback 상품을 합침
+        const allProductsList = [...dbProducts, ...fallbackProducts];
+        console.log('All products (DB + fallback):', allProductsList.length);
+        console.log('Products with categories:', allProductsList.map(p => ({ name: p.name, category: p.category })));
+        
+        setAllProducts(allProductsList);
+        setFilteredProducts(allProductsList);
       } catch (error) {
         console.error('Failed to load products:', error);
-        setError('상품을 불러오는 중 오류가 발생했습니다.');
-        setAllProducts([]);
-        setFilteredProducts([]);
+        console.log('Using fallback products only');
+        // 데이터베이스 오류 시 fallback 상품만 사용
+        setAllProducts(fallbackProducts);
+        setFilteredProducts(fallbackProducts);
+        setError('데이터베이스 연결 오류로 인해 샘플 상품을 표시합니다.');
       } finally {
         setIsLoading(false);
       }
