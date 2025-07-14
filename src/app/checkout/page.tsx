@@ -15,17 +15,6 @@ interface ShippingInfo {
   deliveryNote: string;
 }
 
-const dummyCartItems: CartItem[] = [
-  { 
-    id: '1', 
-    name: '데님 자켓', 
-    price: 89000, 
-    quantity: 1,
-    size: 'L', 
-    color: '인디고'
-  }
-];
-
 const deliveryOptions = [
   '배송 요청사항을 선택해주세요',
   '경비실에 맡겨주세요',

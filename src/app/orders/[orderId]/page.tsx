@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { CheckCircle, Package, Truck, Home, ArrowLeft, Calendar, CreditCard, MapPin, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface OrderItem {
   id: string;
@@ -162,9 +161,9 @@ export default function OrderDetailPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">주문을 찾을 수 없습니다</h1>
           <p className="text-gray-600 mb-6">요청하신 주문 정보를 찾을 수 없습니다.</p>
-          <Button onClick={() => router.push('/orders')} variant="outline">
+          <button onClick={() => router.push('/orders')} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
             주문 목록으로 이동
-          </Button>
+          </button>
         </div>
       </div>
     );
@@ -178,14 +177,13 @@ export default function OrderDetailPage() {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center">
-          <Button 
-            variant="ghost" 
+          <button 
             onClick={() => router.back()}
-            className="mr-4"
+            className="mr-4 inline-flex items-center text-gray-600 hover:text-gray-700 font-medium"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             뒤로가기
-          </Button>
+          </button>
           <div>
             <h1 className="text-2xl font-bold">주문 상세</h1>
             <p className="text-gray-600">주문번호: {order.id}</p>
@@ -361,27 +359,26 @@ export default function OrderDetailPage() {
           {/* 액션 버튼들 */}
           <div className="space-y-3">
             {order.status === 'shipped' && order.trackingNumber && (
-              <Button className="w-full" variant="outline">
+              <button className="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                 배송 조회
-              </Button>
+              </button>
             )}
             {order.status === 'delivered' && (
-              <Button className="w-full" variant="outline">
+              <button className="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                 리뷰 작성
-              </Button>
+              </button>
             )}
             {(order.status === 'pending' || order.status === 'confirmed') && (
-              <Button className="w-full" variant="outline">
+              <button className="w-full bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                 주문 취소
-              </Button>
+              </button>
             )}
-            <Button 
-              className="w-full" 
-              variant="ghost"
+            <button 
+              className="w-full text-gray-600 hover:text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
               onClick={() => router.push('/orders')}
             >
               주문 목록 보기
-            </Button>
+            </button>
           </div>
         </div>
       </div>
