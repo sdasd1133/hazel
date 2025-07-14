@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { authClient } from '@/lib/services/auth';
+import { useAuthStore } from '@/lib/supabase-auth';
+import { useHydrated } from '@/hooks/useHydrated';
 import { logger } from '@/lib/logger';
 
 interface AuthGuardProps {
@@ -18,45 +19,41 @@ const PUBLIC_PATHS = [
 ];
 
 const AuthGuard = ({ children }: AuthGuardProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
   const pathname = usePathname();
+  const hydrated = useHydrated();
 
   useEffect(() => {
-    const checkAuth = async () => {
+    if (!hydrated) return;
+
+    const checkAuth = () => {
       try {
         // 공개 페이지인 경우 인증 체크 스킵
         if (PUBLIC_PATHS.includes(pathname)) {
-          setIsAuthenticated(true);
           setIsLoading(false);
           return;
         }
 
-        const user = await authClient.getCurrentUser();
-        
-        if (user) {
-          setIsAuthenticated(true);
+        if (isAuthenticated && user) {
           logger.log('AuthGuard: 사용자 인증됨', user.email);
+          setIsLoading(false);
         } else {
-          setIsAuthenticated(false);
           logger.log('AuthGuard: 사용자 인증되지 않음, 로그인 페이지로 리다이렉트');
           router.push('/login');
         }
       } catch (error) {
         logger.error('AuthGuard: 인증 확인 오류', error);
-        setIsAuthenticated(false);
         router.push('/login');
-      } finally {
-        setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, [pathname, router]);
+  }, [hydrated, isAuthenticated, user, pathname, router]);
 
   // 로딩 중일 때 표시할 컴포넌트
-  if (isLoading) {
+  if (!hydrated || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">

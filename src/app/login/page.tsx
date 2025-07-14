@@ -49,10 +49,10 @@ export default function LoginPage() {
       }
       
       // 우리의 승인 시스템을 사용 (supabase-auth.ts)
-      const success = await login(email, password);
+      const result = await login(email, password);
       
-      if (!success) {
-        setError('이메일 또는 비밀번호가 올바르지 않거나 등록되지 않은 계정입니다. 테스트 계정을 사용하거나 회원가입을 진행해주세요.');
+      if (!result.success) {
+        setError(result.error || '로그인에 실패했습니다.');
         setLoading(false);
         return;
       }
@@ -60,11 +60,13 @@ export default function LoginPage() {
       // 로그인 성공 메시지
       setSuccess('로그인 성공! 페이지를 이동합니다...');
       
-      // 로그인 성공 후 페이지 이동
+      // 로그인 성공 후 페이지 이동 - 사용자 정보 바로 사용
       setTimeout(() => {
-        if (isAdmin()) {
+        if (result.user?.isAdmin) {
+          console.log('관리자로 로그인됨, 관리자 페이지로 이동');
           router.push('/admin');
         } else {
+          console.log('일반 사용자로 로그인됨, 메인 페이지로 이동');
           router.push('/');
         }
         router.refresh();

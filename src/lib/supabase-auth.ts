@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { AuthState } from '@/types/supabase';
 
 type AuthStoreState = AuthState & {
-  login: (email: string, password: string) => Promise<boolean>; 
+  login: (email: string, password: string) => Promise<{ success: boolean; user?: any; error?: string }>; 
   logout: () => void;
   setLastVisitedPage: (path: string | null) => void;
   isAdmin: () => boolean;
@@ -32,7 +32,10 @@ export const useAuthStore = create<AuthStoreState>()(
           
           // 이메일/비밀번호 기본 유효성 검사
           if (!email || !password) {
-            throw new Error('이메일과 비밀번호를 모두 입력해주세요.');
+            return { 
+              success: false, 
+              error: '이메일과 비밀번호를 모두 입력해주세요.' 
+            };
           }
           
           // 테스트용 계정들 (현재는 비밀번호 검증하지 않음 - 실제 운영에서는 보안 강화 필요)
@@ -81,13 +84,17 @@ export const useAuthStore = create<AuthStoreState>()(
             
             // 승인 상태 확인
             if (user.status === 'pending') {
-              alert('계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.');
-              throw new Error('계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.');
+              return { 
+                success: false, 
+                error: '계정이 아직 승인되지 않았습니다. 관리자의 승인을 기다려주세요.' 
+              };
             }
             
             if (user.status === 'rejected') {
-              alert('계정이 승인 거부되었습니다. 관리자에게 문의하세요.');
-              throw new Error('계정이 승인 거부되었습니다. 관리자에게 문의하세요.');
+              return { 
+                success: false, 
+                error: '계정이 승인 거부되었습니다. 관리자에게 문의하세요.' 
+              };
             }
             
             // 승인된 계정만 로그인 허용
@@ -96,13 +103,16 @@ export const useAuthStore = create<AuthStoreState>()(
                 user,
                 isAuthenticated: true 
               });
-              return true;
+              return { success: true, user };
             }
           }
           
           // 테스트가 아닌 계정의 경우
           console.log('등록되지 않은 계정입니다:', email);
-          throw new Error('등록되지 않은 계정입니다. 회원가입을 진행하거나 테스트 계정을 사용해주세요.');
+          return { 
+            success: false, 
+            error: '등록되지 않은 계정입니다. 회원가입을 진행하거나 테스트 계정을 사용해주세요.' 
+          };
           
           // 실제 Supabase 계정 처리 (현재는 비활성화)
           /*
@@ -142,10 +152,10 @@ export const useAuthStore = create<AuthStoreState>()(
           */
         } catch (error) {
           console.error('Login error:', error);
-          if (error instanceof Error) {
-            throw error; // 에러를 그대로 전파하여 호출하는 곳에서 처리할 수 있도록
-          }
-          throw new Error('로그인 중 알 수 없는 오류가 발생했습니다.');
+          return { 
+            success: false, 
+            error: error instanceof Error ? error.message : '로그인 중 알 수 없는 오류가 발생했습니다.' 
+          };
         }
       },
 
