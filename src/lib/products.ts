@@ -36,19 +36,6 @@ export const categoryToParentMapping: Record<string, string> = {
 
 // 샘플 상품 데이터 - 모든 데모 상품 제거
 export const products: Product[] = [];
-  {
-    id: "2",
-    name: "오버사이즈 맨투맨",
-    price: 45000,
-    category: "여성의류",
-    description: "트렌디한 오버사이즈 핏의 맨투맨 스웨터입니다. 부드러운 면 혼방 소재로 제작되어 편안하게 착용할 수 있습니다.",
-    images: ["/placeholder-product.jpg", "/placeholder-product.jpg"],
-    sizes: ["S", "M", "L", "XL"],
-    colors: ["검정", "베이지", "네이비"],
-    inStock: true,
-  },
-// 샘플 상품 데이터 - 모든 데모 상품 제거
-export const products: Product[] = [];
 
 // 카테고리별 상품 필터링 함수
 export const getProductsByCategory = (category: string) => {
