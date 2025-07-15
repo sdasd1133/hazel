@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { productClient, type Product, type CreateProductData } from '@/lib/services/products'
+import { getCategories, getParentCategories, getCategoriesByParent } from '@/lib/products'
 
 interface Category {
   id: number
@@ -30,6 +31,13 @@ export default function AdminProductsPage() {
     status: 'draft',
     featured: false
   })
+
+  // 카테고리 ID로 카테고리명 찾기 함수
+  const getCategoryNameById = (categoryId: number | null) => {
+    if (!categoryId) return '-'
+    const category = categories.find(cat => cat.id === categoryId)
+    return category ? category.name : '-'
+  }
 
   useEffect(() => {
     loadData()
@@ -84,50 +92,52 @@ export default function AdminProductsPage() {
         }));
       }
       
-      // DB에 카테고리가 없으면 메인 사이트와 동일한 카테고리 사용
-      console.log('DB에 카테고리가 없어서 기본 카테고리를 사용합니다.');
-      const categories = [
-        { id: 1, name: '여성의류' },
-        { id: 2, name: '남성의류' },
-        { id: 3, name: '스포츠의류' },
-        { id: 4, name: '가방' },
-        { id: 5, name: '신발' },
-        { id: 6, name: '시계' },
-        { id: 7, name: '모자' },
-        { id: 8, name: '벨트' },
-        { id: 9, name: '악세사리' },
-        { id: 10, name: '깔맞춤' },
-        { id: 11, name: '중고명품' }
+      // DB에 카테고리가 없으면 메인 사이트와 동일한 순서로 카테고리 사용
+      console.log('DB에 카테고리가 없어서 메인 사이트와 동일한 카테고리를 사용합니다.');
+      
+      // 메인 사이트와 완전히 동일한 순서 (src/lib/products.ts의 순서)
+      const mainSiteCategories = [
+        "남성의류",
+        "여성의류", 
+        "스포츠의류",
+        "악세사리",
+        "모자",
+        "가방",
+        "신발",
+        "시계",
+        "벨트",
+        "깔맞춤",
+        "중고명품"
       ];
       
       // Category 인터페이스에 맞게 변환
-      return categories.map((category, index) => ({
-        id: index + 1, // 임시 ID (1부터 시작)
-        name: category.name,
-        slug: category.id
+      return mainSiteCategories.map((name, index) => ({
+        id: index + 1, // 1부터 시작하는 ID
+        name: name,
+        slug: name.toLowerCase().replace(/\s+/g, '-')
       }));
     } catch (error) {
       console.error('카테고리 로드 오류:', error);
       
-      // 오류 발생 시에도 메인 사이트 카테고리 반환
-      const categories = [
-        { id: 'women-clothing', name: '여성의류' },
-        { id: 'men-clothing', name: '남성의류' },
-        { id: 'sports-clothing', name: '스포츠의류' },
-        { id: 'bags', name: '가방' },
-        { id: 'shoes', name: '신발' },
-        { id: 'watches', name: '시계' },
-        { id: 'hats', name: '모자' },
-        { id: 'belts', name: '벨트' },
-        { id: 'accessories', name: '악세사리' },
-        { id: 'coordinated-sets', name: '깔맞춤' },
-        { id: 'used-luxury', name: '중고명품' }
+      // 오류 발생 시에도 메인 사이트와 동일한 순서로 카테고리 반환
+      const mainSiteCategories = [
+        "남성의류",
+        "여성의류", 
+        "스포츠의류",
+        "악세사리",
+        "모자",
+        "가방",
+        "신발",
+        "시계",
+        "벨트",
+        "깔맞춤",
+        "중고명품"
       ];
       
-      return categories.map((category, index) => ({
+      return mainSiteCategories.map((name, index) => ({
         id: index + 1,
-        name: category.name,
-        slug: category.id
+        name: name,
+        slug: name.toLowerCase().replace(/\s+/g, '-')
       }));
     }
   }
@@ -364,15 +374,42 @@ export default function AdminProductsPage() {
                   name="category_id"
                   value={formData.category_id}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value={0}>카테고리 선택</option>
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
+                  <option value={0} className="text-gray-500">카테고리 선택</option>
+                  {/* 의류 카테고리 그룹 */}
+                  <optgroup label="👔 의류">
+                    {categories.filter(cat => ['남성의류', '여성의류', '스포츠의류'].includes(cat.name)).map(category => (
+                      <option key={category.id} value={category.id} className="pl-4">
+                        {category.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  {/* 아이템 카테고리 그룹 */}
+                  <optgroup label="👜 아이템">
+                    {categories.filter(cat => ['악세사리', '모자', '가방', '신발', '시계', '벨트'].includes(cat.name)).map(category => (
+                      <option key={category.id} value={category.id} className="pl-4">
+                        {category.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                  {/* 추천 카테고리 그룹 */}
+                  <optgroup label="⭐ 추천">
+                    {categories.filter(cat => ['깔맞춤', '중고명품'].includes(cat.name)).map(category => (
+                      <option key={category.id} value={category.id} className="pl-4">
+                        {category.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
+                <div className="text-xs text-gray-500 mt-1">
+                  메인 사이트와 동일한 카테고리 구조 및 순서로 표시됩니다.
+                  {formData.category_id !== 0 && (
+                    <span className="block mt-1 text-blue-600 font-medium">
+                      선택됨: {getCategoryNameById(formData.category_id)}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -628,7 +665,9 @@ export default function AdminProductsPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {(product as any).categories?.name || '-'}
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {getCategoryNameById(product.category_id)}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {product.sale_price && product.sale_price !== product.price ? (
