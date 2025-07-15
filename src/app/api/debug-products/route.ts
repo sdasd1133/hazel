@@ -40,7 +40,28 @@ export async function GET() {
         products: products || [],
         categories: categories || [],
         productsCount: products?.length || 0,
-        categoriesCount: categories?.length || 0
+        categoriesCount: categories?.length || 0,
+        // 카테고리별 상품 통계 추가
+        categoryStats: categories?.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug,
+          productCount: products?.filter(p => p.category_id === cat.id).length || 0,
+          products: products?.filter(p => p.category_id === cat.id).map(p => ({
+            id: p.id,
+            name: p.name,
+            status: p.status
+          })) || []
+        })) || [],
+        // 상품별 상세 정보
+        productDetails: products?.map(p => ({
+          id: p.id,
+          name: p.name,
+          category_id: p.category_id,
+          category_name: p.categories?.name || '미분류',
+          status: p.status,
+          created_at: p.created_at
+        })) || []
       }
     });
 
