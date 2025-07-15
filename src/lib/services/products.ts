@@ -128,6 +128,17 @@ export const productClient = {
 
       if (error) {
         console.error('Product creation error:', error);
+        
+        // SKU 중복 오류 처리
+        if (error.code === '23505' && error.message.includes('products_sku_key')) {
+          throw new Error('SKU가 이미 존재합니다. 다른 SKU를 사용하거나 비워두세요.');
+        }
+        
+        // 기타 제약 조건 오류 처리
+        if (error.code === '23505') {
+          throw new Error('중복된 값이 있습니다. 데이터를 확인해주세요.');
+        }
+        
         throw new Error(`상품 생성 실패: ${error.message}`);
       }
       

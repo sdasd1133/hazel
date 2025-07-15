@@ -40,7 +40,22 @@ export async function GET() {
         products: products || [],
         categories: categories || [],
         productsCount: products?.length || 0,
-        categoriesCount: categories?.length || 0
+        categoriesCount: categories?.length || 0,
+        // 카테고리별 상품 수 통계
+        categoryStats: categories?.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          slug: cat.slug,
+          productCount: products?.filter(p => p.category_id === cat.id).length || 0
+        })) || [],
+        // 상품별 카테고리 정보
+        productDetails: products?.map(p => ({
+          id: p.id,
+          name: p.name,
+          category_id: p.category_id,
+          category_name: p.categories?.name || '없음',
+          status: p.status
+        })) || []
       }
     })
 

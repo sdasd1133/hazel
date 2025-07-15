@@ -171,8 +171,18 @@ export default function AdminProductsPage() {
       const selectedCategory = categories.find(cat => cat.id === formData.category_id);
       console.log('Selected category info:', selectedCategory);
       
+      // SKU 자동 생성 (비어있거나 중복일 경우)
+      let finalSku = formData.sku;
+      if (!finalSku || finalSku.trim() === '') {
+        // 상품명과 타임스탬프를 이용한 고유 SKU 생성
+        const timestamp = Date.now();
+        const productNameSlug = formData.name.replace(/[^a-zA-Z0-9가-힣]/g, '').substring(0, 10);
+        finalSku = `SKU-${productNameSlug}-${timestamp}`;
+      }
+      
       const productData = {
         ...formData,
+        sku: finalSku,
         category_id: formData.category_id === 0 ? null : formData.category_id,
         images: imageUrls.length > 0 ? imageUrls : formData.images
       }
@@ -454,14 +464,18 @@ export default function AdminProductsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">SKU</label>
+                  <label className="block text-sm font-medium mb-1">SKU (자동 생성)</label>
                   <input
                     type="text"
                     name="sku"
                     value={formData.sku}
                     onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2"
+                    placeholder="비워두면 자동으로 생성됩니다"
+                    className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50"
                   />
+                  <div className="text-xs text-gray-500 mt-1">
+                    비워두면 상품 등록 시 자동으로 고유한 SKU가 생성됩니다.
+                  </div>
                 </div>
               </div>
 
