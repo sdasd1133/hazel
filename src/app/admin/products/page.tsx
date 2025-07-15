@@ -17,7 +17,8 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [imageUrls, setImageUrls] = useState<string[]>([])
-  const [newImageUrl, setNewImageUrl] = useState('')
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [uploadingImages, setUploadingImages] = useState(false)
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
@@ -243,7 +244,8 @@ export default function AdminProductsPage() {
       setImageUrls([])
     }
     
-    setNewImageUrl('')
+    // 편집 시에는 파일 배열 초기화 (기존 이미지는 URL로 처리)
+    setImageFiles([])
     setShowForm(true)
   }
 
@@ -270,40 +272,63 @@ export default function AdminProductsPage() {
     }))
   }
 
-  // 이미지 URL 추가 핸들러
-  const addImageUrl = () => {
-    if (!newImageUrl.trim()) {
-      alert('이미지 URL을 입력해주세요.')
+  // 이미지 파일 업로드 핸들러
+  const handleImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    
+    // 최대 10장 제한 확인
+    if (imageUrls.length + files.length > 10) {
+      alert(`최대 10장까지만 등록할 수 있습니다. 현재 ${imageUrls.length}장이 등록되어 있어 ${10 - imageUrls.length}장만 추가할 수 있습니다.`)
       return
     }
     
-    // URL 유효성 간단 검사
+    setUploadingImages(true)
+    
     try {
-      new URL(newImageUrl)
-    } catch {
-      alert('올바른 URL을 입력해주세요.')
-      return
+      const newImageUrls: string[] = []
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i]
+        
+        // 파일 타입 검사
+        if (!file.type.startsWith('image/')) {
+          alert(`${file.name}은(는) 이미지 파일이 아닙니다.`)
+          continue
+        }
+        
+        // 파일 크기 검사 (5MB 제한)
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`${file.name}은(는) 파일 크기가 5MB를 초과합니다.`)
+          continue
+        }
+        
+        // 파일을 Base64로 변환하여 미리보기용으로 사용
+        const reader = new FileReader()
+        reader.onload = () => {
+          if (reader.result) {
+            newImageUrls.push(reader.result as string)
+            
+            // 모든 파일이 처리되었을 때
+            if (newImageUrls.length === files.length) {
+              setImageUrls(prev => [...prev, ...newImageUrls])
+              setImageFiles(prev => [...prev, ...Array.from(files)])
+            }
+          }
+        }
+        reader.readAsDataURL(file)
+      }
+    } catch (error) {
+      console.error('이미지 업로드 오류:', error)
+      alert('이미지 업로드 중 오류가 발생했습니다.')
+    } finally {
+      setUploadingImages(false)
     }
-    
-    // 중복 검사
-    if (imageUrls.includes(newImageUrl)) {
-      alert('이미 추가된 이미지 URL입니다.')
-      return
-    }
-    
-    // 최대 10장 제한
-    if (imageUrls.length >= 10) {
-      alert('최대 10장까지만 등록할 수 있습니다.')
-      return
-    }
-    
-    setImageUrls(prev => [...prev, newImageUrl])
-    setNewImageUrl('')
   }
 
-  // 이미지 URL 삭제 핸들러
+  // 이미지 URL 삭제 핸들러 (파일도 함께 삭제)
   const removeImageUrl = (index: number) => {
     setImageUrls(prev => prev.filter((_, i) => i !== index))
+    setImageFiles(prev => prev.filter((_, i) => i !== index))
   }
 
   // 이미지 순서 변경 핸들러
@@ -314,6 +339,12 @@ export default function AdminProductsPage() {
       newUrls.splice(toIndex, 0, movedUrl)
       return newUrls
     })
+    setImageFiles(prev => {
+      const newFiles = [...prev]
+      const [movedFile] = newFiles.splice(fromIndex, 1)
+      newFiles.splice(toIndex, 0, movedFile)
+      return newFiles
+    })
   }
 
   // 폼 리셋 시 이미지도 초기화
@@ -321,7 +352,7 @@ export default function AdminProductsPage() {
     setShowForm(false)
     setEditingProduct(null)
     setImageUrls([])
-    setNewImageUrl('')
+    setImageFiles([])
     setFormData({
       name: '',
       description: '',
@@ -518,35 +549,41 @@ export default function AdminProductsPage() {
                 />
               </div>
 
-              {/* 이미지 URL 입력 섹션 */}
+              {/* 이미지 파일 업로드 섹션 */}
               <div>
                 <label className="block text-sm font-medium mb-2">상품 이미지</label>
                 
-                {/* 이미지 URL 입력 */}
+                {/* 파일 업로드 */}
                 <div className="mb-4">
-                  <div className="flex gap-2">
-                    <input
-                      type="url"
-                      value={newImageUrl}
-                      onChange={(e) => setNewImageUrl(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          addImageUrl()
-                        }
-                      }}
-                      placeholder="이미지 URL을 입력하세요 (예: https://example.com/image.jpg)"
-                      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                    <button
-                      type="button"
-                      onClick={addImageUrl}
-                      disabled={!newImageUrl.trim()}
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed whitespace-nowrap"
-                    >
-                      추가
-                    </button>
+                  <div className="flex items-center justify-center w-full">
+                    <label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg className="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                          <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                        </svg>
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
+                        </p>
+                        <p className="text-xs text-gray-500">PNG, JPG, WebP (최대 5MB)</p>
+                      </div>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e.target.files)}
+                        className="hidden"
+                        disabled={uploadingImages || imageUrls.length >= 10}
+                      />
+                    </label>
                   </div>
+                  
+                  {uploadingImages && (
+                    <div className="flex items-center justify-center mt-2">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+                      <span className="ml-2 text-sm text-gray-600">이미지 업로드 중...</span>
+                    </div>
+                  )}
                 </div>
                 
                 {/* 이미지 미리보기 */}
@@ -612,10 +649,11 @@ export default function AdminProductsPage() {
                 
                 <div className="text-sm text-gray-500 mt-2">
                   <p>• 최대 10장까지 등록 가능</p>
-                  <p>• 웹에서 접근 가능한 이미지 URL을 입력하세요</p>
+                  <p>• 파일 크기는 5MB 이하로 제한됩니다</p>
                   <p>• 권장 크기: 800x800px 이상</p>
                   <p>• 지원 형식: JPG, PNG, WebP</p>
                   <p>• 첫 번째 이미지가 대표 이미지로 사용됩니다</p>
+                  <p>• 드래그로 이미지 순서를 변경할 수 있습니다</p>
                 </div>
               </div>
 

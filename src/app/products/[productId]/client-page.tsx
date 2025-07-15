@@ -157,7 +157,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
         {/* 상품 이미지 섹션 */}
         <div className="lg:col-span-2">
-          <div className="max-w-lg mx-auto lg:mx-0">
+          <div className="max-w-lg mx-auto lg:ml-auto lg:mr-4">
             <div className="aspect-square relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-4 max-h-96 shadow-lg hover:shadow-xl transition-shadow duration-300">
               {product.images && product.images.length > 0 && product.images[selectedImageIndex] && 
                !product.images[selectedImageIndex].includes('placeholder') ? (
