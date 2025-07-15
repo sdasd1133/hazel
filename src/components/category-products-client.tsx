@@ -43,10 +43,17 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
         // 현재 카테고리에 맞는 상품 필터링
         const categoryProducts = allProducts.filter(product => {
           console.log(`상품 "${product.name}"의 카테고리:`, product.category, '찾는 카테고리:', category);
+          console.log('카테고리 비교 결과:', product.category === category);
           return product.category === category;
         });
         
         console.log('필터링된 카테고리 상품:', categoryProducts);
+        console.log('필터링된 상품 수:', categoryProducts.length);
+        
+        // 디버깅: 모든 상품의 카테고리 목록 출력
+        const allCategories = [...new Set(allProducts.map(p => p.category))];
+        console.log('DB에서 가져온 모든 카테고리들:', allCategories);
+        console.log('현재 찾고 있는 카테고리:', category);
         
         setFilteredProducts(categoryProducts);
       } catch (error) {

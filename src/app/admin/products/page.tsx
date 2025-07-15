@@ -85,19 +85,19 @@ export default function AdminProductsPage() {
       }
       
       // DB에 카테고리가 없으면 메인 사이트와 동일한 카테고리 사용
-      console.log('DB에 카테고리가 없어서 메인 사이트 카테고리를 사용합니다.');
+      console.log('DB에 카테고리가 없어서 기본 카테고리를 사용합니다.');
       const categories = [
-        { id: 'women-clothing', name: '여성의류' },
-        { id: 'men-clothing', name: '남성의류' },
-        { id: 'sports-clothing', name: '스포츠의류' },
-        { id: 'bags', name: '가방' },
-        { id: 'shoes', name: '신발' },
-        { id: 'watches', name: '시계' },
-        { id: 'hats', name: '모자' },
-        { id: 'belts', name: '벨트' },
-        { id: 'accessories', name: '악세사리' },
-        { id: 'coordinated-sets', name: '깔맞춤' },
-        { id: 'used-luxury', name: '중고명품' }
+        { id: 1, name: '여성의류' },
+        { id: 2, name: '남성의류' },
+        { id: 3, name: '스포츠의류' },
+        { id: 4, name: '가방' },
+        { id: 5, name: '신발' },
+        { id: 6, name: '시계' },
+        { id: 7, name: '모자' },
+        { id: 8, name: '벨트' },
+        { id: 9, name: '악세사리' },
+        { id: 10, name: '깔맞춤' },
+        { id: 11, name: '중고명품' }
       ];
       
       // Category 인터페이스에 맞게 변환

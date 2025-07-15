@@ -162,11 +162,41 @@ export const mainProductService = {
 
 // MainProduct를 Product로 변환하는 함수
 export const convertMainProductToProduct = (mainProduct: MainProduct): Product => {
+  // 카테고리 이름 결정 로직 개선
+  let categoryName = '미분류';
+  
+  if (mainProduct.category?.name) {
+    // DB에서 가져온 카테고리 이름 사용
+    categoryName = mainProduct.category.name;
+  } else if (mainProduct.category_id) {
+    // category_id만 있는 경우 매핑 테이블 사용
+    const categoryMapping: Record<number, string> = {
+      1: '여성의류',
+      2: '남성의류',
+      3: '스포츠의류',
+      4: '가방',
+      5: '신발',
+      6: '시계',
+      7: '모자',
+      8: '벨트',
+      9: '악세사리',
+      10: '깔맞춤',
+      11: '중고명품'
+    };
+    categoryName = categoryMapping[mainProduct.category_id] || '미분류';
+  }
+  
+  console.log(`상품 "${mainProduct.name}" 카테고리 변환:`, {
+    categoryId: mainProduct.category_id,
+    categoryObject: mainProduct.category,
+    finalCategoryName: categoryName
+  });
+  
   return {
     id: mainProduct.id.toString(),
     name: mainProduct.name,
     price: mainProduct.sale_price || mainProduct.price,
-    category: mainProduct.category?.name || '미분류',
+    category: categoryName,
     description: mainProduct.description || '',
     images: mainProduct.images.length > 0 ? mainProduct.images : ['/placeholder-product.jpg'],
     sizes: [], // DB에서 sizes 정보가 없으므로 빈 배열
