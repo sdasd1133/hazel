@@ -153,11 +153,12 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   };
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
-        {/* 상품 이미지 */}
-        <div className="max-w-md mx-auto lg:mx-0">
-          <div className="aspect-square relative bg-gray-100 rounded-lg overflow-hidden mb-3 max-h-80">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          {/* 상품 이미지 */}
+          <div className="max-w-md mx-auto lg:mx-0">
+            <div className="aspect-square relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-4 max-h-80 shadow-lg hover:shadow-xl transition-shadow duration-300">
             {product.images && product.images.length > 0 && product.images[selectedImageIndex] && 
              !product.images[selectedImageIndex].includes('placeholder') ? (
               <Image
@@ -176,10 +177,10 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
                 }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
                 <div className="text-center">
-                  <div className="w-20 h-20 mx-auto mb-3 bg-gray-200 rounded-full flex items-center justify-center">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-20 h-20 mx-auto mb-3 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center shadow-md">
+                    <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -191,13 +192,13 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           </div>
           
           {product.images && product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-3">
               {product.images.slice(0, 4).map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`aspect-square relative bg-gray-100 rounded-md overflow-hidden border-2 ${
-                    selectedImageIndex === index ? 'border-indigo-500' : 'border-transparent'
+                  className={`aspect-square relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
+                    selectedImageIndex === index ? 'border-indigo-500 shadow-md' : 'border-transparent hover:border-gray-300'
                   }`}
                 >
                   {image && !image.includes('placeholder') ? (
@@ -210,7 +211,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
                       unoptimized={true}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
                       <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -223,28 +224,46 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
         </div>
         
         {/* 상품 정보 */}
-        <div>
-          <div className="mb-4">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
-            <p className="text-2xl font-bold text-indigo-600">{product.price.toLocaleString()}원</p>
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Premium Collection</span>
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
+            <div className="flex items-center gap-3">
+              <p className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                {product.price.toLocaleString()}원
+              </p>
+              <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                무료배송
+              </span>
+            </div>
           </div>
           
-          <div className="mb-4">
-            <p className="text-gray-600 leading-relaxed text-sm">{product.description}</p>
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 border-l-4 border-indigo-500">
+              <p className="text-gray-700 leading-relaxed">{product.description}</p>
+            </div>
           </div>
           
           {/* 색상 선택 */}
-          <div className="mb-4">
-            <h3 className="text-base font-medium mb-2">색상</h3>
-            <div className="flex gap-2">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <span className="w-5 h-5 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="w-2 h-2 bg-white rounded-full"></span>
+              </span>
+              색상 선택
+            </h3>
+            <div className="flex gap-3">
               {colors.map((color) => (
                 <button
                   key={color}
                   onClick={() => setSelectedColor(color)}
-                  className={`px-3 py-1.5 border rounded-lg transition-colors text-sm ${
+                  className={`px-4 py-2 border-2 rounded-xl transition-all duration-200 font-medium hover:scale-105 ${
                     selectedColor === color
-                      ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 shadow-md'
+                      : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
                   }`}
                 >
                   {color}
@@ -254,17 +273,22 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           </div>
 
           {/* 사이즈 선택 */}
-          <div className="mb-4">
-            <h3 className="text-base font-medium mb-2">사이즈 <span className="text-red-500">*</span></h3>
-            <div className="grid grid-cols-5 gap-2">
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <span className="w-5 h-5 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="w-2 h-2 bg-white rounded-full"></span>
+              </span>
+              사이즈 선택 <span className="text-red-500 ml-1">*</span>
+            </h3>
+            <div className="grid grid-cols-5 gap-3">
               {sizes.map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`py-2 border rounded-lg font-medium transition-colors text-sm ${
+                  className={`py-3 border-2 rounded-xl font-semibold transition-all duration-200 hover:scale-105 ${
                     selectedSize === size
-                      ? 'border-indigo-500 bg-indigo-500 text-white'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-indigo-500 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+                      : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
                   }`}
                 >
                   {size}
@@ -274,19 +298,24 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           </div>
 
           {/* 수량 선택 */}
-          <div className="mb-6">
-            <h3 className="text-base font-medium mb-2">수량</h3>
-            <div className="flex items-center gap-2">
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-3 flex items-center">
+              <span className="w-5 h-5 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="w-2 h-2 bg-white rounded-full"></span>
+              </span>
+              수량
+            </h3>
+            <div className="flex items-center gap-3">
               <button
                 onClick={decrementQuantity}
-                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-sm"
+                className="w-10 h-10 border-2 border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:border-indigo-300 transition-all duration-200 font-semibold"
               >
                 -
               </button>
-              <span className="w-12 text-center font-medium text-sm">{quantity}</span>
+              <span className="w-16 text-center font-bold text-lg bg-gradient-to-r from-gray-100 to-gray-200 py-2 rounded-xl">{quantity}</span>
               <button
                 onClick={incrementQuantity}
-                className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-sm"
+                className="w-10 h-10 border-2 border-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:border-indigo-300 transition-all duration-200 font-semibold"
               >
                 +
               </button>
@@ -294,46 +323,68 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           </div>
 
           {/* 구매 버튼들 */}
-          <div className="space-y-2 mb-6">
+          <div className="space-y-4 mb-8">
             {/* 찜하기 버튼 */}
             <button
               onClick={handleWishlistToggle}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-medium transition-colors border text-sm ${
+              className={`w-full flex items-center justify-center gap-3 py-3 rounded-xl font-semibold transition-all duration-200 border-2 hover:scale-105 ${
                 isInWishlist(product.id)
-                  ? 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200 text-red-600 hover:shadow-lg'
+                  : 'bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-gray-50 hover:to-indigo-50'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
+              <Heart className={`w-5 h-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
               {isInWishlist(product.id) ? '찜 취소' : '찜하기'}
             </button>
             
             <button
               onClick={handleAddToCart}
-              className="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors text-sm"
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              장바구니에 추가
+              🛒 장바구니에 추가
             </button>
-            <button className="w-full bg-gray-900 text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors text-sm">
-              바로 구매하기
+            <button className="w-full bg-gradient-to-r from-gray-800 to-gray-900 text-white py-4 rounded-xl font-bold hover:from-gray-900 hover:to-black transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105">
+              ⚡ 바로 구매하기
             </button>
           </div>
 
           {/* 배송 정보 */}
-          <div className="border-t pt-4">
-            <div className="flex items-start gap-3 mb-3">
-              <span className="font-medium text-gray-700 min-w-[60px] text-sm">배송</span>
-              <div>
-                <p className="text-gray-600 text-sm">3,000원 (70,000원 이상 구매 시 무료배송)</p>
-                <p className="text-xs text-gray-500 mt-1">제주 및 도서산간 지역은 추가 배송비 발생</p>
-              </div>
-            </div>
+          <div className="bg-gradient-to-r from-gray-50 to-indigo-50 rounded-xl p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-800">
+              <span className="w-6 h-6 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" />
+                </svg>
+              </span>
+              배송 & 교환/반품 정보
+            </h3>
             
-            <div className="flex items-start gap-3">
-              <span className="font-medium text-gray-700 min-w-[60px] text-sm">교환/반품</span>
-              <div>
-                <p className="text-gray-600 text-sm">상품 수령 후 7일 이내 교환/반품 가능</p>
-                <p className="text-xs text-gray-500 mt-1">단순 변심에 의한 교환/반품 시 배송비 고객 부담</p>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                    <path d="M3 4a1 1 0 00-1 1v1a1 1 0 001 1h1l1.68 5.39A3 3 0 008.49 15H15a1 1 0 000-2H8.49a1 1 0 01-.96-.73L6.92 10h8.08a1 1 0 00.95-.68l1.25-4A1 1 0 0016.2 4H3z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">배송비</p>
+                  <p className="text-gray-600 text-sm">3,000원 (70,000원 이상 구매 시 무료배송)</p>
+                  <p className="text-xs text-gray-500 mt-1">제주 및 도서산간 지역은 추가 배송비 발생</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-800">교환/반품</p>
+                  <p className="text-gray-600 text-sm">상품 수령 후 7일 이내 교환/반품 가능</p>
+                  <p className="text-xs text-gray-500 mt-1">단순 변심에 의한 교환/반품 시 배송비 고객 부담</p>
+                </div>
               </div>
             </div>
           </div>
