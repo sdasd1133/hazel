@@ -7,6 +7,7 @@ import { Product } from "@/types";
 import ProductCard from "@/components/ui/product-card";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { ChevronRight, ChevronDown } from "lucide-react";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -23,10 +24,20 @@ export default function ProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState(Date.now());
+  const [expandedParentCategories, setExpandedParentCategories] = useState<string[]>([]);
 
   // 수동 새로고침 함수
   const refreshProducts = () => {
     setLastRefresh(Date.now());
+  };
+
+  // 상위 카테고리 토글 함수
+  const toggleParentCategory = (parentId: string) => {
+    setExpandedParentCategories(prev => 
+      prev.includes(parentId) 
+        ? prev.filter(id => id !== parentId)
+        : [...prev, parentId]
+    );
   };
 
   // 데이터베이스에서 상품 로드
@@ -237,43 +248,72 @@ export default function ProductsPage() {
               </div>
               
               <div className="p-4">
-                <div className="space-y-1">
-                  {filteredCategories.map((categoryItem) => (
-                    <div key={categoryItem.id}>
-                      <button
-                        onClick={() => {
-                          const url = getUrlFromCategory(categoryItem.name);
-                          console.log('카테고리 클릭:', categoryItem.name, '→', url);
-                          window.location.href = url;
-                        }}
-                        className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-between group ${
-                          category === categoryItem.id
-                            ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                        }`}
-                      >
-                        <span className="flex items-center">
-                          <span className={`w-2 h-2 rounded-full mr-3 ${
-                            category === categoryItem.id 
-                              ? "bg-indigo-500" 
-                              : "bg-gray-300 group-hover:bg-indigo-400"
-                          }`}></span>
-                          {categoryItem.name}
-                        </span>
-                        <svg 
-                          className={`w-4 h-4 transition-transform duration-200 ${
-                            category === categoryItem.id 
-                              ? "text-indigo-500 rotate-90" 
-                              : "text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1"
-                          }`} 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
+                <div className="space-y-2">
+                  {parentCategories.map((parentCat) => {
+                    const childCategories = getCategoriesByParent(parentCat.id);
+                    const isExpanded = expandedParentCategories.includes(parentCat.id);
+                    
+                    return (
+                      <div key={parentCat.id} className="border-b border-gray-100 last:border-b-0 pb-2 last:pb-0">
+                        {/* 상위 카테고리 헤더 */}
+                        <button
+                          onClick={() => toggleParentCategory(parentCat.id)}
+                          className="w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between group hover:bg-gray-50"
                         >
-                          <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
+                          <span className="flex items-center">
+                            <span className="w-2 h-2 rounded-full mr-3 bg-indigo-400"></span>
+                            <span className="font-medium text-gray-800">{parentCat.name}</span>
+                          </span>
+                          {isExpanded ? (
+                            <ChevronDown className="w-4 h-4 text-gray-500 transition-transform duration-200" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-gray-500 transition-transform duration-200" />
+                          )}
+                        </button>
+                        
+                        {/* 하위 카테고리 목록 */}
+                        {isExpanded && (
+                          <div className="mt-1 ml-4 space-y-1">
+                            {childCategories.map((categoryItem) => (
+                              <button
+                                key={categoryItem.id}
+                                onClick={() => {
+                                  const url = getUrlFromCategory(categoryItem.name);
+                                  console.log('카테고리 클릭:', categoryItem.name, '→', url);
+                                  window.location.href = url;
+                                }}
+                                className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between group ${
+                                  category === categoryItem.id
+                                    ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
+                                    : "text-gray-600 hover:bg-gray-50 hover:text-indigo-600"
+                                }`}
+                              >
+                                <span className="flex items-center">
+                                  <span className={`w-1.5 h-1.5 rounded-full mr-3 ${
+                                    category === categoryItem.id 
+                                      ? "bg-indigo-500" 
+                                      : "bg-gray-300 group-hover:bg-indigo-400"
+                                  }`}></span>
+                                  <span className="text-sm">{categoryItem.name}</span>
+                                </span>
+                                <svg 
+                                  className={`w-3 h-3 transition-transform duration-200 ${
+                                    category === categoryItem.id 
+                                      ? "text-indigo-500" 
+                                      : "text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1"
+                                  }`} 
+                                  fill="currentColor" 
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                </svg>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
