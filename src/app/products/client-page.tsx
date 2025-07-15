@@ -1,7 +1,7 @@
 "use client";
 
 import { mainProductService, type MainProduct, convertMainProductsToProducts } from "@/lib/services/main-products";
-import { getCategories, getParentCategories, getCategoriesByParent, products as fallbackProducts } from "@/lib/products";
+import { getCategories, getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Product } from "@/types";
 import ProductCard from "@/components/ui/product-card";
@@ -22,6 +22,12 @@ export default function ProductsPage() {
   const [filteredCategories, setFilteredCategories] = useState([...categories]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState(Date.now());
+
+  // 수동 새로고침 함수
+  const refreshProducts = () => {
+    setLastRefresh(Date.now());
+  };
 
   // 데이터베이스에서 상품 로드
   useEffect(() => {
@@ -37,27 +43,25 @@ export default function ProductsPage() {
         const dbProducts = convertMainProductsToProducts(mainProducts);
         console.log('Converted DB products:', dbProducts);
         
-        // 데이터베이스 상품과 fallback 상품을 합침
-        const allProductsList = [...dbProducts, ...fallbackProducts];
-        console.log('All products (DB + fallback):', allProductsList.length);
-        console.log('Products with categories:', allProductsList.map(p => ({ name: p.name, category: p.category })));
+        // 데이터베이스 상품만 사용
+        console.log('All products from DB:', dbProducts.length);
+        console.log('Products with categories:', dbProducts.map(p => ({ name: p.name, category: p.category })));
         
-        setAllProducts(allProductsList);
-        setFilteredProducts(allProductsList);
+        setAllProducts(dbProducts);
+        setFilteredProducts(dbProducts);
       } catch (error) {
         console.error('Failed to load products:', error);
-        console.log('Using fallback products only');
-        // 데이터베이스 오류 시 fallback 상품만 사용
-        setAllProducts(fallbackProducts);
-        setFilteredProducts(fallbackProducts);
-        setError('데이터베이스 연결 오류로 인해 샘플 상품을 표시합니다.');
+        setError('상품을 불러오는데 실패했습니다.');
+        // 데이터베이스 오류 시 빈 배열 사용
+        setAllProducts([]);
+        setFilteredProducts([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProducts();
-  }, []);
+  }, [lastRefresh]); // lastRefresh를 의존성에 추가
   
   // 상품 및 카테고리 필터링 로직
   useEffect(() => {
@@ -277,6 +281,20 @@ export default function ProductsPage() {
 
           {/* 상품 목록 */}
           <div className="flex-1">
+            {/* 상품 목록 헤더 */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold">
+                상품 목록 ({filteredProducts.length}개)
+              </h2>
+              <button
+                onClick={refreshProducts}
+                disabled={isLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isLoading ? '로딩 중...' : '새로고침'}
+              </button>
+            </div>
+            
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {/* 로딩 스켈레톤 */}

@@ -15,6 +15,7 @@ interface CategoryProductsClientProps {
 export default function CategoryProductsClient({ category }: CategoryProductsClientProps) {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState(Date.now());
   
   const parentCategories = getParentCategories();
   const categories = getCategories();
@@ -23,6 +24,11 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
   const currentCategory = categories.find(cat => cat.name === category);
   const parentCategory = currentCategory ? 
     parentCategories.find(parent => parent.id === currentCategory.parentId) : null;
+
+  // 수동 새로고침 함수
+  const refreshProducts = () => {
+    setLastRefresh(Date.now());
+  };
   
   useEffect(() => {
     const filterProducts = async () => {
@@ -42,27 +48,18 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
         
         console.log('필터링된 카테고리 상품:', categoryProducts);
         
-        // 하드코딩된 상품도 포함 (기존 데모 상품)
-        const hardcodedProducts = products.filter(product => product.category === category);
-        console.log('하드코딩된 상품:', hardcodedProducts);
-        
-        // 두 데이터 소스 합치기
-        const allCategoryProducts = [...categoryProducts, ...hardcodedProducts];
-        console.log('최종 표시될 상품:', allCategoryProducts);
-        
-        setFilteredProducts(allCategoryProducts);
+        setFilteredProducts(categoryProducts);
       } catch (error) {
         console.error('상품 데이터 로드 실패:', error);
-        // 오류 시 하드코딩된 상품만 표시
-        const categoryProducts = products.filter(product => product.category === category);
-        setFilteredProducts(categoryProducts);
+        // 오류 시 빈 배열 표시
+        setFilteredProducts([]);
       } finally {
         setIsLoading(false);
       }
     };
     
     filterProducts();
-  }, [category]);
+  }, [category, lastRefresh]); // lastRefresh를 의존성에 추가
   
   if (isLoading) {
     return (
@@ -102,11 +99,20 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
       </div>
       
       {/* 카테고리 헤더 */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{category}</h1>
-        <p className="text-muted-foreground">
-          {filteredProducts.length}개의 상품이 있습니다
-        </p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{category}</h1>
+          <p className="text-muted-foreground">
+            {filteredProducts.length}개의 상품이 있습니다
+          </p>
+        </div>
+        <button
+          onClick={refreshProducts}
+          disabled={isLoading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {isLoading ? '로딩 중...' : '새로고침'}
+        </button>
       </div>
       
       <div className="flex flex-col md:flex-row gap-6">
