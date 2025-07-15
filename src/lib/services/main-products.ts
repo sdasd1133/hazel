@@ -76,13 +76,29 @@ export const mainProductService = {
     }
   },
 
-  // 카테고리별 상품 조회 (카테고리명 기준) - 메인사이트용
+  // 카테고리별 상품 조회 (카테고리명 기준) - 메인사이트용 (완전 재작성)
   async getProductsByCategoryName(categoryName: string): Promise<MainProduct[]> {
     try {
-      console.log('=== 카테고리별 상품 조회 시작 ===');
+      console.log('=== 카테고리별 상품 조회 (재작성 버전) ===');
       console.log('요청된 카테고리명:', categoryName);
       
-      // 카테고리명을 ID로 매핑 (관리자 페이지와 동일한 순서)
+      // 1단계: 모든 상품을 먼저 가져와서 확인
+      const { data: allProducts, error: allError } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
+        .order('created_at', { ascending: false })
+
+      if (allError) {
+        console.error('전체 상품 조회 오류:', allError);
+        throw new Error(`전체 상품 조회 실패: ${allError.message}`)
+      }
+
+      console.log('전체 상품 수:', allProducts?.length || 0);
+      
+      // 2단계: 카테고리명을 ID로 매핑
       const categoryNameToIdMapping: Record<string, number> = {
         '남성의류': 1,
         '여성의류': 2,
@@ -97,60 +113,44 @@ export const mainProductService = {
         '중고명품': 11
       };
       
-      const categoryId = categoryNameToIdMapping[categoryName];
+      const targetCategoryId = categoryNameToIdMapping[categoryName];
+      console.log(`카테고리 "${categoryName}" → ID: ${targetCategoryId}`);
       
-      if (!categoryId) {
+      if (!targetCategoryId) {
         console.log('❌ 매핑되지 않은 카테고리명:', categoryName);
-        console.log('사용 가능한 카테고리:', Object.keys(categoryNameToIdMapping));
         return [];
       }
       
-      console.log(`✅ 카테고리 "${categoryName}" → ID: ${categoryId}`);
+      // 3단계: 해당 카테고리 상품 필터링 (여러 방식으로 시도)
+      const filteredProducts = allProducts?.filter(product => {
+        // 방법 1: category_id로 직접 비교
+        const matchByCategoryId = product.category_id === targetCategoryId;
+        
+        // 방법 2: 카테고리 객체의 이름으로 비교
+        const matchByCategoryName = product.categories?.name === categoryName;
+        
+        console.log(`상품 "${product.name}":`, {
+          category_id: product.category_id,
+          categories_name: product.categories?.name,
+          targetCategoryId,
+          targetCategoryName: categoryName,
+          matchByCategoryId,
+          matchByCategoryName
+        });
+        
+        return matchByCategoryId || matchByCategoryName;
+      }) || [];
       
-      // 먼저 모든 상품 조회 (디버깅용)
-      const { data: allProducts, error: allError } = await supabase
-        .from('products')
-        .select(`
-          *,
-          categories(id, name, slug)
-        `)
-        .order('created_at', { ascending: false })
-
-      if (allError) {
-        console.error('전체 상품 조회 오류:', allError);
-      } else {
-        console.log('전체 상품 수:', allProducts?.length || 0);
-        console.log('전체 상품의 카테고리 분포:', 
-          allProducts?.reduce((acc: any, p: any) => {
-            const catId = p.category_id;
-            acc[catId] = (acc[catId] || 0) + 1;
-            return acc;
-          }, {}) || {}
-        );
-      }
-      
-      // 특정 카테고리 상품 조회
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          *,
-          categories(id, name, slug)
-        `)
-        .eq('category_id', categoryId)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('카테고리별 상품 조회 오류:', error);
-        throw new Error(`카테고리별 상품 조회 실패: ${error.message}`)
-      }
-
-      console.log(`카테고리 ID ${categoryId}에 속한 상품 수:`, data?.length || 0);
-      if (data && data.length > 0) {
-        console.log('조회된 상품들:', data.map(p => ({ id: p.id, name: p.name, category_id: p.category_id })));
-      }
+      console.log(`최종 필터링된 상품 수: ${filteredProducts.length}`);
+      console.log('필터링된 상품들:', filteredProducts.map(p => ({ 
+        id: p.id, 
+        name: p.name, 
+        category_id: p.category_id,
+        categories_name: p.categories?.name 
+      })));
       console.log('=== 카테고리별 상품 조회 완료 ===');
       
-      return data as MainProduct[]
+      return filteredProducts as MainProduct[]
     } catch (error) {
       console.error('Get products by category name error:', error)
       throw error
