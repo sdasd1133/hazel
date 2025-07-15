@@ -1,6 +1,6 @@
 "use client";
 
-import { mainProductService, type MainProduct, convertMainProductsToProducts } from "@/lib/services/main-products";
+import { mainProductService, type MainProduct, convertMainProductsToProducts, getProductsByCategory } from "@/lib/services/main-products";
 import { getCategories, getParentCategories, getCategoriesByParent } from "@/lib/products";
 import { getUrlFromCategory } from "@/lib/category-utils";
 import { Product } from "@/types";
@@ -76,48 +76,61 @@ export default function ProductsPage() {
   
   // 상품 및 카테고리 필터링 로직
   useEffect(() => {
-    if (allProducts.length === 0) return;
-    
-    const filterProducts = () => {
-      console.log('필터링 시작 - parent:', parent, 'category:', category);
-      
-      let newFilteredProducts = [...allProducts];
-      let newFilteredCategories = [...categories];
-      
-      // 상위 카테고리 선택 시
-      if (parent) {
-        console.log('상위 카테고리 필터링:', parent);
-        newFilteredCategories = getCategoriesByParent(parent);
+    const filterProducts = async () => {
+      try {
+        console.log('필터링 시작 - parent:', parent, 'category:', category);
         
-        // 상위 카테고리에 속하는 하위 카테고리들의 이름 목록 생성
-        const childCategoryNames = newFilteredCategories.map(cat => cat.name);
+        let newFilteredProducts: Product[] = [];
+        let newFilteredCategories = [...categories];
         
-        // 해당 카테고리에 속하는 상품 필터링
-        newFilteredProducts = allProducts.filter(product => 
-          childCategoryNames.includes(product.category)
-        );
-        
-        console.log('필터링된 상품 수:', newFilteredProducts.length);
-        console.log('필터링된 카테고리:', newFilteredCategories.map(c => c.name));
-      } 
-      // 하위 카테고리 선택 시
-      else if (category) {
-        console.log('하위 카테고리 필터링:', category);
-        
-        // 카테고리 slug를 이름으로 변환
-        const categoryObj = categories.find(cat => 
-          cat.id.replace(/\s+/g, '-').toLowerCase() === category
-        );
-        
-        if (categoryObj) {
-          newFilteredProducts = allProducts.filter(product => 
-            product.category === categoryObj.name
+        // 상위 카테고리 선택 시
+        if (parent) {
+          console.log('상위 카테고리 필터링:', parent);
+          newFilteredCategories = getCategoriesByParent(parent);
+          
+          // 상위 카테고리에 속하는 하위 카테고리들의 이름 목록 생성
+          const childCategoryNames = newFilteredCategories.map(cat => cat.name);
+          console.log('하위 카테고리들:', childCategoryNames);
+          
+          // 각 하위 카테고리별로 상품을 조회하고 합치기
+          const categoryProductPromises = childCategoryNames.map(categoryName => 
+            getProductsByCategory(categoryName)
           );
+          
+          const categoryProductsArrays = await Promise.all(categoryProductPromises);
+          newFilteredProducts = categoryProductsArrays.flat();
+          
+          console.log('상위 카테고리로 필터링된 상품 수:', newFilteredProducts.length);
+        } 
+        // 하위 카테고리 선택 시
+        else if (category) {
+          console.log('하위 카테고리 필터링:', category);
+          
+          // 카테고리 slug를 이름으로 변환
+          const categoryObj = categories.find(cat => 
+            cat.id.replace(/\s+/g, '-').toLowerCase() === category
+          );
+          
+          if (categoryObj) {
+            console.log('카테고리 객체 찾음:', categoryObj.name);
+            newFilteredProducts = await getProductsByCategory(categoryObj.name);
+            console.log('하위 카테고리로 필터링된 상품 수:', newFilteredProducts.length);
+          } else {
+            console.log('카테고리 객체를 찾을 수 없음:', category);
+            newFilteredProducts = [];
+          }
         }
+        // 전체 상품 (필터 없음)
+        else {
+          newFilteredProducts = allProducts;
+        }
+        
+        setFilteredProducts(newFilteredProducts);
+        setFilteredCategories(newFilteredCategories);
+      } catch (error) {
+        console.error('상품 필터링 중 오류:', error);
+        setFilteredProducts([]);
       }
-      
-      setFilteredProducts(newFilteredProducts);
-      setFilteredCategories(newFilteredCategories);
     };
     
     filterProducts();

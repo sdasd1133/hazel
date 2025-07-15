@@ -6,7 +6,7 @@ import ProductCard from "@/components/ui/product-card";
 import { useState, useEffect } from "react";
 import { ChevronRight, ChevronDown, Home } from "lucide-react";
 import Link from "next/link";
-import { getAllProducts } from "@/lib/services/main-products";
+import { getAllProducts, getProductsByCategory } from "@/lib/services/main-products";
 
 interface CategoryProductsClientProps {
   category: string;
@@ -57,24 +57,10 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
       try {
         console.log('카테고리별 상품 로딩 시작:', category);
         
-        // 데이터베이스에서 모든 상품 가져오기
-        const allProducts = await getAllProducts();
-        console.log('전체 상품 데이터:', allProducts);
-        
-        // 현재 카테고리에 맞는 상품 필터링
-        const categoryProducts = allProducts.filter(product => {
-          console.log(`상품 "${product.name}"의 카테고리:`, product.category, '찾는 카테고리:', category);
-          console.log('카테고리 비교 결과:', product.category === category);
-          return product.category === category;
-        });
-        
-        console.log('필터링된 카테고리 상품:', categoryProducts);
+        // 카테고리별 상품 직접 조회 (DB에서 category_id로 필터링)
+        const categoryProducts = await getProductsByCategory(category);
+        console.log('카테고리별 상품 조회 결과:', categoryProducts);
         console.log('필터링된 상품 수:', categoryProducts.length);
-        
-        // 디버깅: 모든 상품의 카테고리 목록 출력
-        const allCategories = [...new Set(allProducts.map(p => p.category))];
-        console.log('DB에서 가져온 모든 카테고리들:', allCategories);
-        console.log('현재 찾고 있는 카테고리:', category);
         
         setFilteredProducts(categoryProducts);
       } catch (error) {

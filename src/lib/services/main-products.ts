@@ -51,7 +51,7 @@ export const mainProductService = {
     }
   },
 
-  // 카테고리별 상품 조회
+  // 카테고리별 상품 조회 (카테고리 ID 기준)
   async getProductsByCategory(categoryId: number): Promise<MainProduct[]> {
     try {
       const { data, error } = await supabase
@@ -72,6 +72,57 @@ export const mainProductService = {
       return data as MainProduct[]
     } catch (error) {
       console.error('Get products by category error:', error)
+      throw error
+    }
+  },
+
+  // 카테고리별 상품 조회 (카테고리명 기준) - 메인사이트용
+  async getProductsByCategoryName(categoryName: string): Promise<MainProduct[]> {
+    try {
+      console.log('카테고리명으로 상품 검색:', categoryName);
+      
+      // 카테고리명을 ID로 매핑 (관리자 페이지와 동일한 순서)
+      const categoryNameToIdMapping: Record<string, number> = {
+        '남성의류': 1,
+        '여성의류': 2,
+        '스포츠의류': 3,
+        '악세사리': 4,
+        '모자': 5,
+        '가방': 6,
+        '신발': 7,
+        '시계': 8,
+        '벨트': 9,
+        '깔맞춤': 10,
+        '중고명품': 11
+      };
+      
+      const categoryId = categoryNameToIdMapping[categoryName];
+      
+      if (!categoryId) {
+        console.log('매핑되지 않은 카테고리명:', categoryName);
+        return [];
+      }
+      
+      console.log(`카테고리 "${categoryName}" → ID: ${categoryId}`);
+      
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          categories(id, name, slug)
+        `)
+        .eq('category_id', categoryId)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Products by category name fetch error:', error)
+        throw new Error(`카테고리별 상품 조회 실패: ${error.message}`)
+      }
+
+      console.log(`카테고리 "${categoryName}"에 속한 상품 수:`, data?.length || 0);
+      return data as MainProduct[]
+    } catch (error) {
+      console.error('Get products by category name error:', error)
       throw error
     }
   },
@@ -169,19 +220,19 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
     // DB에서 가져온 카테고리 이름 사용
     categoryName = mainProduct.category.name;
   } else if (mainProduct.category_id) {
-    // category_id만 있는 경우 매핑 테이블 사용
+    // category_id만 있는 경우 메인 사이트와 동일한 순서로 매핑
     const categoryMapping: Record<number, string> = {
-      1: '여성의류',
-      2: '남성의류',
-      3: '스포츠의류',
-      4: '가방',
-      5: '신발',
-      6: '시계',
-      7: '모자',
-      8: '벨트',
-      9: '악세사리',
-      10: '깔맞춤',
-      11: '중고명품'
+      1: '남성의류',      // 메인 사이트 순서 1번
+      2: '여성의류',      // 메인 사이트 순서 2번  
+      3: '스포츠의류',    // 메인 사이트 순서 3번
+      4: '악세사리',      // 메인 사이트 순서 4번
+      5: '모자',          // 메인 사이트 순서 5번
+      6: '가방',          // 메인 사이트 순서 6번
+      7: '신발',          // 메인 사이트 순서 7번
+      8: '시계',          // 메인 사이트 순서 8번
+      9: '벨트',          // 메인 사이트 순서 9번
+      10: '깔맞춤',       // 메인 사이트 순서 10번
+      11: '중고명품'      // 메인 사이트 순서 11번
     };
     categoryName = categoryMapping[mainProduct.category_id] || '미분류';
   }
@@ -220,6 +271,23 @@ export const getAllProducts = async (): Promise<Product[]> => {
     return products
   } catch (error) {
     console.error('getAllProducts 오류:', error)
+    return []
+  }
+}
+
+// 카테고리별 상품 조회 함수 (메인사이트용)
+export const getProductsByCategory = async (categoryName: string): Promise<Product[]> => {
+  try {
+    console.log('getProductsByCategory 호출됨, 카테고리:', categoryName)
+    const mainProducts = await mainProductService.getProductsByCategoryName(categoryName)
+    console.log(`카테고리 "${categoryName}"에서 가져온 상품 수:`, mainProducts.length)
+    
+    const products = convertMainProductsToProducts(mainProducts)
+    console.log('변환된 카테고리 상품 데이터:', products)
+    
+    return products
+  } catch (error) {
+    console.error('getProductsByCategory 오류:', error)
     return []
   }
 }
