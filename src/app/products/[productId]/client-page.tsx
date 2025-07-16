@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Heart } from "lucide-react";
@@ -143,16 +143,16 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     { label: '네이비', value: 'Navy' }
   ];
   
-  // 사이즈 선택이 필요 없는 카테고리 확인
-  const shouldShowSizeSelection = () => {
-    if (!product.category) return true;
+  // 사이즈 선택이 필요 없는 카테고리 확인 - useMemo로 최적화
+  const shouldShowSizeSelection = useMemo(() => {
+    if (!product?.category) return true;
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
     
     // 디버깅 로그 (임시)
     if (productId === '12') {
-      console.log('🔍 shouldShowSizeSelection 디버깅:', {
+      console.log('🔍 shouldShowSizeSelection useMemo 디버깅:', {
         productCategory: product.category,
         categoryStr,
         noSizeCategories,
@@ -164,11 +164,11 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     return !noSizeCategories.some(cat => 
       categoryStr.includes(cat.toLowerCase())
     );
-  };
+  }, [product?.category, productId]);
 
   const handleAddToCart = () => {
     // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인
-    if (shouldShowSizeSelection() && !selectedSize) {
+    if (shouldShowSizeSelection && !selectedSize) {
       alert('사이즈를 선택해주세요.');
       return;
     }
@@ -321,7 +321,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
             </div>
 
             {/* 사이즈 선택 - 특정 카테고리에만 표시 */}
-            {shouldShowSizeSelection() && (
+            {shouldShowSizeSelection && (
               <div className="mb-4">
                 <h3 className="text-sm font-semibold mb-2 flex items-center">
                   <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
