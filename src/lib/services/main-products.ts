@@ -100,19 +100,17 @@ export const mainProductService = {
         raw_category: p.category
       })));
       
-      // 2단계: 카테고리명을 ID로 매핑 (관리자 페이지와 동일한 매핑)
+      // 2단계: 카테고리명을 ID로 매핑 (실제 DB 구조에 맞게 수정)
       const categoryNameToIdMapping: Record<string, number> = {
         '남성의류': 1,
         '여성의류': 2,
         '스포츠의류': 3,
-        '악세사리': 4,
-        '모자': 5,
-        '가방': 6,
-        '신발': 7,
-        '시계': 8,
-        '벨트': 9,
-        '깔맞춤': 10,
-        '중고명품': 11
+        '모자': 9,         // 실제 DB ID: 9
+        '가방': 5,         // 실제 DB ID: 5
+        '신발': 6,         // 실제 DB ID: 6
+        '시계': 8,         // 실제 DB ID: 8
+        '벨트': 10,        // 실제 DB ID: 10
+        '악세사리': 20     // 실제 DB ID: 20
       };
       
       const targetCategoryId = categoryNameToIdMapping[categoryName];
@@ -272,19 +270,17 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
     categoryName = mainProduct.category.name;
     console.log('🔍 카테고리 결정: DB category 객체에서 가져온 이름 사용:', categoryName);
   } else if (mainProduct.category_id) {
-    // category_id만 있는 경우 메인 사이트와 동일한 순서로 매핑
+    // category_id만 있는 경우 실제 DB 구조에 맞게 매핑
     const categoryMapping: Record<number, string> = {
-      1: '남성의류',      // 메인 사이트 순서 1번
-      2: '여성의류',      // 메인 사이트 순서 2번  
-      3: '스포츠의류',    // 메인 사이트 순서 3번
-      4: '악세사리',      // 메인 사이트 순서 4번
-      5: '모자',          // 메인 사이트 순서 5번
-      6: '가방',          // 메인 사이트 순서 6번
-      7: '신발',          // 메인 사이트 순서 7번
-      8: '시계',          // 메인 사이트 순서 8번
-      9: '벨트',          // 메인 사이트 순서 9번
-      10: '깔맞춤',       // 메인 사이트 순서 10번
-      11: '중고명품'      // 메인 사이트 순서 11번
+      1: '남성의류',
+      2: '여성의류',
+      3: '스포츠의류',
+      5: '가방',         // 실제 DB ID: 5
+      6: '신발',         // 실제 DB ID: 6
+      8: '시계',         // 실제 DB ID: 8
+      9: '모자',         // 실제 DB ID: 9
+      10: '벨트',        // 실제 DB ID: 10
+      20: '악세사리'     // 실제 DB ID: 20
     };
     categoryName = categoryMapping[mainProduct.category_id] || '미분류';
     console.log('🔍 카테고리 결정: category_id 매핑 사용:', {
