@@ -4,18 +4,11 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Heart } from "lucide-react";
-import dynamic from "next/dynamic";
 import { mainProductService, convertMainProductToProduct } from "@/lib/services/main-products";
 import { products as fallbackProducts } from "@/lib/products";
 import { useCartStore } from "@/lib/cartStore";
 import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
-
-// 사이즈 선택 컴포넌트를 동적으로 로드 (SSR 비활성화)
-const SizeSelector = dynamic(
-  () => import('./size-selector').then(mod => mod.SizeSelector),
-  { ssr: false }
-);
 
 interface ProductClientPageProps {
   productId: string;
@@ -25,6 +18,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   
@@ -32,6 +26,11 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // 클라이언트 사이드 마운트 확인
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 상품 데이터 로드
   useEffect(() => {
@@ -150,9 +149,9 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     { label: '네이비', value: 'Navy' }
   ];
   
-  // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인 (동적 컴포넌트 사용)
+  // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인 (클라이언트 사이드에서만)
   const shouldShowSizeSelection = useMemo(() => {
-    if (!product?.category) return false;
+    if (!mounted || !product?.category) return false;
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
@@ -160,7 +159,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     return !noSizeCategories.some(cat => 
       categoryStr.includes(cat.toLowerCase())
     );
-  }, [product?.category]);
+  }, [mounted, product?.category]);
 
   const handleAddToCart = () => {
     // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인
@@ -316,13 +315,32 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
               </div>
             </div>
 
-            {/* 사이즈 선택 - 동적 컴포넌트 사용 (SSR 비활성화) */}
-            <SizeSelector 
-              product={product}
-              productId={productId}
-              selectedSize={selectedSize}
-              setSelectedSize={setSelectedSize}
-            />
+            {/* 사이즈 선택 - 클라이언트 사이드에서만 렌더링 */}
+            {mounted && shouldShowSizeSelection && (
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold mb-2 flex items-center">
+                  <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                  </span>
+                  사이즈 선택
+                </h3>
+                <div className="flex gap-2">
+                  {sizes.map((size) => (
+                    <button
+                      key={size.value}
+                      onClick={() => setSelectedSize(size.value)}
+                      className={`px-3 py-1.5 border-2 rounded-lg transition-all duration-200 text-sm font-medium hover:scale-105 ${
+                        selectedSize === size.value
+                          ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 shadow-md'
+                          : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {size.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* 수량 선택 */}
             <div className="mb-5">
