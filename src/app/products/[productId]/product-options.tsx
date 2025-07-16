@@ -18,14 +18,49 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
 
-  const sizes = [
+  // 전체 사이즈 목록 (관리자에서 선택할 수 있는 사이즈들)
+  const allSizes = [
     { label: 'M (95)', value: 'M' },
     { label: 'L (100)', value: 'L' },
     { label: 'XL (105)', value: 'XL' },
     { label: '2XL (110)', value: '2XL' }
   ];
+
+  // 상품에 지정된 사이즈만 필터링
+  const availableSizes = allSizes.filter(size => 
+    product.sizes && product.sizes.includes(size.value)
+  );
+
+  // 상품에 사이즈가 지정되지 않은 경우 기본 사이즈 사용
+  const sizes = availableSizes.length > 0 ? availableSizes : allSizes;
   
-  const colors = [
+  // 전체 색상 목록 (관리자에서 선택할 수 있는 색상들)
+  const allColors = [
+    { label: '블랙', value: 'Black' },
+    { label: '화이트', value: 'White' },
+    { label: '그레이', value: 'Gray' },
+    { label: '네이비', value: 'Navy' },
+    { label: '레드', value: 'Red' },
+    { label: '블루', value: 'Blue' },
+    { label: '그린', value: 'Green' },
+    { label: '옐로우', value: 'Yellow' },
+    { label: '핑크', value: 'Pink' },
+    { label: '퍼플', value: 'Purple' },
+    { label: '오렌지', value: 'Orange' },
+    { label: '브라운', value: 'Brown' },
+    { label: '베이지', value: 'Beige' },
+    { label: '카키', value: 'Khaki' },
+    { label: '마젠타', value: 'Magenta' },
+    { label: '민트', value: 'Mint' }
+  ];
+
+  // 상품에 지정된 색상만 필터링
+  const availableColors = allColors.filter(color => 
+    product.colors && product.colors.includes(color.value)
+  );
+
+  // 상품에 색상이 지정되지 않은 경우 기본 색상 사용
+  const colors = availableColors.length > 0 ? availableColors : [
     { label: '블랙', value: 'Black' },
     { label: '화이트', value: 'White' },
     { label: '그레이', value: 'Gray' },
@@ -38,6 +73,20 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
+    
+    // 디버깅 로그
+    console.log('🔍 ProductOptions 상품 정보 디버깅:', {
+      productId: product.id,
+      productName: product.name,
+      productCategory: product.category,
+      categoryStr,
+      productColors: product.colors,
+      productSizes: product.sizes,
+      availableColors: availableColors.map(c => c.label),
+      availableSizes: availableSizes.map(s => s.label),
+      noSizeCategories,
+      shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase()))
+    });
     
     return !noSizeCategories.some(cat => 
       categoryStr.includes(cat.toLowerCase())
@@ -77,30 +126,32 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
 
   return (
     <>
-      {/* 색상 선택 */}
-      <div className="mb-4">
-        <h3 className="text-sm font-semibold mb-2 flex items-center">
-          <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-            <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-          </span>
-          색상 선택
-        </h3>
-        <div className="flex gap-2">
-          {colors.map((color) => (
-            <button
-              key={color.value}
-              onClick={() => setSelectedColor(color.value)}
-              className={`px-3 py-1.5 border-2 rounded-lg transition-all duration-200 text-sm font-medium hover:scale-105 ${
-                selectedColor === color.value
-                  ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 shadow-md'
-                  : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
-              }`}
-            >
-              {color.label}
-            </button>
-          ))}
+      {/* 색상 선택 - 색상이 지정된 상품만 표시 */}
+      {colors.length > 0 && (
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold mb-2 flex items-center">
+            <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+              <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+            </span>
+            색상 선택
+          </h3>
+          <div className="flex gap-2">
+            {colors.map((color) => (
+              <button
+                key={color.value}
+                onClick={() => setSelectedColor(color.value)}
+                className={`px-3 py-1.5 border-2 rounded-lg transition-all duration-200 text-sm font-medium hover:scale-105 ${
+                  selectedColor === color.value
+                    ? 'border-indigo-500 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 shadow-md'
+                    : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                }`}
+              >
+                {color.label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 사이즈 선택 */}
       {shouldShowSizeSelection() && (
