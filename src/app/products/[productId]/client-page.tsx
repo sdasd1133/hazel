@@ -328,8 +328,8 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
               </div>
             </div>
 
-            {/* 사이즈 선택 - 특정 카테고리에만 표시 */}
-            {shouldShowSizeSelection && (
+            {/* 사이즈 선택 - 특정 카테고리에만 표시 (클라이언트에서만 렌더링) */}
+            {isClient && shouldShowSizeSelection && (
               <div className="mb-4">
                 <h3 className="text-sm font-semibold mb-2 flex items-center">
                   <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
