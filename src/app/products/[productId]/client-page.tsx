@@ -4,11 +4,18 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Heart } from "lucide-react";
+import dynamic from "next/dynamic";
 import { mainProductService, convertMainProductToProduct } from "@/lib/services/main-products";
 import { products as fallbackProducts } from "@/lib/products";
 import { useCartStore } from "@/lib/cartStore";
 import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
+
+// 사이즈 선택 컴포넌트를 동적으로 로드 (SSR 비활성화)
+const SizeSelector = dynamic(
+  () => import('./size-selector').then(mod => mod.SizeSelector),
+  { ssr: false }
+);
 
 interface ProductClientPageProps {
   productId: string;
@@ -25,12 +32,6 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isClient, setIsClient] = useState(false);
-
-  // 클라이언트 사이드 렌더링 확인
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   // 상품 데이터 로드
   useEffect(() => {
@@ -149,30 +150,17 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     { label: '네이비', value: 'Navy' }
   ];
   
-  // 사이즈 선택이 필요 없는 카테고리 확인 - useMemo로 최적화
+  // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인 (동적 컴포넌트 사용)
   const shouldShowSizeSelection = useMemo(() => {
-    // 클라이언트 사이드에서만 실행
-    if (!isClient || !product?.category) return false;
+    if (!product?.category) return false;
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
     
-    // 디버깅 로그 (임시)
-    if (productId === '12') {
-      console.log('🔍 shouldShowSizeSelection useMemo 디버깅:', {
-        isClient,
-        productCategory: product.category,
-        categoryStr,
-        noSizeCategories,
-        shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase()))
-      });
-    }
-    
-    // 가방, 시계, 악세사리 카테고리에서는 사이즈 선택 숨김
     return !noSizeCategories.some(cat => 
       categoryStr.includes(cat.toLowerCase())
     );
-  }, [product?.category, productId, isClient]);
+  }, [product?.category]);
 
   const handleAddToCart = () => {
     // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인
@@ -328,32 +316,13 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
               </div>
             </div>
 
-            {/* 사이즈 선택 - 특정 카테고리에만 표시 (클라이언트에서만 렌더링) */}
-            {isClient && shouldShowSizeSelection && (
-              <div className="mb-4">
-                <h3 className="text-sm font-semibold mb-2 flex items-center">
-                  <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-                  </span>
-                  사이즈 선택 <span className="text-red-500 ml-1">*</span>
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {sizes.map((size) => (
-                    <button
-                      key={size.value}
-                      onClick={() => setSelectedSize(size.value)}
-                      className={`py-2 px-3 border-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 ${
-                        selectedSize === size.value
-                          ? 'border-indigo-500 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                          : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      {size.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* 사이즈 선택 - 동적 컴포넌트 사용 (SSR 비활성화) */}
+            <SizeSelector 
+              product={product}
+              productId={productId}
+              selectedSize={selectedSize}
+              setSelectedSize={setSelectedSize}
+            />
 
             {/* 수량 선택 */}
             <div className="mb-5">
