@@ -40,6 +40,21 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           
           if (mainProduct) {
             const convertedProduct = convertMainProductToProduct(mainProduct);
+            
+            // 가방 상품 디버깅 (임시)
+            if (productId === '12') {
+              console.log('🔍 가방 상품 상세 디버깅:', {
+                productId,
+                productName: mainProduct.name,
+                category_id: mainProduct.category_id,
+                categoryObject: mainProduct.category,
+                convertedCategory: convertedProduct.category,
+                shouldShowSize: !['가방', '시계', '악세사리'].some(cat => 
+                  convertedProduct.category.toString().toLowerCase().trim().includes(cat.toLowerCase())
+                )
+              });
+            }
+            
             setProduct(convertedProduct);
             return;
           }
@@ -134,6 +149,16 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
+    
+    // 디버깅 로그 (임시)
+    if (productId === '12') {
+      console.log('🔍 shouldShowSizeSelection 디버깅:', {
+        productCategory: product.category,
+        categoryStr,
+        noSizeCategories,
+        shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase()))
+      });
+    }
     
     // 가방, 시계, 악세사리 카테고리에서는 사이즈 선택 숨김
     return !noSizeCategories.some(cat => 
