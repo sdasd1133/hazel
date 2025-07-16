@@ -91,7 +91,7 @@ export const mainProductService = {
         throw new Error(`전체 상품 조회 실패: ${allError.message}`)
       }
       
-      // 2단계: 카테고리명을 ID로 매핑
+      // 2단계: 카테고리명을 ID로 매핑 (관리자 페이지와 동일한 매핑)
       const categoryNameToIdMapping: Record<string, number> = {
         '남성의류': 1,
         '여성의류': 2,
@@ -108,15 +108,30 @@ export const mainProductService = {
       
       const targetCategoryId = categoryNameToIdMapping[categoryName];
       
+      // 디버깅을 위한 로그
+      console.log(`카테고리 매핑 확인:`, {
+        요청카테고리: categoryName,
+        매핑된ID: targetCategoryId,
+        전체매핑: categoryNameToIdMapping
+      });
+      
       if (!targetCategoryId) {
+        console.log(`카테고리 '${categoryName}'에 해당하는 ID를 찾을 수 없습니다.`);
         return [];
       }
       
-      // 3단계: 해당 카테고리 상품 필터링
+      // 3단계: 해당 카테고리 상품 필터링 (category_id로만 비교)
       const filteredProducts = allProducts?.filter(product => {
-        // category_id로 직접 비교 또는 카테고리 객체의 이름으로 비교
-        return product.category_id === targetCategoryId || product.categories?.name === categoryName;
+        // category_id로만 직접 비교 (더 정확한 매칭)
+        return product.category_id === targetCategoryId;
       }) || [];
+      
+      // 디버깅을 위한 로그
+      console.log(`카테고리 '${categoryName}' (ID: ${targetCategoryId}) 상품 필터링 결과:`, {
+        총상품수: allProducts?.length || 0,
+        필터링된상품수: filteredProducts.length,
+        필터링된상품들: filteredProducts.map(p => ({ id: p.id, name: p.name, category_id: p.category_id }))
+      });
       
       return filteredProducts as MainProduct[]
     } catch (error) {

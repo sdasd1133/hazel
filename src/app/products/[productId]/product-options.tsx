@@ -19,12 +19,40 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
   const [quantity, setQuantity] = useState(1);
 
   // 전체 사이즈 목록 (관리자에서 선택할 수 있는 사이즈들)
-  const allSizes = [
+  const allClothingSizes = [
     { label: 'M (95)', value: 'M' },
     { label: 'L (100)', value: 'L' },
     { label: 'XL (105)', value: 'XL' },
     { label: '2XL (110)', value: '2XL' }
   ];
+
+  // 신발 사이즈 목록 (한국 기준)
+  const allShoeSizes = [
+    { label: '220', value: '220' },
+    { label: '225', value: '225' },
+    { label: '230', value: '230' },
+    { label: '235', value: '235' },
+    { label: '240', value: '240' },
+    { label: '245', value: '245' },
+    { label: '250', value: '250' },
+    { label: '255', value: '255' },
+    { label: '260', value: '260' },
+    { label: '265', value: '265' },
+    { label: '270', value: '270' },
+    { label: '275', value: '275' },
+    { label: '280', value: '280' },
+    { label: '285', value: '285' },
+    { label: '290', value: '290' },
+    { label: '295', value: '295' },
+    { label: '300', value: '300' }
+  ];
+
+  // 카테고리에 따라 사이즈 목록 선택
+  const isShoeCategory = product.category && 
+    (product.category.toString().toLowerCase().includes('신발') || 
+     product.category.toString().toLowerCase().includes('shoe'));
+
+  const allSizes = isShoeCategory ? allShoeSizes : allClothingSizes;
 
   // 상품에 지정된 사이즈만 필터링
   const availableSizes = allSizes.filter(size => 
@@ -80,10 +108,12 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
       productName: product.name,
       productCategory: product.category,
       categoryStr,
+      isShoeCategory,
       productColors: product.colors,
       productSizes: product.sizes,
       availableColors: availableColors.map(c => c.label),
       availableSizes: availableSizes.map(s => s.label),
+      sizeType: isShoeCategory ? 'shoe' : 'clothing',
       noSizeCategories,
       shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase()))
     });
@@ -160,9 +190,9 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
             <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
             </span>
-            사이즈 선택
+            {isShoeCategory ? '신발 사이즈 선택 (mm)' : '사이즈 선택'}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {sizes.map((size) => (
               <button
                 key={size.value}
