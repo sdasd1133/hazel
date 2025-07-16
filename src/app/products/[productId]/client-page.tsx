@@ -40,22 +40,19 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           
           if (mainProduct) {
             const convertedProduct = convertMainProductToProduct(mainProduct);
-            console.log('Loaded product from DB:', convertedProduct);
             setProduct(convertedProduct);
             return;
           }
         } catch (dbError) {
-          console.log('DB 조회 실패, fallback 상품에서 검색:', dbError);
+          console.log('DB 조회 실패, fallback 상품에서 검색');
         }
         
         // DB에서 찾지 못했거나 오류가 발생하면 fallback 상품에서 검색
         const fallbackProduct = fallbackProducts.find(p => p.id === productId);
         
         if (fallbackProduct) {
-          console.log('Loaded product from fallback:', fallbackProduct);
           setProduct(fallbackProduct);
         } else {
-          console.log('Product not found:', productId);
           notFound();
         }
       } catch (error) {
@@ -133,47 +130,15 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   
   // 사이즈 선택이 필요 없는 카테고리 확인
   const shouldShowSizeSelection = () => {
-    console.log('=== SIZE SELECTION DEBUG ===');
-    console.log('Product object:', product);
-    console.log('Product name:', product.name);
-    console.log('Product ID:', product.id);
-    
-    if (!product.category) {
-      console.log('❌ 카테고리 정보가 없어서 사이즈 선택 표시');
-      return true; // 카테고리 정보가 없으면 사이즈 선택 표시
-    }
-    
-    // 디버깅용 콘솔 출력
-    console.log('✅ Product category:', product.category);
-    console.log('✅ Product category type:', typeof product.category);
+    if (!product.category) return true;
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
-    
-    // 더 엄격한 카테고리 매칭
     const categoryStr = product.category.toString().toLowerCase().trim();
-    console.log('✅ Category string processed:', `"${categoryStr}"`);
     
-    const shouldHide = noSizeCategories.some(cat => {
-      const catLower = cat.toLowerCase();
-      const match = categoryStr.includes(catLower);
-      console.log(`🔍 "${categoryStr}" includes "${catLower}"?`, match);
-      return match;
-    });
-    
-    const shouldShow = !shouldHide;
-    
-    console.log('🎯 Should HIDE size selection:', shouldHide);
-    console.log('🎯 Should SHOW size selection:', shouldShow);
-    console.log('📝 No size categories:', noSizeCategories);
-    console.log('=== SIZE SELECTION DEBUG END ===');
-    
-    // 가방 상품은 강제로 false 반환 (임시 테스트)
-    if (categoryStr.includes('가방')) {
-      console.log('🚫 FORCE HIDE: 가방 카테고리 감지됨');
-      return false;
-    }
-    
-    return shouldShow;
+    // 가방, 시계, 악세사리 카테고리에서는 사이즈 선택 숨김
+    return !noSizeCategories.some(cat => 
+      categoryStr.includes(cat.toLowerCase())
+    );
   };
 
   const handleAddToCart = () => {
