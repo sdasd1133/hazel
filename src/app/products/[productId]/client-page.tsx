@@ -40,18 +40,6 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
           
           if (mainProduct) {
             const convertedProduct = convertMainProductToProduct(mainProduct);
-            
-            // 가방 상품의 디버깅 정보 (임시)
-            if (productId === '12' || productId === '11') {
-              console.log('🔍 가방 상품 디버깅:', {
-                productId,
-                productName: mainProduct.name,
-                category_id: mainProduct.category_id,
-                categoryObject: mainProduct.category,
-                convertedCategory: convertedProduct.category
-              });
-            }
-            
             setProduct(convertedProduct);
             return;
           }

@@ -55,13 +55,8 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
     const filterProducts = async () => {
       setIsLoading(true);
       try {
-        console.log('카테고리별 상품 로딩 시작:', category);
-        
         // 카테고리별 상품 직접 조회 (DB에서 category_id로 필터링)
         const categoryProducts = await getProductsByCategory(category);
-        console.log('카테고리별 상품 조회 결과:', categoryProducts);
-        console.log('필터링된 상품 수:', categoryProducts.length);
-        
         setFilteredProducts(categoryProducts);
       } catch (error) {
         console.error('상품 데이터 로드 실패:', error);
@@ -174,7 +169,6 @@ export default function CategoryProductsClient({ category }: CategoryProductsCli
                               key={categoryItem.id}
                               onClick={() => {
                                 const url = getUrlFromCategory(categoryItem.name);
-                                console.log('카테고리 클릭:', categoryItem.name, '→', url);
                                 window.location.href = url;
                               }}
                               className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between group ${

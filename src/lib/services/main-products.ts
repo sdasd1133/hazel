@@ -252,14 +252,8 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
 // 메인사이트에서 사용할 전체 상품 조회 함수
 export const getAllProducts = async (): Promise<Product[]> => {
   try {
-    console.log('getAllProducts 호출됨')
     const mainProducts = await mainProductService.getActiveProducts()
-    console.log('DB에서 가져온 상품 수:', mainProducts.length)
-    console.log('DB 상품 데이터:', mainProducts)
-    
     const products = convertMainProductsToProducts(mainProducts)
-    console.log('변환된 상품 데이터:', products)
-    
     return products
   } catch (error) {
     console.error('getAllProducts 오류:', error)
@@ -270,13 +264,8 @@ export const getAllProducts = async (): Promise<Product[]> => {
 // 카테고리별 상품 조회 함수 (메인사이트용)
 export const getProductsByCategory = async (categoryName: string): Promise<Product[]> => {
   try {
-    console.log('getProductsByCategory 호출됨, 카테고리:', categoryName)
     const mainProducts = await mainProductService.getProductsByCategoryName(categoryName)
-    console.log(`카테고리 "${categoryName}"에서 가져온 상품 수:`, mainProducts.length)
-    
     const products = convertMainProductsToProducts(mainProducts)
-    console.log('변환된 카테고리 상품 데이터:', products)
-    
     return products
   } catch (error) {
     console.error('getProductsByCategory 오류:', error)
