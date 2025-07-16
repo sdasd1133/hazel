@@ -91,6 +91,15 @@ export const mainProductService = {
         throw new Error(`전체 상품 조회 실패: ${allError.message}`)
       }
       
+      // 전체 상품 데이터 로그 출력 (디버깅)
+      console.log('🔍 전체 상품 데이터 확인:', allProducts?.map(p => ({
+        id: p.id,
+        name: p.name,
+        category_id: p.category_id,
+        category_from_join: p.categories,
+        raw_category: p.category
+      })));
+      
       // 2단계: 카테고리명을 ID로 매핑 (관리자 페이지와 동일한 매핑)
       const categoryNameToIdMapping: Record<string, number> = {
         '남성의류': 1,
@@ -109,28 +118,44 @@ export const mainProductService = {
       const targetCategoryId = categoryNameToIdMapping[categoryName];
       
       // 디버깅을 위한 로그
-      console.log(`카테고리 매핑 확인:`, {
+      console.log(`🔍 카테고리 매핑 확인:`, {
         요청카테고리: categoryName,
         매핑된ID: targetCategoryId,
         전체매핑: categoryNameToIdMapping
       });
       
       if (!targetCategoryId) {
-        console.log(`카테고리 '${categoryName}'에 해당하는 ID를 찾을 수 없습니다.`);
+        console.log(`❌ 카테고리 '${categoryName}'에 해당하는 ID를 찾을 수 없습니다.`);
         return [];
       }
       
       // 3단계: 해당 카테고리 상품 필터링 (category_id로만 비교)
       const filteredProducts = allProducts?.filter(product => {
-        // category_id로만 직접 비교 (더 정확한 매칭)
-        return product.category_id === targetCategoryId;
+        const matches = product.category_id === targetCategoryId;
+        
+        // 각 상품별 필터링 결과 로그
+        console.log(`🔍 상품 필터링 확인:`, {
+          productId: product.id,
+          productName: product.name,
+          product_category_id: product.category_id,
+          target_category_id: targetCategoryId,
+          matches: matches,
+          category_from_join: product.categories
+        });
+        
+        return matches;
       }) || [];
       
       // 디버깅을 위한 로그
-      console.log(`카테고리 '${categoryName}' (ID: ${targetCategoryId}) 상품 필터링 결과:`, {
+      console.log(`🔍 카테고리 '${categoryName}' (ID: ${targetCategoryId}) 필터링 결과:`, {
         총상품수: allProducts?.length || 0,
         필터링된상품수: filteredProducts.length,
-        필터링된상품들: filteredProducts.map(p => ({ id: p.id, name: p.name, category_id: p.category_id }))
+        필터링된상품목록: filteredProducts.map(p => ({ 
+          id: p.id, 
+          name: p.name, 
+          category_id: p.category_id,
+          category_name: p.categories?.name
+        }))
       });
       
       return filteredProducts as MainProduct[]
@@ -229,9 +254,23 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   // 카테고리 이름 결정 로직 개선
   let categoryName = '미분류';
   
-  if (mainProduct.category?.name) {
+  // 디버깅 로그 추가
+  console.log('🔍 상품 변환 시작:', {
+    productId: mainProduct.id,
+    productName: mainProduct.name,
+    category_id: mainProduct.category_id,
+    category_object: mainProduct.category,
+    categories_join: mainProduct.categories
+  });
+  
+  if (mainProduct.categories?.name) {
+    // DB 조인에서 가져온 카테고리 이름 사용 (우선순위)
+    categoryName = mainProduct.categories.name;
+    console.log('🔍 카테고리 결정: DB 조인에서 가져온 이름 사용:', categoryName);
+  } else if (mainProduct.category?.name) {
     // DB에서 가져온 카테고리 이름 사용
     categoryName = mainProduct.category.name;
+    console.log('🔍 카테고리 결정: DB category 객체에서 가져온 이름 사용:', categoryName);
   } else if (mainProduct.category_id) {
     // category_id만 있는 경우 메인 사이트와 동일한 순서로 매핑
     const categoryMapping: Record<number, string> = {
@@ -248,7 +287,18 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
       11: '중고명품'      // 메인 사이트 순서 11번
     };
     categoryName = categoryMapping[mainProduct.category_id] || '미분류';
+    console.log('🔍 카테고리 결정: category_id 매핑 사용:', {
+      category_id: mainProduct.category_id,
+      mapped_name: categoryName,
+      mapping: categoryMapping
+    });
   }
+  
+  console.log('🔍 최종 카테고리 결정:', {
+    productId: mainProduct.id,
+    productName: mainProduct.name,
+    finalCategory: categoryName
+  });
   
   return {
     id: mainProduct.id.toString(),
