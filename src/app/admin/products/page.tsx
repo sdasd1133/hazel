@@ -43,8 +43,27 @@ export default function AdminProductsPage() {
   }
 
   // 사이즈 및 색상 옵션
-  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'FREE']
-  const availableColors = ['Black', 'White', 'Gray', 'Navy', 'Brown', 'Beige', 'Red', 'Blue', 'Green', 'Pink', 'Yellow', 'Purple']
+  const availableSizes = [
+    { label: 'M (95)', value: 'M' },
+    { label: 'L (100)', value: 'L' },
+    { label: 'XL (105)', value: 'XL' },
+    { label: '2XL (110)', value: '2XL' },
+    { label: 'FREE', value: 'FREE' }
+  ]
+  const availableColors = [
+    { label: '블랙', value: 'Black' },
+    { label: '화이트', value: 'White' },
+    { label: '그레이', value: 'Gray' },
+    { label: '네이비', value: 'Navy' },
+    { label: '브라운', value: 'Brown' },
+    { label: '베이지', value: 'Beige' },
+    { label: '레드', value: 'Red' },
+    { label: '블루', value: 'Blue' },
+    { label: '그린', value: 'Green' },
+    { label: '핑크', value: 'Pink' },
+    { label: '옐로우', value: 'Yellow' },
+    { label: '퍼플', value: 'Purple' }
+  ]
 
   // 사이즈 선택이 필요 없는 카테고리 확인
   const shouldShowSizeSelection = () => {
@@ -716,19 +735,19 @@ export default function AdminProductsPage() {
                 <div>
                   <label className="block text-sm font-medium mb-2">사이즈 선택</label>
                   <div className="border border-gray-300 rounded-lg p-4">
-                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                       {availableSizes.map((size) => (
                         <button
-                          key={size}
+                          key={size.value}
                           type="button"
-                          onClick={() => toggleSize(size)}
+                          onClick={() => toggleSize(size.value)}
                           className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
-                            selectedSizes.includes(size)
+                            selectedSizes.includes(size.value)
                               ? 'bg-blue-500 text-white border-blue-500'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                           }`}
                         >
-                          {size}
+                          {size.label}
                         </button>
                       ))}
                     </div>
@@ -753,16 +772,16 @@ export default function AdminProductsPage() {
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
                     {availableColors.map((color) => (
                       <button
-                        key={color}
+                        key={color.value}
                         type="button"
-                        onClick={() => toggleColor(color)}
+                        onClick={() => toggleColor(color.value)}
                         className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
-                          selectedColors.includes(color)
+                          selectedColors.includes(color.value)
                             ? 'bg-blue-500 text-white border-blue-500'
                             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                         }`}
                       >
-                        {color}
+                        {color.label}
                       </button>
                     ))}
                   </div>
