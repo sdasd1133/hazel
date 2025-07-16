@@ -19,6 +19,8 @@ export default function AdminProductsPage() {
   const [imageUrls, setImageUrls] = useState<string[]>([])
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([])
+  const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
@@ -38,6 +40,21 @@ export default function AdminProductsPage() {
     if (!categoryId) return '-'
     const category = categories.find(cat => cat.id === categoryId)
     return category ? category.name : '-'
+  }
+
+  // 사이즈 및 색상 옵션
+  const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'FREE']
+  const availableColors = ['Black', 'White', 'Gray', 'Navy', 'Brown', 'Beige', 'Red', 'Blue', 'Green', 'Pink', 'Yellow', 'Purple']
+
+  // 사이즈 선택이 필요 없는 카테고리 확인
+  const shouldShowSizeSelection = () => {
+    const selectedCategory = categories.find(cat => cat.id === formData.category_id)
+    if (!selectedCategory) return true
+    
+    const noSizeCategories = ['가방', '시계', '악세사리']
+    return !noSizeCategories.some(cat => 
+      selectedCategory.name.toLowerCase().includes(cat.toLowerCase())
+    )
   }
 
   useEffect(() => {
@@ -185,7 +202,13 @@ export default function AdminProductsPage() {
         ...formData,
         sku: finalSku,
         category_id: formData.category_id === 0 ? null : formData.category_id,
-        images: imageUrls.length > 0 ? imageUrls : formData.images
+        images: imageUrls.length > 0 ? imageUrls : formData.images,
+        // 사이즈와 색상 정보를 tags 배열에 추가
+        tags: [
+          ...formData.tags,
+          ...selectedSizes.map(size => `size:${size}`),
+          ...selectedColors.map(color => `color:${color}`)
+        ]
       }
       
       console.log('Final product data to submit:', productData);
@@ -242,6 +265,17 @@ export default function AdminProductsPage() {
       setImageUrls([...product.images])
     } else {
       setImageUrls([])
+    }
+    
+    // 기존 사이즈와 색상 정보 로드
+    if (product.tags && product.tags.length > 0) {
+      const sizes = product.tags.filter(tag => tag.startsWith('size:')).map(tag => tag.replace('size:', ''))
+      const colors = product.tags.filter(tag => tag.startsWith('color:')).map(tag => tag.replace('color:', ''))
+      setSelectedSizes(sizes)
+      setSelectedColors(colors)
+    } else {
+      setSelectedSizes([])
+      setSelectedColors([])
     }
     
     // 편집 시에는 파일 배열 초기화 (기존 이미지는 URL로 처리)
@@ -347,12 +381,32 @@ export default function AdminProductsPage() {
     })
   }
 
+  // 사이즈 선택 토글 핸들러
+  const toggleSize = (size: string) => {
+    setSelectedSizes(prev => 
+      prev.includes(size) 
+        ? prev.filter(s => s !== size)
+        : [...prev, size]
+    )
+  }
+
+  // 색상 선택 토글 핸들러
+  const toggleColor = (color: string) => {
+    setSelectedColors(prev => 
+      prev.includes(color) 
+        ? prev.filter(c => c !== color)
+        : [...prev, color]
+    )
+  }
+
   // 폼 리셋 시 이미지도 초기화
   const resetForm = () => {
     setShowForm(false)
     setEditingProduct(null)
     setImageUrls([])
     setImageFiles([])
+    setSelectedSizes([])
+    setSelectedColors([])
     setFormData({
       name: '',
       description: '',
@@ -654,6 +708,74 @@ export default function AdminProductsPage() {
                   <p>• 지원 형식: JPG, PNG, WebP</p>
                   <p>• 첫 번째 이미지가 대표 이미지로 사용됩니다</p>
                   <p>• 드래그로 이미지 순서를 변경할 수 있습니다</p>
+                </div>
+              </div>
+
+              {/* 사이즈 선택 섹션 (특정 카테고리만) */}
+              {shouldShowSizeSelection() && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">사이즈 선택</label>
+                  <div className="border border-gray-300 rounded-lg p-4">
+                    <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+                      {availableSizes.map((size) => (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => toggleSize(size)}
+                          className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                            selectedSizes.includes(size)
+                              ? 'bg-blue-500 text-white border-blue-500'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                    {selectedSizes.length > 0 && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <div className="text-sm text-gray-600">
+                          선택된 사이즈: {selectedSizes.join(', ')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    복수 선택 가능합니다. 가방, 시계, 악세사리 카테고리는 사이즈 선택이 표시되지 않습니다.
+                  </div>
+                </div>
+              )}
+
+              {/* 색상 선택 섹션 */}
+              <div>
+                <label className="block text-sm font-medium mb-2">색상 선택</label>
+                <div className="border border-gray-300 rounded-lg p-4">
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                    {availableColors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => toggleColor(color)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                          selectedColors.includes(color)
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedColors.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        선택된 색상: {selectedColors.join(', ')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  복수 선택 가능합니다. 모든 카테고리에서 색상을 선택할 수 있습니다.
                 </div>
               </div>
 

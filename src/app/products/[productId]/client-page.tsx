@@ -120,9 +120,20 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
 
   const sizes = ['XS', 'S', 'M', 'L', 'XL'];
   const colors = ['Black', 'White', 'Gray', 'Navy'];
+  
+  // 사이즈 선택이 필요 없는 카테고리 확인
+  const shouldShowSizeSelection = () => {
+    if (!product.category) return true; // 카테고리 정보가 없으면 사이즈 선택 표시
+    
+    const noSizeCategories = ['가방', '시계', '악세사리'];
+    return !noSizeCategories.some(cat => 
+      product.category?.toLowerCase().includes(cat.toLowerCase())
+    );
+  };
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
+    // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인
+    if (shouldShowSizeSelection() && !selectedSize) {
       alert('사이즈를 선택해주세요.');
       return;
     }
@@ -274,30 +285,32 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
               </div>
             </div>
 
-            {/* 사이즈 선택 */}
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold mb-2 flex items-center">
-                <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-                </span>
-                사이즈 선택 <span className="text-red-500 ml-1">*</span>
-              </h3>
-              <div className="grid grid-cols-5 gap-2">
-                {sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`py-2 border-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 ${
-                      selectedSize === size
-                        ? 'border-indigo-500 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
-                        : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+            {/* 사이즈 선택 - 특정 카테고리에만 표시 */}
+            {shouldShowSizeSelection() && (
+              <div className="mb-4">
+                <h3 className="text-sm font-semibold mb-2 flex items-center">
+                  <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
+                  </span>
+                  사이즈 선택 <span className="text-red-500 ml-1">*</span>
+                </h3>
+                <div className="grid grid-cols-5 gap-2">
+                  {sizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      className={`py-2 border-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:scale-105 ${
+                        selectedSize === size
+                          ? 'border-indigo-500 bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg'
+                          : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* 수량 선택 */}
             <div className="mb-5">
