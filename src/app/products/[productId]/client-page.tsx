@@ -25,6 +25,12 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+
+  // 클라이언트 사이드 렌더링 확인
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // 상품 데이터 로드
   useEffect(() => {
@@ -145,7 +151,8 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   
   // 사이즈 선택이 필요 없는 카테고리 확인 - useMemo로 최적화
   const shouldShowSizeSelection = useMemo(() => {
-    if (!product?.category) return true;
+    // 클라이언트 사이드에서만 실행
+    if (!isClient || !product?.category) return false;
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     const categoryStr = product.category.toString().toLowerCase().trim();
@@ -153,6 +160,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     // 디버깅 로그 (임시)
     if (productId === '12') {
       console.log('🔍 shouldShowSizeSelection useMemo 디버깅:', {
+        isClient,
         productCategory: product.category,
         categoryStr,
         noSizeCategories,
@@ -164,7 +172,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
     return !noSizeCategories.some(cat => 
       categoryStr.includes(cat.toLowerCase())
     );
-  }, [product?.category, productId]);
+  }, [product?.category, productId, isClient]);
 
   const handleAddToCart = () => {
     // 사이즈 선택이 필요한 카테고리에서만 사이즈 확인
