@@ -42,8 +42,6 @@ export const mainProductService = {
         throw new Error(`상품 조회 실패: ${error.message}`)
       }
 
-      console.log('Fetched products from DB:', data?.length || 0)
-      console.log('Raw DB data:', data)
       return data as MainProduct[]
     } catch (error) {
       console.error('Get active products error:', error)
@@ -79,9 +77,6 @@ export const mainProductService = {
   // 카테고리별 상품 조회 (카테고리명 기준) - 메인사이트용 (완전 재작성)
   async getProductsByCategoryName(categoryName: string): Promise<MainProduct[]> {
     try {
-      console.log('=== 카테고리별 상품 조회 (재작성 버전) ===');
-      console.log('요청된 카테고리명:', categoryName);
-      
       // 1단계: 모든 상품을 먼저 가져와서 확인
       const { data: allProducts, error: allError } = await supabase
         .from('products')
@@ -95,8 +90,6 @@ export const mainProductService = {
         console.error('전체 상품 조회 오류:', allError);
         throw new Error(`전체 상품 조회 실패: ${allError.message}`)
       }
-
-      console.log('전체 상품 수:', allProducts?.length || 0);
       
       // 2단계: 카테고리명을 ID로 매핑
       const categoryNameToIdMapping: Record<string, number> = {
@@ -114,41 +107,16 @@ export const mainProductService = {
       };
       
       const targetCategoryId = categoryNameToIdMapping[categoryName];
-      console.log(`카테고리 "${categoryName}" → ID: ${targetCategoryId}`);
       
       if (!targetCategoryId) {
-        console.log('❌ 매핑되지 않은 카테고리명:', categoryName);
         return [];
       }
       
-      // 3단계: 해당 카테고리 상품 필터링 (여러 방식으로 시도)
+      // 3단계: 해당 카테고리 상품 필터링
       const filteredProducts = allProducts?.filter(product => {
-        // 방법 1: category_id로 직접 비교
-        const matchByCategoryId = product.category_id === targetCategoryId;
-        
-        // 방법 2: 카테고리 객체의 이름으로 비교
-        const matchByCategoryName = product.categories?.name === categoryName;
-        
-        console.log(`상품 "${product.name}":`, {
-          category_id: product.category_id,
-          categories_name: product.categories?.name,
-          targetCategoryId,
-          targetCategoryName: categoryName,
-          matchByCategoryId,
-          matchByCategoryName
-        });
-        
-        return matchByCategoryId || matchByCategoryName;
+        // category_id로 직접 비교 또는 카테고리 객체의 이름으로 비교
+        return product.category_id === targetCategoryId || product.categories?.name === categoryName;
       }) || [];
-      
-      console.log(`최종 필터링된 상품 수: ${filteredProducts.length}`);
-      console.log('필터링된 상품들:', filteredProducts.map(p => ({ 
-        id: p.id, 
-        name: p.name, 
-        category_id: p.category_id,
-        categories_name: p.categories?.name 
-      })));
-      console.log('=== 카테고리별 상품 조회 완료 ===');
       
       return filteredProducts as MainProduct[]
     } catch (error) {
@@ -246,16 +214,9 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   // 카테고리 이름 결정 로직 개선
   let categoryName = '미분류';
   
-  console.log('상품 변환:', {
-    productName: mainProduct.name,
-    categoryId: mainProduct.category_id,
-    categoryObject: mainProduct.category
-  });
-  
   if (mainProduct.category?.name) {
     // DB에서 가져온 카테고리 이름 사용
     categoryName = mainProduct.category.name;
-    console.log('DB 카테고리 이름 사용:', categoryName);
   } else if (mainProduct.category_id) {
     // category_id만 있는 경우 메인 사이트와 동일한 순서로 매핑
     const categoryMapping: Record<number, string> = {
@@ -272,10 +233,7 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
       11: '중고명품'      // 메인 사이트 순서 11번
     };
     categoryName = categoryMapping[mainProduct.category_id] || '미분류';
-    console.log('매핑을 통한 카테고리 이름:', categoryName);
   }
-  
-  console.log(`상품 "${mainProduct.name}" 최종 카테고리:`, categoryName);
   
   return {
     id: mainProduct.id.toString(),
