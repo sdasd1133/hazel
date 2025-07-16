@@ -133,30 +133,45 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
   
   // 사이즈 선택이 필요 없는 카테고리 확인
   const shouldShowSizeSelection = () => {
+    console.log('=== SIZE SELECTION DEBUG ===');
+    console.log('Product object:', product);
+    console.log('Product name:', product.name);
+    console.log('Product ID:', product.id);
+    
     if (!product.category) {
-      console.log('카테고리 정보가 없어서 사이즈 선택 표시');
+      console.log('❌ 카테고리 정보가 없어서 사이즈 선택 표시');
       return true; // 카테고리 정보가 없으면 사이즈 선택 표시
     }
     
     // 디버깅용 콘솔 출력
-    console.log('Product category:', product.category);
-    console.log('Product category type:', typeof product.category);
+    console.log('✅ Product category:', product.category);
+    console.log('✅ Product category type:', typeof product.category);
     
     const noSizeCategories = ['가방', '시계', '악세사리'];
     
     // 더 엄격한 카테고리 매칭
     const categoryStr = product.category.toString().toLowerCase().trim();
+    console.log('✅ Category string processed:', `"${categoryStr}"`);
+    
     const shouldHide = noSizeCategories.some(cat => {
-      const match = categoryStr.includes(cat.toLowerCase());
-      console.log(`"${categoryStr}" includes "${cat.toLowerCase()}"?`, match);
+      const catLower = cat.toLowerCase();
+      const match = categoryStr.includes(catLower);
+      console.log(`🔍 "${categoryStr}" includes "${catLower}"?`, match);
       return match;
     });
     
     const shouldShow = !shouldHide;
     
-    console.log('Should show size selection:', shouldShow);
-    console.log('No size categories:', noSizeCategories);
-    console.log('Category string processed:', categoryStr);
+    console.log('🎯 Should HIDE size selection:', shouldHide);
+    console.log('🎯 Should SHOW size selection:', shouldShow);
+    console.log('📝 No size categories:', noSizeCategories);
+    console.log('=== SIZE SELECTION DEBUG END ===');
+    
+    // 가방 상품은 강제로 false 반환 (임시 테스트)
+    if (categoryStr.includes('가방')) {
+      console.log('🚫 FORCE HIDE: 가방 카테고리 감지됨');
+      return false;
+    }
     
     return shouldShow;
   };
