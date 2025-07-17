@@ -1,19 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucid  // 바지 사이즈 필터링 (tags에서 pantssize: 프리픽스로 저장된 사이즈 추출)
-  const availablePantsSizes = product.tags 
-    ? allPantsSizes.filter(size => 
-        product.tags!.some(tag => tag.startsWith('pantssize:') && tag.includes(size.value))
-      )
-    : [];
-
-  // 신발 사이즈 필터링 (tags에서 shoesize: 프리픽스로 저장된 사이즈 추출)
-  const availableShoeSizes = product.tags 
-    ? allShoeSizes.filter(size => 
-        product.tags!.some(tag => tag.startsWith('shoesize:') && tag.includes(size.value))
-      )
-    : [];port { useCartStore } from "@/lib/cartStore";
+import { Heart } from "lucide-react";
+import { useCartStore } from "@/lib/cartStore";
 import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
 
@@ -92,14 +81,14 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
   // 바지 사이즈 필터링 (tags에서 pantssize: 프리픽스로 저장된 사이즈 추출)
   const availablePantsSizes = product.tags 
     ? allPantsSizes.filter(size => 
-        product.tags.some(tag => tag.startsWith('pantssize') && tag.includes(size.value))
+        product.tags!.some(tag => tag.startsWith('pantssize:') && tag.includes(size.value))
       )
     : [];
 
   // 신발 사이즈 필터링 (tags에서 shoesize: 프리픽스로 저장된 사이즈 추출)
   const availableShoeSizes = product.tags 
     ? allShoeSizes.filter(size => 
-        product.tags.some(tag => tag.startsWith('shoesize') && tag.includes(size.value))
+        product.tags!.some(tag => tag.startsWith('shoesize:') && tag.includes(size.value))
       )
     : [];
 
