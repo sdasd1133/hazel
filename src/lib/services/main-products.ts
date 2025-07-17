@@ -102,9 +102,9 @@ export const mainProductService = {
       
       // 2단계: 카테고리명을 ID로 매핑 (실제 DB 구조에 맞게 수정)
       const categoryNameToIdMapping: Record<string, number> = {
-        '남성의류': 1,
-        '여성의류': 2,
-        '스포츠의류': 3,
+        '남성의류': 2,     // 실제 DB ID: 2
+        '여성의류': 3,     // 실제 DB ID: 3
+        '스포츠의류': 7,   // 실제 DB ID: 7
         '모자': 9,         // 실제 DB ID: 9
         '가방': 5,         // 실제 DB ID: 5
         '신발': 6,         // 실제 DB ID: 6
@@ -130,17 +130,6 @@ export const mainProductService = {
       // 3단계: 해당 카테고리 상품 필터링 (category_id로만 비교)
       const filteredProducts = allProducts?.filter(product => {
         const matches = product.category_id === targetCategoryId;
-        
-        // 각 상품별 필터링 결과 로그
-        console.log(`🔍 상품 필터링 확인:`, {
-          productId: product.id,
-          productName: product.name,
-          product_category_id: product.category_id,
-          target_category_id: targetCategoryId,
-          matches: matches,
-          category_from_join: product.categories
-        });
-        
         return matches;
       }) || [];
       
@@ -252,29 +241,18 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   // 카테고리 이름 결정 로직 개선
   let categoryName = '미분류';
   
-  // 디버깅 로그 추가
-  console.log('🔍 상품 변환 시작:', {
-    productId: mainProduct.id,
-    productName: mainProduct.name,
-    category_id: mainProduct.category_id,
-    category_object: mainProduct.category,
-    categories_join: mainProduct.categories
-  });
-  
   if (mainProduct.categories?.name) {
     // DB 조인에서 가져온 카테고리 이름 사용 (우선순위)
     categoryName = mainProduct.categories.name;
-    console.log('🔍 카테고리 결정: DB 조인에서 가져온 이름 사용:', categoryName);
   } else if (mainProduct.category?.name) {
     // DB에서 가져온 카테고리 이름 사용
     categoryName = mainProduct.category.name;
-    console.log('🔍 카테고리 결정: DB category 객체에서 가져온 이름 사용:', categoryName);
   } else if (mainProduct.category_id) {
     // category_id만 있는 경우 실제 DB 구조에 맞게 매핑
     const categoryMapping: Record<number, string> = {
-      1: '남성의류',
-      2: '여성의류',
-      3: '스포츠의류',
+      2: '남성의류',     // 실제 DB ID: 2
+      3: '여성의류',     // 실제 DB ID: 3
+      7: '스포츠의류',   // 실제 DB ID: 7
       5: '가방',         // 실제 DB ID: 5
       6: '신발',         // 실제 DB ID: 6
       8: '시계',         // 실제 DB ID: 8
@@ -283,18 +261,7 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
       20: '악세사리'     // 실제 DB ID: 20
     };
     categoryName = categoryMapping[mainProduct.category_id] || '미분류';
-    console.log('🔍 카테고리 결정: category_id 매핑 사용:', {
-      category_id: mainProduct.category_id,
-      mapped_name: categoryName,
-      mapping: categoryMapping
-    });
   }
-  
-  console.log('🔍 최종 카테고리 결정:', {
-    productId: mainProduct.id,
-    productName: mainProduct.name,
-    finalCategory: categoryName
-  });
   
   return {
     id: mainProduct.id.toString(),
