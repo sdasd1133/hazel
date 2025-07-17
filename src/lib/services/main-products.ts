@@ -102,8 +102,8 @@ export const mainProductService = {
       
       // 2단계: 카테고리명을 ID로 매핑 (실제 DB 구조에 맞게 수정)
       const categoryNameToIdMapping: Record<string, number> = {
-        '남성의류': 2,     // 실제 DB ID: 2
-        '여성의류': 3,     // 실제 DB ID: 3
+        '여성의류': 2,     // 실제 DB ID: 2
+        '남성의류': 3,     // 실제 DB ID: 3
         '스포츠의류': 7,   // 실제 DB ID: 7
         '모자': 9,         // 실제 DB ID: 9
         '가방': 5,         // 실제 DB ID: 5
@@ -250,8 +250,8 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   } else if (mainProduct.category_id) {
     // category_id만 있는 경우 실제 DB 구조에 맞게 매핑
     const categoryMapping: Record<number, string> = {
-      2: '남성의류',     // 실제 DB ID: 2
-      3: '여성의류',     // 실제 DB ID: 3
+      2: '여성의류',     // 실제 DB ID: 2
+      3: '남성의류',     // 실제 DB ID: 3
       7: '스포츠의류',   // 실제 DB ID: 7
       5: '가방',         // 실제 DB ID: 5
       6: '신발',         // 실제 DB ID: 6
