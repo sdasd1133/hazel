@@ -16,11 +16,78 @@ export interface MainProduct {
   featured: boolean
   created_at: string
   updated_at: string
+  colors?: string[]  // 추가: 상품 색상 정보
+  sizes?: string[]   // 추가: 상품 사이즈 정보
   category?: {
     id: number
     name: string
     slug: string
   }
+  categories?: {  // Supabase 조인 결과용
+    id: number
+    name: string
+    slug: string
+  }
+}
+
+// 색상과 사이즈 정보를 가져오는 헬퍼 함수들
+const getProductColors = async (productId: number): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('product_colors')
+      .select('color')
+      .eq('product_id', productId)
+      .order('id')
+
+    if (error) {
+      console.error('Product colors fetch error:', error)
+      return []
+    }
+
+    return data?.map(item => item.color) || []
+  } catch (error) {
+    console.error('Get product colors error:', error)
+    return []
+  }
+}
+
+const getProductSizes = async (productId: number): Promise<string[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('product_sizes')
+      .select('size')
+      .eq('product_id', productId)
+      .order('id')
+
+    if (error) {
+      console.error('Product sizes fetch error:', error)
+      return []
+    }
+
+    return data?.map(item => item.size) || []
+  } catch (error) {
+    console.error('Get product sizes error:', error)
+    return []
+  }
+}
+
+// 상품에 색상과 사이즈 정보를 추가하는 함수
+const enrichProductWithOptions = async (product: MainProduct): Promise<MainProduct> => {
+  const [colors, sizes] = await Promise.all([
+    getProductColors(product.id),
+    getProductSizes(product.id)
+  ])
+
+  return {
+    ...product,
+    colors,
+    sizes
+  }
+}
+
+// 여러 상품에 색상과 사이즈 정보를 추가하는 함수
+const enrichProductsWithOptions = async (products: MainProduct[]): Promise<MainProduct[]> => {
+  return Promise.all(products.map(product => enrichProductWithOptions(product)))
 }
 
 // 메인사이트용 상품 서비스
@@ -42,7 +109,8 @@ export const mainProductService = {
         throw new Error(`상품 조회 실패: ${error.message}`)
       }
 
-      return data as MainProduct[]
+      // 색상과 사이즈 정보를 추가하여 반환
+      return await enrichProductsWithOptions(data as MainProduct[])
     } catch (error) {
       console.error('Get active products error:', error)
       throw error
@@ -145,7 +213,8 @@ export const mainProductService = {
         }))
       });
       
-      return filteredProducts as MainProduct[]
+      // 색상과 사이즈 정보를 추가하여 반환
+      return await enrichProductsWithOptions(filteredProducts as MainProduct[])
     } catch (error) {
       console.error('Get products by category name error:', error)
       throw error
@@ -177,7 +246,8 @@ export const mainProductService = {
       }
 
       console.log('Fetched product:', data);
-      return data as MainProduct
+      // 색상과 사이즈 정보를 추가하여 반환
+      return await enrichProductWithOptions(data as MainProduct)
     } catch (error) {
       console.error('Get product error:', error)
       throw error
@@ -270,8 +340,8 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
     category: categoryName,
     description: mainProduct.description || '',
     images: mainProduct.images.length > 0 ? mainProduct.images : ['/placeholder-product.jpg'],
-    sizes: [], // DB에서 sizes 정보가 없으므로 빈 배열
-    colors: [], // DB에서 colors 정보가 없으므로 빈 배열
+    sizes: mainProduct.sizes || [], // DB에서 가져온 사이즈 정보 사용
+    colors: mainProduct.colors || [], // DB에서 가져온 색상 정보 사용
     isFeatured: mainProduct.featured,
     inStock: mainProduct.stock_quantity > 0 && mainProduct.status === 'active'
   }

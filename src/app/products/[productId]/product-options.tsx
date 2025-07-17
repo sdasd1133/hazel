@@ -87,13 +87,8 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
     product.colors && product.colors.includes(color.value)
   );
 
-  // 상품에 색상이 지정되지 않은 경우 기본 색상 사용
-  const colors = availableColors.length > 0 ? availableColors : [
-    { label: '블랙', value: 'Black' },
-    { label: '화이트', value: 'White' },
-    { label: '그레이', value: 'Gray' },
-    { label: '네이비', value: 'Navy' }
-  ];
+  // 상품에 색상이 지정되지 않은 경우 빈 배열로 설정 (색상 선택 UI 숨김)
+  const colors = availableColors.length > 0 ? availableColors : [];
 
   // 사이즈 선택이 필요한 카테고리 확인
   const shouldShowSizeSelection = () => {
@@ -113,9 +108,12 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
       productSizes: product.sizes,
       availableColors: availableColors.map(c => c.label),
       availableSizes: availableSizes.map(s => s.label),
+      finalColors: colors.map(c => c.label),
+      finalSizes: sizes.map(s => s.label),
       sizeType: isShoeCategory ? 'shoe' : 'clothing',
       noSizeCategories,
-      shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase()))
+      shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase())),
+      willShowColorSelection: colors.length > 0
     });
     
     return !noSizeCategories.some(cat => 
