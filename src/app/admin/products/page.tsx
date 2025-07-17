@@ -23,6 +23,11 @@ export default function AdminProductsPage() {
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [selectedShoeSizes, setSelectedShoeSizes] = useState<string[]>([])  // 신발 사이즈 상태 추가
   const [selectedPantsSizes, setSelectedPantsSizes] = useState<string[]>([])  // 바지 사이즈 상태 추가
+  
+  // 카테고리 필터링 상태 추가
+  const [selectedCategory, setSelectedCategory] = useState<number>(0) // 0은 전체
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+  
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
@@ -105,6 +110,16 @@ export default function AdminProductsPage() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // 카테고리 필터링 useEffect 추가
+  useEffect(() => {
+    if (selectedCategory === 0) {
+      setFilteredProducts(products)
+    } else {
+      const filtered = products.filter(product => product.category_id === selectedCategory)
+      setFilteredProducts(filtered)
+    }
+  }, [products, selectedCategory])
 
   const loadData = async () => {
     try {
@@ -495,6 +510,22 @@ export default function AdminProductsPage() {
     })
   }
 
+  // 카테고리별 상품 필터링 함수
+  const filterProductsByCategory = (categoryId: number) => {
+    if (categoryId === 0) {
+      setFilteredProducts(products) // 전체 상품
+    } else {
+      const filtered = products.filter(product => product.category_id === categoryId)
+      setFilteredProducts(filtered)
+    }
+  }
+
+  // 카테고리 선택 변경 핸들러
+  const handleCategoryFilter = (categoryId: number) => {
+    setSelectedCategory(categoryId)
+    filterProductsByCategory(categoryId)
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -513,6 +544,36 @@ export default function AdminProductsPage() {
         >
           상품 등록
         </button>
+      </div>
+
+      {/* 카테고리 필터링 섹션 */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-1">카테고리 필터</label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleCategoryFilter(0)}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+              selectedCategory === 0
+                ? 'bg-blue-500 text-white shadow-md'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            전체
+          </button>
+          {categories.map(category => (
+            <button
+              key={category.id}
+              onClick={() => handleCategoryFilter(category.id)}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                selectedCategory === category.id
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* 상품 등록/수정 폼 */}
@@ -940,6 +1001,42 @@ export default function AdminProductsPage() {
 
       {/* 상품 목록 */}
       <div className="bg-white rounded-lg shadow">
+        {/* 카테고리 필터 UI */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">카테고리 필터:</span>
+            <button
+              onClick={() => handleCategoryFilter(0)}
+              className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                selectedCategory === 0
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              전체 ({products.length})
+            </button>
+            {categories.map((category) => {
+              const categoryProductCount = products.filter(p => p.category_id === category.id).length;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategoryFilter(category.id)}
+                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                    selectedCategory === category.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {category.name} ({categoryProductCount})
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            현재 표시 중: {filteredProducts.length}개 상품
+          </div>
+        </div>
+        
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
@@ -965,69 +1062,77 @@ export default function AdminProductsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
-                <tr key={product.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {product.name}
-                    </div>
-                    {product.featured && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                        추천
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {getCategoryNameById(product.category_id)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.sale_price && product.sale_price !== product.price ? (
-                      <div>
-                        <span className="line-through text-gray-500">
-                          ₩{product.price.toLocaleString()}
-                        </span>
-                        <br />
-                        <span className="text-red-600 font-semibold">
-                          ₩{product.sale_price.toLocaleString()}
-                        </span>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <tr key={product.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {product.name}
                       </div>
-                    ) : (
-                      <span>₩{product.price.toLocaleString()}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.stock_quantity}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      product.status === 'active' ? 'bg-green-100 text-green-800' :
-                      product.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-                      product.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {product.status === 'active' ? '판매중' :
-                       product.status === 'draft' ? '임시저장' :
-                       product.status === 'inactive' ? '판매중지' : '품절'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      삭제
-                    </button>
+                      {product.featured && (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          추천
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {getCategoryNameById(product.category_id)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {product.sale_price && product.sale_price !== product.price ? (
+                        <div>
+                          <span className="line-through text-gray-500">
+                            ₩{product.price.toLocaleString()}
+                          </span>
+                          <br />
+                          <span className="text-red-600 font-semibold">
+                            ₩{product.sale_price.toLocaleString()}
+                          </span>
+                        </div>
+                      ) : (
+                        <span>₩{product.price.toLocaleString()}</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {product.stock_quantity}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        product.status === 'active' ? 'bg-green-100 text-green-800' :
+                        product.status === 'draft' ? 'bg-gray-100 text-gray-800' :
+                        product.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {product.status === 'active' ? '판매중' :
+                         product.status === 'draft' ? '임시저장' :
+                         product.status === 'inactive' ? '판매중지' : '품절'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                    해당 카테고리에 등록된 상품이 없습니다.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
