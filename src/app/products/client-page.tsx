@@ -209,7 +209,7 @@ export default function ProductsPage() {
         <>
         <div className="flex flex-col md:flex-row gap-6">
           {/* 카테고리 필터 사이드바 */}
-          <div className="w-full md:w-1/5 mb-6">
+          <div className="w-full md:w-1/6 mb-6">
             <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
                 <h2 className="text-lg font-bold text-white flex items-center">
