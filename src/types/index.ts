@@ -8,6 +8,7 @@ export interface Product {
   images: string[];
   sizes: string[];
   colors: string[];
+  tags?: string[]; // 상품 태그 (사이즈/색상 정보 포함)
   isFeatured?: boolean;
   inStock: boolean;
 }

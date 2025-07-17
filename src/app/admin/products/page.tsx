@@ -22,6 +22,7 @@ export default function AdminProductsPage() {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [selectedShoeSizes, setSelectedShoeSizes] = useState<string[]>([])  // 신발 사이즈 상태 추가
+  const [selectedPantsSizes, setSelectedPantsSizes] = useState<string[]>([])  // 바지 사이즈 상태 추가
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
     description: '',
@@ -64,6 +65,16 @@ export default function AdminProductsPage() {
     { label: '42', value: '42' },
     { label: '43', value: '43' },
     { label: '44', value: '44' }
+  ]
+
+  // 바지 사이즈 옵션 (30~40)
+  const availablePantsSizes = [
+    { label: '30', value: '30' },
+    { label: '32', value: '32' },
+    { label: '34', value: '34' },
+    { label: '36', value: '36' },
+    { label: '38', value: '38' },
+    { label: '40', value: '40' }
   ]
   const availableColors = [
     { label: '블랙', value: 'Black' },
@@ -242,7 +253,8 @@ export default function AdminProductsPage() {
           ...formData.tags,
           ...selectedSizes.map(size => `size:${size}`),
           ...selectedColors.map(color => `color:${color}`),
-          ...selectedShoeSizes.map(size => `shoesize:${size}`)  // 신발 사이즈 추가
+          ...selectedShoeSizes.map(size => `shoesize:${size}`),  // 신발 사이즈 추가
+          ...selectedPantsSizes.map(size => `pantssize:${size}`)  // 바지 사이즈 추가
         ]
       }
       
@@ -307,13 +319,16 @@ export default function AdminProductsPage() {
       const sizes = product.tags.filter(tag => tag.startsWith('size:')).map(tag => tag.replace('size:', ''))
       const colors = product.tags.filter(tag => tag.startsWith('color:')).map(tag => tag.replace('color:', ''))
       const shoeSizes = product.tags.filter(tag => tag.startsWith('shoesize:')).map(tag => tag.replace('shoesize:', ''))  // 신발 사이즈 로드
+      const pantsSizes = product.tags.filter(tag => tag.startsWith('pantssize:')).map(tag => tag.replace('pantssize:', ''))  // 바지 사이즈 로드
       setSelectedSizes(sizes)
       setSelectedColors(colors)
       setSelectedShoeSizes(shoeSizes)  // 신발 사이즈 상태 설정
+      setSelectedPantsSizes(pantsSizes)  // 바지 사이즈 상태 설정
     } else {
       setSelectedSizes([])
       setSelectedColors([])
       setSelectedShoeSizes([])  // 신발 사이즈 초기화
+      setSelectedPantsSizes([])  // 바지 사이즈 초기화
     }
     
     // 편집 시에는 파일 배열 초기화 (기존 이미지는 URL로 처리)
@@ -446,6 +461,15 @@ export default function AdminProductsPage() {
     )
   }
 
+  // 바지 사이즈 선택 토글 핸들러
+  const togglePantsSize = (size: string) => {
+    setSelectedPantsSizes(prev => 
+      prev.includes(size) 
+        ? prev.filter(s => s !== size)
+        : [...prev, size]
+    )
+  }
+
   // 폼 리셋 시 이미지도 초기화
   const resetForm = () => {
     setShowForm(false)
@@ -455,6 +479,7 @@ export default function AdminProductsPage() {
     setSelectedSizes([])
     setSelectedColors([])
     setSelectedShoeSizes([])  // 신발 사이즈 초기화 추가
+    setSelectedPantsSizes([])  // 바지 사이즈 초기화 추가
     setFormData({
       name: '',
       description: '',
@@ -857,6 +882,39 @@ export default function AdminProductsPage() {
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
                   복수 선택 가능합니다. 신발 상품에 적용됩니다.
+                </div>
+              </div>
+
+              {/* 바지 사이즈 선택 섹션 */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <label className="block text-sm font-medium mb-2">바지 사이즈 선택</label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                    {availablePantsSizes.map((size) => (
+                      <button
+                        key={size.value}
+                        type="button"
+                        onClick={() => togglePantsSize(size.value)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                          selectedPantsSizes.includes(size.value)
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {size.label}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedPantsSizes.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        선택된 바지 사이즈: {selectedPantsSizes.join(', ')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  복수 선택 가능합니다. 바지 상품에 적용됩니다.
                 </div>
               </div>
 

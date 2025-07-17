@@ -1,8 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Heart } from "lucide-react";
-import { useCartStore } from "@/lib/cartStore";
+import { Heart } from "lucid  // 바지 사이즈 필터링 (tags에서 pantssize: 프리픽스로 저장된 사이즈 추출)
+  const availablePantsSizes = product.tags 
+    ? allPantsSizes.filter(size => 
+        product.tags!.some(tag => tag.startsWith('pantssize:') && tag.includes(size.value))
+      )
+    : [];
+
+  // 신발 사이즈 필터링 (tags에서 shoesize: 프리픽스로 저장된 사이즈 추출)
+  const availableShoeSizes = product.tags 
+    ? allShoeSizes.filter(size => 
+        product.tags!.some(tag => tag.startsWith('shoesize:') && tag.includes(size.value))
+      )
+    : [];port { useCartStore } from "@/lib/cartStore";
 import { useWishlistStore } from "@/lib/wishlistStore";
 import { Product } from "@/types";
 
@@ -57,12 +68,48 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
     { label: '44', value: '44' }
   ];
 
+  // 바지 사이즈 목록 (inch 단위)
+  const allPantsSizes = [
+    { label: '30', value: '30' },
+    { label: '32', value: '32' },
+    { label: '34', value: '34' },
+    { label: '36', value: '36' },
+    { label: '38', value: '38' },
+    { label: '40', value: '40' }
+  ];
+
   // 카테고리에 따라 사이즈 목록 선택
   const isShoeCategory = product.category && 
     (product.category.toString().toLowerCase().includes('신발') || 
      product.category.toString().toLowerCase().includes('shoe'));
 
-  const allSizes = isShoeCategory ? allShoeSizes : allClothingSizes;
+  // 바지 카테고리 감지 추가
+  const isPantsCategory = product.category && 
+    (product.category.toString().toLowerCase().includes('바지') || 
+     product.category.toString().toLowerCase().includes('pants') || 
+     product.category.toString().toLowerCase().includes('하의'));
+
+  // 바지 사이즈 필터링 (tags에서 pantssize: 프리픽스로 저장된 사이즈 추출)
+  const availablePantsSizes = product.tags 
+    ? allPantsSizes.filter(size => 
+        product.tags.some(tag => tag.startsWith('pantssize') && tag.includes(size.value))
+      )
+    : [];
+
+  // 신발 사이즈 필터링 (tags에서 shoesize: 프리픽스로 저장된 사이즈 추출)
+  const availableShoeSizes = product.tags 
+    ? allShoeSizes.filter(size => 
+        product.tags.some(tag => tag.startsWith('shoesize') && tag.includes(size.value))
+      )
+    : [];
+
+  // 카테고리와 실제 데이터에 따라 사이즈 목록 결정
+  let allSizes = allClothingSizes;
+  if (isShoeCategory && availableShoeSizes.length > 0) {
+    allSizes = allShoeSizes;
+  } else if (isPantsCategory && availablePantsSizes.length > 0) {
+    allSizes = allPantsSizes;
+  }
 
   // 상품에 지정된 사이즈만 필터링
   const availableSizes = allSizes.filter(size => 
@@ -114,13 +161,17 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
       productCategory: product.category,
       categoryStr,
       isShoeCategory,
+      isPantsCategory,
       productColors: product.colors,
       productSizes: product.sizes,
+      productTags: product.tags || [],
       availableColors: availableColors.map(c => c.label),
       availableSizes: availableSizes.map(s => s.label),
+      availableShoeSizes: availableShoeSizes.map(s => s.label),
+      availablePantsSizes: availablePantsSizes.map(s => s.label),
       finalColors: colors.map(c => c.label),
       finalSizes: sizes.map(s => s.label),
-      sizeType: isShoeCategory ? 'shoe' : 'clothing',
+      sizeType: isShoeCategory ? 'shoe' : isPantsCategory ? 'pants' : 'clothing',
       noSizeCategories,
       shouldShow: !noSizeCategories.some(cat => categoryStr.includes(cat.toLowerCase())),
       willShowColorSelection: colors.length > 0
@@ -198,10 +249,19 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
             <span className="w-4 h-4 mr-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
             </span>
-            {isShoeCategory ? '신발 사이즈 선택 (mm)' : '사이즈 선택'}
+            {isShoeCategory && availableShoeSizes.length > 0 
+              ? '신발 사이즈 선택' 
+              : isPantsCategory && availablePantsSizes.length > 0 
+              ? '바지 사이즈 선택 (inch)' 
+              : '사이즈 선택'}
           </h3>
           <div className="flex gap-2 flex-wrap">
-            {sizes.map((size) => (
+            {/* 카테고리와 데이터에 따라 적절한 사이즈 목록 표시 */}
+            {(isShoeCategory && availableShoeSizes.length > 0 
+              ? availableShoeSizes 
+              : isPantsCategory && availablePantsSizes.length > 0 
+              ? availablePantsSizes 
+              : sizes).map((size) => (
               <button
                 key={size.value}
                 onClick={() => setSelectedSize(size.value)}

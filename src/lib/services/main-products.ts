@@ -55,14 +55,23 @@ const extractShoeSizesFromTags = (tags: string[] | undefined): string[] => {
     .map(tag => tag.replace('shoesize:', ''))
 }
 
+const extractPantsSizesFromTags = (tags: string[] | undefined): string[] => {
+  if (!tags || !Array.isArray(tags)) return []
+  
+  return tags
+    .filter(tag => tag.startsWith('pantssize:'))
+    .map(tag => tag.replace('pantssize:', ''))
+}
+
 // 상품에 색상과 사이즈 정보를 추가하는 함수 (tags에서 추출)
 const enrichProductWithOptions = async (product: MainProduct): Promise<MainProduct> => {
   const colors = extractColorsFromTags(product.tags)
   const regularSizes = extractSizesFromTags(product.tags)
   const shoeSizes = extractShoeSizesFromTags(product.tags)
+  const pantsSizes = extractPantsSizesFromTags(product.tags)
   
-  // 일반 사이즈와 신발 사이즈를 합쳐서 sizes 배열에 저장
-  const sizes = [...regularSizes, ...shoeSizes]
+  // 일반 사이즈, 신발 사이즈, 바지 사이즈를 합쳐서 sizes 배열에 저장
+  const sizes = [...regularSizes, ...shoeSizes, ...pantsSizes]
 
   console.log('🎨 색상/사이즈 정보 추출:', {
     productId: product.id,
@@ -71,6 +80,7 @@ const enrichProductWithOptions = async (product: MainProduct): Promise<MainProdu
     extractedColors: colors,
     extractedRegularSizes: regularSizes,
     extractedShoeSizes: shoeSizes,
+    extractedPantsSizes: pantsSizes,
     finalSizes: sizes
   })
 
@@ -338,6 +348,7 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
     images: mainProduct.images.length > 0 ? mainProduct.images : ['/placeholder-product.jpg'],
     sizes: mainProduct.sizes || [], // DB에서 가져온 사이즈 정보 사용
     colors: mainProduct.colors || [], // DB에서 가져온 색상 정보 사용
+    tags: mainProduct.tags || [], // DB에서 가져온 태그 정보 사용
     isFeatured: mainProduct.featured,
     inStock: mainProduct.stock_quantity > 0 && mainProduct.status === 'active'
   }
