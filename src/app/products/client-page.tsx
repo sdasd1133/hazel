@@ -207,46 +207,6 @@ export default function ProductsPage() {
       {/* 메인 콘텐츠 - 로딩 중이 아닐 때만 표시 */}
       {!isLoading && !error && (
         <>
-        {/* 상위 카테고리 필터 */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-3 border-b pb-6 mb-6">
-            <button
-              onClick={() => navigateTo({ parent: undefined, category: undefined })}
-              className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${
-                !parent && !category
-                  ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
-                  : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"
-              }`}
-            >
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-                전체
-              </span>
-            </button>
-            
-            {parentCategories.map((parentCategory) => (
-              <button
-                key={parentCategory.id}
-                onClick={() => navigateTo({ parent: parentCategory.id, category: undefined })}
-                className={`px-6 py-3 text-sm font-medium rounded-full transition-all duration-200 transform hover:scale-105 ${
-                  parent === parentCategory.id
-                    ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg"
-                    : "bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-md"
-                }`}
-              >
-                <span className="flex items-center">
-                  <span className={`w-2 h-2 rounded-full mr-2 ${
-                    parent === parentCategory.id ? "bg-white" : "bg-gray-400"
-                  }`}></span>
-                  {parentCategory.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="flex flex-col md:flex-row gap-6">
           {/* 카테고리 필터 사이드바 */}
           <div className="w-full md:w-1/5 mb-6">
@@ -262,6 +222,23 @@ export default function ProductsPage() {
               
               <div className="p-4">
                 <div className="space-y-2">
+                  {/* 전체 버튼 추가 */}
+                  <button
+                    onClick={() => navigateTo({ parent: undefined, category: undefined })}
+                    className={`w-full text-left px-3 py-2 rounded-lg transition-all duration-200 flex items-center justify-between group mb-3 ${
+                      !parent && !category
+                        ? "bg-gradient-to-r from-indigo-50 to-purple-50 border-l-4 border-indigo-500 text-indigo-700 font-medium"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-indigo-600"
+                    }`}
+                  >
+                    <span className="flex items-center">
+                      <span className={`w-2 h-2 rounded-full mr-3 ${
+                        !parent && !category ? "bg-indigo-500" : "bg-gray-300 group-hover:bg-indigo-400"
+                      }`}></span>
+                      <span className="font-medium">전체</span>
+                    </span>
+                  </button>
+                  
                   {parentCategories.map((parentCat) => {
                     const childCategories = getCategoriesByParent(parentCat.id);
                     const isExpanded = expandedParentCategories.includes(parentCat.id);
