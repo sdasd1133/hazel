@@ -32,11 +32,6 @@ export const categoryToParentMapping: Record<string, string> = {
   "벨트": "accessories",
   "깔맞춤": "best",
   "중고명품": "best",
-  // 하위 카테고리 추가
-  "남성 상의": "clothing",
-  "남성 하의": "clothing",
-  "여성 상의": "clothing",
-  "여성 하의": "clothing",
 };
 
 // 샘플 상품 데이터 - 모든 데모 상품 제거
@@ -71,12 +66,7 @@ export const getCategories = () => {
     "시계",
     "벨트",
     "깔맞춤",
-    "중고명품",
-    // 하위 카테고리 추가
-    "남성 상의",
-    "남성 하의",
-    "여성 상의",
-    "여성 하의"
+    "중고명품"
   ];
   
   return predefinedCategories.map(name => ({

@@ -174,12 +174,7 @@ export const mainProductService = {
         '신발': 6,         // 실제 DB ID: 6
         '시계': 8,         // 실제 DB ID: 8
         '벨트': 10,        // 실제 DB ID: 10
-        '악세사리': 20,    // 실제 DB ID: 20
-        // 하위 카테고리 추가
-        '남성 상의': 3,    // 남성의류와 동일한 ID 사용
-        '남성 하의': 3,    // 남성의류와 동일한 ID 사용
-        '여성 상의': 2,    // 여성의류와 동일한 ID 사용
-        '여성 하의': 2     // 여성의류와 동일한 ID 사용
+        '악세사리': 20     // 실제 DB ID: 20
       };
       
       const targetCategoryId = categoryNameToIdMapping[categoryName];
