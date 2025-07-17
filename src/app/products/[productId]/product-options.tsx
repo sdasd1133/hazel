@@ -26,7 +26,7 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
     { label: '2XL (110)', value: '2XL' }
   ];
 
-  // 신발 사이즈 목록 (한국 기준)
+  // 신발 사이즈 목록 (한국 기준 mm + 유럽 사이즈)
   const allShoeSizes = [
     { label: '220', value: '220' },
     { label: '225', value: '225' },
@@ -44,7 +44,17 @@ export default function ProductOptions({ product }: ProductOptionsProps) {
     { label: '285', value: '285' },
     { label: '290', value: '290' },
     { label: '295', value: '295' },
-    { label: '300', value: '300' }
+    { label: '300', value: '300' },
+    // 유럽 사이즈 (관리자에서 설정한 사이즈)
+    { label: '36', value: '36' },
+    { label: '37', value: '37' },
+    { label: '38', value: '38' },
+    { label: '39', value: '39' },
+    { label: '40', value: '40' },
+    { label: '41', value: '41' },
+    { label: '42', value: '42' },
+    { label: '43', value: '43' },
+    { label: '44', value: '44' }
   ];
 
   // 카테고리에 따라 사이즈 목록 선택

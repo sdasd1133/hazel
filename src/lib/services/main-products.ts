@@ -47,17 +47,31 @@ const extractSizesFromTags = (tags: string[] | undefined): string[] => {
     .map(tag => tag.replace('size:', ''))
 }
 
+const extractShoeSizesFromTags = (tags: string[] | undefined): string[] => {
+  if (!tags || !Array.isArray(tags)) return []
+  
+  return tags
+    .filter(tag => tag.startsWith('shoesize:'))
+    .map(tag => tag.replace('shoesize:', ''))
+}
+
 // 상품에 색상과 사이즈 정보를 추가하는 함수 (tags에서 추출)
 const enrichProductWithOptions = async (product: MainProduct): Promise<MainProduct> => {
   const colors = extractColorsFromTags(product.tags)
-  const sizes = extractSizesFromTags(product.tags)
+  const regularSizes = extractSizesFromTags(product.tags)
+  const shoeSizes = extractShoeSizesFromTags(product.tags)
+  
+  // 일반 사이즈와 신발 사이즈를 합쳐서 sizes 배열에 저장
+  const sizes = [...regularSizes, ...shoeSizes]
 
   console.log('🎨 색상/사이즈 정보 추출:', {
     productId: product.id,
     productName: product.name,
     tags: product.tags,
     extractedColors: colors,
-    extractedSizes: sizes
+    extractedRegularSizes: regularSizes,
+    extractedShoeSizes: shoeSizes,
+    finalSizes: sizes
   })
 
   return {
@@ -160,7 +174,12 @@ export const mainProductService = {
         '신발': 6,         // 실제 DB ID: 6
         '시계': 8,         // 실제 DB ID: 8
         '벨트': 10,        // 실제 DB ID: 10
-        '악세사리': 20     // 실제 DB ID: 20
+        '악세사리': 20,    // 실제 DB ID: 20
+        // 하위 카테고리 추가
+        '남성 상의': 3,    // 남성의류와 동일한 ID 사용
+        '남성 하의': 3,    // 남성의류와 동일한 ID 사용
+        '여성 상의': 2,    // 여성의류와 동일한 ID 사용
+        '여성 하의': 2     // 여성의류와 동일한 ID 사용
       };
       
       const targetCategoryId = categoryNameToIdMapping[categoryName];
