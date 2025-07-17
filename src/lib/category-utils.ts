@@ -3,7 +3,7 @@ export const categoryUrlMapping: Record<string, string> = {
   "남성의류": "/category/men-clothing",
   "여성의류": "/category/women-clothing", 
   "스포츠의류": "/category/sports-clothing",
-  "가방": "/category/bags",
+  "가방&지갑": "/category/bags",
   "신발": "/category/shoes",
   "시계": "/category/watches",
   "모자": "/category/hats",

@@ -180,7 +180,7 @@ export const mainProductService = {
         '남성의류': 3,     // 실제 DB ID: 3
         '스포츠의류': 7,   // 실제 DB ID: 7
         '모자': 9,         // 실제 DB ID: 9
-        '가방': 5,         // 실제 DB ID: 5
+        '가방&지갑': 5,    // 실제 DB ID: 5
         '신발': 6,         // 실제 DB ID: 6
         '시계': 8,         // 실제 DB ID: 8
         '벨트': 10,        // 실제 DB ID: 10
@@ -329,7 +329,7 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
       2: '여성의류',     // 실제 DB ID: 2
       3: '남성의류',     // 실제 DB ID: 3
       7: '스포츠의류',   // 실제 DB ID: 7
-      5: '가방',         // 실제 DB ID: 5
+      5: '가방&지갑',    // 실제 DB ID: 5
       6: '신발',         // 실제 DB ID: 6
       8: '시계',         // 실제 DB ID: 8
       9: '모자',         // 실제 DB ID: 9
