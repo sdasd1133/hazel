@@ -30,53 +30,35 @@ export interface MainProduct {
   }
 }
 
-// 색상과 사이즈 정보를 가져오는 헬퍼 함수들
-const getProductColors = async (productId: string): Promise<string[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('product_colors')
-      .select('color')
-      .eq('product_id', productId)
-      .order('id')
-
-    if (error) {
-      console.error('Product colors fetch error:', error)
-      return []
-    }
-
-    return data?.map(item => item.color) || []
-  } catch (error) {
-    console.error('Get product colors error:', error)
-    return []
-  }
+// 색상과 사이즈 정보를 tags에서 추출하는 헬퍼 함수들
+const extractColorsFromTags = (tags: string[] | undefined): string[] => {
+  if (!tags || !Array.isArray(tags)) return []
+  
+  return tags
+    .filter(tag => tag.startsWith('color:'))
+    .map(tag => tag.replace('color:', ''))
 }
 
-const getProductSizes = async (productId: string): Promise<string[]> => {
-  try {
-    const { data, error } = await supabase
-      .from('product_sizes')
-      .select('size')
-      .eq('product_id', productId)
-      .order('id')
-
-    if (error) {
-      console.error('Product sizes fetch error:', error)
-      return []
-    }
-
-    return data?.map(item => item.size) || []
-  } catch (error) {
-    console.error('Get product sizes error:', error)
-    return []
-  }
+const extractSizesFromTags = (tags: string[] | undefined): string[] => {
+  if (!tags || !Array.isArray(tags)) return []
+  
+  return tags
+    .filter(tag => tag.startsWith('size:'))
+    .map(tag => tag.replace('size:', ''))
 }
 
-// 상품에 색상과 사이즈 정보를 추가하는 함수
+// 상품에 색상과 사이즈 정보를 추가하는 함수 (tags에서 추출)
 const enrichProductWithOptions = async (product: MainProduct): Promise<MainProduct> => {
-  const [colors, sizes] = await Promise.all([
-    getProductColors(product.id),
-    getProductSizes(product.id)
-  ])
+  const colors = extractColorsFromTags(product.tags)
+  const sizes = extractSizesFromTags(product.tags)
+
+  console.log('🎨 색상/사이즈 정보 추출:', {
+    productId: product.id,
+    productName: product.name,
+    tags: product.tags,
+    extractedColors: colors,
+    extractedSizes: sizes
+  })
 
   return {
     ...product,
