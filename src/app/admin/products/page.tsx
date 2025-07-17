@@ -819,6 +819,39 @@ export default function AdminProductsPage() {
                 </div>
               )}
 
+              {/* 바지 사이즈 선택 섹션 */}
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <label className="block text-sm font-medium mb-2">바지 사이즈 선택</label>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                    {availablePantsSizes.map((size) => (
+                      <button
+                        key={size.value}
+                        type="button"
+                        onClick={() => togglePantsSize(size.value)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
+                          selectedPantsSizes.includes(size.value)
+                            ? 'bg-blue-500 text-white border-blue-500'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {size.label}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedPantsSizes.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="text-sm text-gray-600">
+                        선택된 바지 사이즈: {selectedPantsSizes.join(', ')}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  복수 선택 가능합니다. 바지 상품에 적용됩니다.
+                </div>
+              </div>
+
               {/* 색상 선택 섹션 */}
               <div>
                 <label className="block text-sm font-medium mb-2">색상 선택</label>
@@ -882,39 +915,6 @@ export default function AdminProductsPage() {
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
                   복수 선택 가능합니다. 신발 상품에 적용됩니다.
-                </div>
-              </div>
-
-              {/* 바지 사이즈 선택 섹션 */}
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <label className="block text-sm font-medium mb-2">바지 사이즈 선택</label>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-                    {availablePantsSizes.map((size) => (
-                      <button
-                        key={size.value}
-                        type="button"
-                        onClick={() => togglePantsSize(size.value)}
-                        className={`px-3 py-2 text-sm font-medium rounded-md border transition-colors ${
-                          selectedPantsSizes.includes(size.value)
-                            ? 'bg-blue-500 text-white border-blue-500'
-                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        {size.label}
-                      </button>
-                    ))}
-                  </div>
-                  {selectedPantsSizes.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        선택된 바지 사이즈: {selectedPantsSizes.join(', ')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  복수 선택 가능합니다. 바지 상품에 적용됩니다.
                 </div>
               </div>
 
