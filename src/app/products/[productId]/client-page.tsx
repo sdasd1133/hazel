@@ -34,7 +34,7 @@ export default function ProductClientPage({ productId }: ProductClientPageProps)
         
         // 먼저 DB에서 상품 검색
         try {
-          const mainProduct = await mainProductService.getProduct(parseInt(productId));
+          const mainProduct = await mainProductService.getProduct(productId);
           
           if (mainProduct) {
             const convertedProduct = convertMainProductToProduct(mainProduct);

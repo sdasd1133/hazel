@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { Product } from '@/types'
 
 export interface MainProduct {
-  id: number
+  id: string  // UUID 타입으로 수정
   name: string
   description?: string
   price: number
@@ -31,7 +31,7 @@ export interface MainProduct {
 }
 
 // 색상과 사이즈 정보를 가져오는 헬퍼 함수들
-const getProductColors = async (productId: number): Promise<string[]> => {
+const getProductColors = async (productId: string): Promise<string[]> => {
   try {
     const { data, error } = await supabase
       .from('product_colors')
@@ -51,7 +51,7 @@ const getProductColors = async (productId: number): Promise<string[]> => {
   }
 }
 
-const getProductSizes = async (productId: number): Promise<string[]> => {
+const getProductSizes = async (productId: string): Promise<string[]> => {
   try {
     const { data, error } = await supabase
       .from('product_sizes')
@@ -222,7 +222,7 @@ export const mainProductService = {
   },
 
   // 특정 상품 조회
-  async getProduct(id: number): Promise<MainProduct | null> {
+  async getProduct(id: string): Promise<MainProduct | null> {
     try {
       console.log('Fetching product with ID:', id);
       
@@ -334,7 +334,7 @@ export const convertMainProductToProduct = (mainProduct: MainProduct): Product =
   }
   
   return {
-    id: mainProduct.id.toString(),
+    id: mainProduct.id,  // 이미 string 타입이므로 toString() 불필요
     name: mainProduct.name,
     price: mainProduct.sale_price || mainProduct.price,
     category: categoryName,
